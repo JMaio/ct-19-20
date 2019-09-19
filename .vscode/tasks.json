@@ -13,9 +13,15 @@
             }
         },
         {
+            "label": "test: symbols",
+            "type": "shell",
+            "command": "java -cp bin Main -lexer tests/symbols.c symbols.out",
+            "group": "test",
+        },
+        {
             "label": "test: fibonacci",
             "type": "shell",
-            "command": "java -cp bin Main -lexer tests/fibonacci.c dummy.out",
+            "command": "java -cp bin Main -lexer tests/fibonacci.c fibonacci.out",
             "group": {
                 "kind": "test",
                 "isDefault": true

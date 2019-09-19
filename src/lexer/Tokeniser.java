@@ -43,9 +43,6 @@ public class Tokeniser {
         return result;
     }
 
-    /*
-     * To be completed
-     */
     private Token next() throws IOException {
 
         int line = scanner.getLine();
@@ -58,11 +55,86 @@ public class Tokeniser {
         if (Character.isWhitespace(c))
             return next();
 
-        // attempt to grab next character ahead of time
-        try {
-            char p = scanner.peek();
+        //  identifiers, types, keywords
+        if (Character.isLetter(c)) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(c);
+            c = scanner.peek();
+            while (Character.isLetterOrDigit(c)) {
+                sb.append(c);
+                scanner.next();
+                c = scanner.peek();
+            }
 
-            String nextPair = new String(new char[] {c, p});
+            switch (sb.toString()) {
+                // types
+                case "int"   : return new Token(TokenClass.INT,    line, column);
+                case "void"  : return new Token(TokenClass.VOID,   line, column);
+                case "char"  : return new Token(TokenClass.CHAR,   line, column);
+            
+                // keywords
+                case "if"    : return new Token(TokenClass.IF,     line, column);
+                case "else"  : return new Token(TokenClass.ELSE,   line, column);
+                case "while" : return new Token(TokenClass.WHILE,  line, column);
+                case "return": return new Token(TokenClass.RETURN, line, column);
+                case "struct": return new Token(TokenClass.STRUCT, line, column);
+                case "sizeof": return new Token(TokenClass.SIZEOF, line, column);
+
+                // just an identifier
+                default: return new Token(TokenClass.IDENTIFIER, sb.toString(), line, column);
+            }
+        }
+
+        // string literals
+        // "abcdef\""
+        if (c == '"') {
+            StringBuilder sb = new StringBuilder();
+            c = scanner.next();
+            char n = scanner.peek();
+            
+            while (c != '"') {
+                if (c != '\\') {
+                    sb.append(c);
+                }
+                String nextPair = new String(new char[] {c, n});
+                if (nextPair.equals("\\\"")) {
+                    sb.append(scanner.next());
+                    c = scanner.peek();
+                }
+                c = scanner.next();
+            }
+            return new Token(TokenClass.STRING_LITERAL, sb.toString(), line, column);
+        }
+
+        // int literals
+        if (Character.isDigit(c)) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(c);
+            c = scanner.peek();
+            // read digits
+            while (Character.isDigit(c)) {
+                sb.append(c);
+                scanner.next();
+                c = scanner.peek();
+            }
+            // finished reading digits, check proper termination
+            if (!Character.isLetter(c)) {
+                return new Token(TokenClass.INT_LITERAL, sb.toString(), line, column);
+            } else {
+                // improper termination, get whole invalid token
+                while (Character.isLetterOrDigit(c)) {
+                    scanner.next();
+                    c = scanner.peek();
+                }
+                return new Token(TokenClass.INVALID, line, column);
+            }
+        }
+
+        // attempt to grab next character ahead of time for 2-character tokens
+        try {
+            char n = scanner.peek();
+
+            String nextPair = new String(new char[] {c, n});
             switch (nextPair) {
                 /** line comment */
                 case "//": {
@@ -73,6 +145,7 @@ public class Tokeniser {
                     }
                     return next();
                 }
+
                 /** multiline comment */
                 case "/*": {
                     char curr = scanner.next();
@@ -85,31 +158,36 @@ public class Tokeniser {
                     scanner.next();
                     return next();
                 }
+
+                /** comparisons */
+                case "!=": {
+                    scanner.next();
+                    return new Token(TokenClass.NE, line, column);
+                }
                 case "==": {
                     scanner.next();
                     return new Token(TokenClass.EQ, line, column);
                 }
+                case "<=": {
+                    scanner.next();
+                    return new Token(TokenClass.LE, line, column);
+                }
+                case ">=": {
+                    scanner.next();
+                    return new Token(TokenClass.GE, line, column);
+                }
+
+                /** logical operators */
+                case "&&": {
+                    scanner.next();
+                    return new Token(TokenClass.AND, line, column);
+                }
+                case "||": {
+                    scanner.next();
+                    return new Token(TokenClass.OR, line, column);
+                }
             }
             
-            // if (nextPair.equals("//")) {
-            //     char curr = scanner.next();
-            //     // brute-force newline as '\n'
-            //     while (curr != '\n') {
-            //         curr = scanner.next();
-            //     }
-            //     return next();
-            // }
-            // if (nextPair.equals("/*")) {
-            //     char curr = scanner.next();
-            //     String end = new String(new char[] {curr, scanner.peek()});
-            //     while (!end.equals("*/")) {
-            //         curr = scanner.next();
-            //         end = new String(new char[] {curr, scanner.peek()});
-            //     }
-            //     // skip two characters
-            //     scanner.next();
-            //     return next();
-            // }
         } catch (EOFException e) {
             // end of file reached, only match basic tokens
         }
@@ -117,79 +195,31 @@ public class Tokeniser {
         /** --- basic tokens --- */
         switch (c) {
             /** delimiters */
-            case '{': return new Token(TokenClass.LBRA, line, column);
-            case '}': return new Token(TokenClass.RBRA, line, column);
-            case '(': return new Token(TokenClass.LPAR, line, column);
-            case ')': return new Token(TokenClass.RPAR, line, column);
-            case '[': return new Token(TokenClass.LSBR, line, column);
-            case ']': return new Token(TokenClass.RSBR, line, column);
-            case ';': return new Token(TokenClass.SC, line, column);
-            case ',': return new Token(TokenClass.COMMA, line, column);
+            case '{': return new Token(TokenClass.LBRA,    line, column);
+            case '}': return new Token(TokenClass.RBRA,    line, column);
+            case '(': return new Token(TokenClass.LPAR,    line, column);
+            case ')': return new Token(TokenClass.RPAR,    line, column);
+            case '[': return new Token(TokenClass.LSBR,    line, column);
+            case ']': return new Token(TokenClass.RSBR,    line, column);
+            case ';': return new Token(TokenClass.SC,      line, column);
+            case ',': return new Token(TokenClass.COMMA,   line, column);
             
             /** operators */
-            case '+': return new Token(TokenClass.PLUS, line, column);
-            case '-': return new Token(TokenClass.MINUS, line, column);
+            case '+': return new Token(TokenClass.PLUS,    line, column);
+            case '-': return new Token(TokenClass.MINUS,   line, column);
             case '*': return new Token(TokenClass.ASTERIX, line, column);
-            case '/': return new Token(TokenClass.DIV, line, column);
-            case '%': return new Token(TokenClass.REM, line, column);
+            case '/': return new Token(TokenClass.DIV,     line, column);
+            case '%': return new Token(TokenClass.REM,     line, column);
             
             /** struct member access */
-            case '.': return new Token(TokenClass.DOT, line, column);
+            case '.': return new Token(TokenClass.DOT,     line, column);
             
             /** comparisons */
-            case '=': {
-                if (p == '=') {
-                    scanner.next();
-                    return new Token(TokenClass.EQ, line, column);
-                }
-                // not an EQ, default to assign
-                return new Token(TokenClass.ASSIGN, line, column);
-            }
-            case '<': {
-                if (p == '=') {
-                    scanner.next();
-                    return new Token(TokenClass.LE, line, column);
-                }
-                return new Token(TokenClass.LT, line, column);                
-            }
-            case '>': {
-                if (p == '=') {
-                    scanner.next();
-                    return new Token(TokenClass.GE, line, column);
-                }
-                return new Token(TokenClass.GT, line, column);                
-            }
+            case '=': return new Token(TokenClass.ASSIGN,  line, column);
+            case '<': return new Token(TokenClass.LT,      line, column);
+            case '>': return new Token(TokenClass.GT,      line, column);
 
-            /** logical operators */
-            case '&': {
-                if (p == '&') {
-                    scanner.next();
-                    return new Token(TokenClass.AND, line, column);
-                }
-                // dereference?
-                // return new Token(TokenClass.?, line, column);
-            }
-            case '|': {
-                if (p == '|') {
-                    scanner.next();
-                    return new Token(TokenClass.OR, line, column);
-                }
-            }
         }
-
-        /** --- text tokens --- */
-        if (Character.isLetter(c)) {
-            /** types */
-
-            /** keywords */
-
-            /** include */
-
-            /** literals */
-        }
-
-
-
 
         // if we reach this point, it means we did not recognise a valid token
         error(c, line, column);
