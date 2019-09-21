@@ -173,6 +173,54 @@ public class Tokeniser {
                 return new Token(TokenClass.INVALID, "bad int: " + sb.toString(), line, column);
             }
         }
+        
+        // character literals
+        // 'a', '\\', '\n', ...
+        if (c == '\'') {
+            StringBuilder sb = new StringBuilder();
+            c = scanner.next();
+
+            if (c == '\'') {
+                return new Token(TokenClass.INVALID, "empty char literal", line, column);
+            } else if (c == '\\') {
+                // escape sequence
+                c = scanner.next();
+                if (escapedChars.containsKey(c)) {
+                    sb.append(escapedChars.get(c));
+                } else {
+                    // invalid escape sequence
+                    error("\\" + c, line, column);
+                }
+                // skip escaped character
+            } else {
+                // 'single' character
+                sb.append(c);
+            }
+            
+            // check end quote
+            char endChar = scanner.next();
+            
+            if (endChar == '\'') {
+                if (sb.length() == 0) {
+                    return new Token(TokenClass.INVALID, "illegal char literal", line, column);
+                }
+                return new Token(TokenClass.CHAR_LITERAL, sb.toString(), line, column);
+            } else {
+                // keep going if:
+                // - last character is a backslash followed by a single quote
+                // or
+                // - last character not followed by single quote
+                // [', \, ', (\ - here), ', ']
+                while ((endChar == '\\' && scanner.peek() == '\'') || (scanner.peek() != '\'')) {
+                    sb.append(endChar);
+                    endChar = scanner.next();
+                }
+                sb.append(endChar);
+                // skip end quote
+                scanner.next();
+                return new Token(TokenClass.INVALID, "bad char: [" + sb.toString() + "]", line, column);
+            }
+        }
 
         // attempt to grab next character ahead of time for 2-character tokens
         try {
