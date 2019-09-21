@@ -121,7 +121,7 @@ public class Tokeniser {
             if (sb.toString().equals("#include")) {
                 return new Token(TokenClass.INCLUDE, line, column);
             } else {
-                return new Token(TokenClass.INVALID, sb.toString(), line, column);
+                return new Token(TokenClass.INVALID, "bad include: " + sb.toString(), line, column);
             }
         }
 
@@ -167,10 +167,10 @@ public class Tokeniser {
             } else {
                 // improper termination, get whole invalid token
                 while (Character.isLetterOrDigit(c)) {
-                    scanner.next();
+                    sb.append(scanner.next());
                     c = scanner.peek();
                 }
-                return new Token(TokenClass.INVALID, line, column);
+                return new Token(TokenClass.INVALID, "bad int: " + sb.toString(), line, column);
             }
         }
 
