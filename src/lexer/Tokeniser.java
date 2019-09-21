@@ -222,34 +222,44 @@ public class Tokeniser {
             }
         }
 
-        // attempt to grab next character ahead of time for 2-character tokens
+        // attempt to grab next character ahead of time for 2-(non-alpha)character tokens
+        // comments
         try {
             char n = scanner.peek();
-
             String nextPair = new String(new char[] {c, n});
-            switch (nextPair) {
-                /** line comment */
-                case "//": {
-                    char curr = scanner.next();
-                    // brute-force newline as '\n'
-                    while (curr != '\n') {
-                        curr = scanner.next();
+            try {
+                switch (nextPair) {
+                    /** line comment */
+                    case "//": {
+                        System.out.println("line comment!");
+                        // stop comment at newline char '\n'
+                        while (scanner.peek() != '\n') {
+                            c = scanner.next();
+                        }
+                        // skip two characters
+                        c = scanner.next();
+                        return next();
                     }
-                    return next();
-                }
-
-                /** multiline comment */
-                case "/*": {
-                    char curr = scanner.next();
-                    String end = new String(new char[] {curr, scanner.peek()});
-                    while (!end.equals("*/")) {
-                        curr = scanner.next();
-                        end = new String(new char[] {curr, scanner.peek()});
+    
+                    /** multiline comment */
+                    case "/*": {
+                        // System.out.println("multiline comment!");
+                        // skip to inside comment
+                        scanner.next();
+                        c = scanner.next();
+                        while (!(c == '*' && scanner.peek() == '/')) {
+                            c = scanner.next();
+                        }
+                        // skip two characters
+                        c = scanner.next();
+                        return next();
                     }
-                    // skip two characters
-                    scanner.next();
-                    return next();
                 }
+            } catch (EOFException e) {
+                return new Token(TokenClass.EOF, scanner.getLine(), scanner.getColumn());
+            }
+        } catch (EOFException e) {}
+        // if EOF reached, simply continue
 
                 /** comparisons */
                 case "!=": {
