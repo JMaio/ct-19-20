@@ -74,11 +74,12 @@ public class Tokeniser {
             return next();
 
         //  identifiers, types, keywords
-        if (Character.isLetter(c)) {
+        if (Character.isLetter(c) || c == '_') {
             StringBuilder sb = new StringBuilder();
             sb.append(c);
             c = scanner.peek();
-            while (Character.isLetterOrDigit(c)) {
+
+            while (Character.isLetterOrDigit(c) || c == '_') {
                 sb.append(c);
                 scanner.next();
                 c = scanner.peek();
