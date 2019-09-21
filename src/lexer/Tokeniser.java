@@ -4,6 +4,8 @@ import lexer.Token.TokenClass;
 
 import java.io.EOFException;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author cdubach
