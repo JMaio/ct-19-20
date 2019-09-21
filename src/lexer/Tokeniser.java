@@ -51,6 +51,7 @@ public class Tokeniser {
         return result;
     }
 
+    // https://www.baeldung.com/java-initialize-hashmap - section 2.
     private static final Map<Character, Character> escapedChars = new HashMap<Character, Character>() {{
         put('t',  '\t');
         put('b',  '\b');
