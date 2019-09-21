@@ -261,6 +261,10 @@ public class Tokeniser {
         } catch (EOFException e) {}
         // if EOF reached, simply continue
 
+        try {
+            char n = scanner.peek();
+            String nextPair = new String(new char[] {c, n});
+            switch(nextPair) {
                 /** comparisons */
                 case "!=": {
                     scanner.next();
@@ -290,9 +294,8 @@ public class Tokeniser {
                 }
             }
             
-        } catch (EOFException e) {
-            // end of file reached, only match basic tokens
-        }
+        } catch (EOFException e) {}
+        // end of file reached, only match basic tokens
 
         /** --- basic tokens --- */
         switch (c) {
@@ -321,6 +324,8 @@ public class Tokeniser {
             case '<': return new Token(TokenClass.LT,      line, column);
             case '>': return new Token(TokenClass.GT,      line, column);
 
+            // match newline characters before EOF
+            case '\n': return next();
         }
 
         // if we reach this point, it means we did not recognise a valid token
