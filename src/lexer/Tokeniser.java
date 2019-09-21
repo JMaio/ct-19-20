@@ -21,11 +21,17 @@ public class Tokeniser {
         this.scanner = scanner;
     }
 
-    private void error(char c, int line, int col) {
-        System.out.println("Lexing error: unrecognised character ("+c+") at "+line+":"+col);
-	    error++;
+    // more flexible string overload
+    private void error(String s, int line, int col) {
+        System.out.println("Lexing error: unrecognised character (" + s + ") at " + line + ":" + col);
+        error++;
     }
 
+    private void error(char c, int line, int col) {
+        error(Character.toString(c), line, col);
+        // System.out.println("Lexing error: unrecognised character ("+c+") at "+line+":"+col);
+	    error++;
+    }    
 
     public Token nextToken() {
         Token result;
@@ -42,6 +48,18 @@ public class Tokeniser {
         }
         return result;
     }
+
+    private static final Map<Character, Character> escapedChars = new HashMap<Character, Character>() {{
+        put('t',  '\t');
+        put('b',  '\b');
+        put('n',  '\n');
+        put('r',  '\r');
+        put('f',  '\f');
+        put('0',  '\0');
+        put('\'', '\'');
+        put('"',  '\"');
+        put('\\', '\\');
+    }};
 
     private Token next() throws IOException {
 
@@ -109,16 +127,20 @@ public class Tokeniser {
         if (c == '"') {
             StringBuilder sb = new StringBuilder();
             c = scanner.next();
-            char n = scanner.peek();
             
+            // until current character is string terminator
             while (c != '"') {
-                if (c != '\\') {
+                if (c == '\\') {
+                    // escaped character
+                    c = scanner.next();
+                    if (escapedChars.containsKey(c)) {
+                        // valid escape character
+                        sb.append(escapedChars.get(c));
+                    } else {
+                        error("\\" + c, line, column);
+                    }
+                } else {
                     sb.append(c);
-                }
-                String nextPair = new String(new char[] {c, n});
-                if (nextPair.equals("\\\"")) {
-                    sb.append(scanner.next());
-                    c = scanner.peek();
                 }
                 c = scanner.next();
             }
