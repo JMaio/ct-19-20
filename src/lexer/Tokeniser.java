@@ -85,6 +85,25 @@ public class Tokeniser {
             }
         }
 
+        // #include
+        if (c == '#') {
+            StringBuilder sb = new StringBuilder();
+            sb.append(c);
+            c = scanner.peek();
+            
+            while(Character.isLetterOrDigit(c)) {
+                sb.append(c);
+                scanner.next();
+                c = scanner.peek();
+            }
+
+            if (sb.toString().equals("#include")) {
+                return new Token(TokenClass.INCLUDE, line, column);
+            } else {
+                return new Token(TokenClass.INVALID, sb.toString(), line, column);
+            }
+        }
+
         // string literals
         // "abcdef\""
         if (c == '"') {
