@@ -79,6 +79,7 @@ public class Tokeniser {
         if (Character.isLetter(c) || c == '_') {
             StringBuilder sb = new StringBuilder();
             sb.append(c);
+            // peek to make sure scanner remains in correct position
             c = scanner.peek();
 
             while (Character.isLetterOrDigit(c) || c == '_') {
@@ -129,6 +130,7 @@ public class Tokeniser {
         // "abcdef\""
         if (c == '"') {
             StringBuilder sb = new StringBuilder();
+            // delimited by double quotes so no need to peek
             c = scanner.next();
             
             // until current character is string terminator

@@ -1,7 +1,7 @@
 { } ( ) [ ] ; , 
 int void char 
 if else while return struct sizeof
-
+=
 // include
 #include somefile
 #includea 
@@ -24,6 +24,7 @@ if else while return struct sizeof
 '\\' 
 '\'' 
 '\'\'' 
+' \' \' \\ \' ' 
 '\a'
 // 'abcdef'
 // 'abc\''
@@ -60,7 +61,11 @@ __ = 3
 
 // line comment 
 []
+//
 /* multiline 
 comment */
+/**/
 {}
+*
 // comment at the end
+/**/
