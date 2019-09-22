@@ -31,8 +31,6 @@ public class Tokeniser {
 
     private void error(char c, int line, int col) {
         error(Character.toString(c), line, col);
-        // System.out.println("Lexing error: unrecognised character ("+c+") at "+line+":"+col);
-	    error++;
     }    
 
     public Token nextToken() {
@@ -123,6 +121,7 @@ public class Tokeniser {
             if (sb.toString().equals("#include")) {
                 return new Token(TokenClass.INCLUDE, line, column);
             } else {
+                error(sb.toString(), line, column);
                 return new Token(TokenClass.INVALID, "bad include: " + sb.toString(), line, column);
             }
         }
@@ -173,6 +172,7 @@ public class Tokeniser {
                     sb.append(scanner.next());
                     c = scanner.peek();
                 }
+                error(sb.toString(), line, column);
                 return new Token(TokenClass.INVALID, "bad int: " + sb.toString(), line, column);
             }
         }
@@ -184,6 +184,7 @@ public class Tokeniser {
             c = scanner.next();
 
             if (c == '\'') {
+                error("{empty char literal}", line, column);
                 return new Token(TokenClass.INVALID, "empty char literal", line, column);
             } else if (c == '\\') {
                 // escape sequence
@@ -193,6 +194,7 @@ public class Tokeniser {
                 } else {
                     // invalid escape sequence
                     error("\\" + c, line, column);
+                    sb.append('\\' + c);
                 }
                 // skip escaped character
             } else {
@@ -204,10 +206,11 @@ public class Tokeniser {
             char endChar = scanner.next();
             
             if (endChar == '\'') {
-                if (sb.length() == 0) {
-                    return new Token(TokenClass.INVALID, "illegal char literal", line, column);
+                if (sb.length() == 1) {
+                    return new Token(TokenClass.CHAR_LITERAL, sb.toString(), line, column);
+                } else {
+                    return new Token(TokenClass.INVALID, "illegal char literal [" + sb.toString() + "]", line, column);
                 }
-                return new Token(TokenClass.CHAR_LITERAL, sb.toString(), line, column);
             } else {
                 // keep going if:
                 // - last character is a backslash followed by a single quote
@@ -221,6 +224,7 @@ public class Tokeniser {
                 sb.append(endChar);
                 // skip end quote
                 scanner.next();
+                error(sb.toString(), line, column);
                 return new Token(TokenClass.INVALID, "bad char: [" + sb.toString() + "]", line, column);
             }
         }

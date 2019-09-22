@@ -1,11 +1,18 @@
-{ } ( ) [ ] ; , 
-int void char 
-if else while return struct sizeof
-=
+// { } ( ) [ ] ; , 
+// int void char 
+// if else while return struct sizeof
+// =
+
+comments
+// nested // here
+after_comment
+/* this // is a /* nested comment? */
+after_nested_comment
+
 // include
 #include somefile
-#includea 
-#includea123
+#includea       // 1
+#includea123    // 2
 
 // something silly?
 // \\
@@ -13,28 +20,30 @@ if else while return struct sizeof
 // strings
 "" // pass
 "hello"  // pass
-"\nescape\nme\n...\n\\\\\"hello\" there\n" // pass
+"\nescape\nme\n...\n\\\"hello\" there\n" // pass
 "\"perhaps\""
-"this is \very wrong"
+"this is \very wrong" // 3
 
 // chars
-'' 
+''              // 4
 'x' 
 '\n' 
 '\\' 
 '\'' 
-'\'\'' 
-' \' \' \\ \' ' 
-'\a'
-// 'abcdef'
-// 'abc\''
+'\'\''          // 5
+' \' \' \\ \' ' // 6
+'\a'            // 7
+'='
+'=12345'        // 8
+'abcdef'        // 9
+'abc\''         // 10
 
 // ints
 0
 001
 123
 -1234 
-1234e10 // not actually valid mini-c
+1234e10         // 11 (not actually valid mini-c)
 
 // idents
 hello 
@@ -53,11 +62,11 @@ __ = 3
 .
 
 // invalid
-123abc
-123abc;
+123abc          // 12
+123abc;         // 13
 
-123abc123a3a56a01
-123abc123;
+12a123a3a56a01  // 14
+123abc123;      // 15
 
 // line comment 
 []
