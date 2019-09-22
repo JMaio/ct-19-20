@@ -26,6 +26,12 @@
                 "kind": "test",
                 "isDefault": true
             }
+        },
+        {
+            "label": "test: tictactoe",
+            "type": "shell",
+            "command": "java -cp bin Main -lexer tests/tictactoe.c tictactoe.out",
+            "group": "test"
         }
     ]
 }
