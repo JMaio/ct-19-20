@@ -234,7 +234,7 @@ public class Tokeniser {
                 switch (nextPair) {
                     /** line comment */
                     case "//": {
-                        System.out.println("line comment!");
+                        // System.out.println("line comment!");
                         // stop comment at newline char '\n'
                         while (scanner.peek() != '\n') {
                             c = scanner.next();
