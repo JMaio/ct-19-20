@@ -181,50 +181,29 @@ public class Tokeniser {
             StringBuilder sb = new StringBuilder();
             c = scanner.next();
 
-            if (c == '\'') {
-                error("{empty char literal}", line, column);
-                return new Token(TokenClass.INVALID, "empty char literal", line, column);
-            } else if (c == '\\') {
-                // escape sequence
+            while (c != '\'') {
+                if (c == '\\') {
+                    c = scanner.next();
+                    if (escapedChars.containsKey(c)) {
+                        sb.append(escapedChars.get(c));
+                    } else {
+                        // invalid escape sequence
+                        error("\\" + c, line, column);
+                        sb.append('\\' + c);
+                    }
+                } else {
+                    sb.append(c);
+                }
                 c = scanner.next();
-                if (escapedChars.containsKey(c)) {
-                    sb.append(escapedChars.get(c));
-                } else {
-                    // invalid escape sequence
-                    error("\\" + c, line, column);
-                    sb.append('\\' + c);
-                }
-                // skip escaped character
-            } else {
-                // 'single' character
-                sb.append(c);
             }
-            
-            // check end quote
-            char endChar = scanner.next();
-            
-            if (endChar == '\'') {
-                if (sb.length() == 1) {
-                    return new Token(TokenClass.CHAR_LITERAL, sb.toString(), line, column);
-                } else {
-                    return new Token(TokenClass.INVALID, "illegal char literal [" + sb.toString() + "]", line, column);
-                }
+
+            if (sb.length() == 1) {
+                return new Token(TokenClass.CHAR_LITERAL, sb.toString(), line, column);
             } else {
-                // keep going if:
-                // - last character is a backslash followed by a single quote
-                // or
-                // - last character not followed by single quote
-                // [', \, ', (\ - here), ', ']
-                while ((endChar == '\\' && scanner.peek() == '\'') || (scanner.peek() != '\'')) {
-                    sb.append(endChar);
-                    endChar = scanner.next();
-                }
-                sb.append(endChar);
-                // skip end quote
-                scanner.next();
-                error(sb.toString(), line, column);
-                return new Token(TokenClass.INVALID, "bad char: [" + sb.toString() + "]", line, column);
+                error("illegal char literal", line, column);
+                return new Token(TokenClass.INVALID, "illegal char literal: " + sb.toString(), line, column);
             }
+
         }
 
         // attempt to grab next character ahead of time for 2-(non-alpha)character tokens
@@ -261,10 +240,10 @@ public class Tokeniser {
                     }
                 }
             } catch (EOFException e) {
-                return new Token(TokenClass.EOF, scanner.getLine(), scanner.getColumn());
+                return new Token(TokenClass.EOF, line, column);
             }
         } catch (EOFException e) {}
-        // if EOF reached, simply continue
+        // if EOF reached, simply continue to check for 1 more char
 
         try {
             char n = scanner.peek();
