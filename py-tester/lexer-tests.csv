@@ -1,3 +1,4 @@
 lexer/symbols.c, PASS
 lexer/invalid.c, LEXER_FAIL
 fibonacci.c, PASS
+lexer/bad_end.c, LEXER_FAIL

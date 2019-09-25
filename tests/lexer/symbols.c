@@ -37,6 +37,10 @@ after_nested_comment
 123
 -1234 
 
+// should only be parse, not lexer errors
+1234e10
+
+a0
 
 // idents
 hello 
