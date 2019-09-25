@@ -13,25 +13,13 @@
             }
         },
         {
-            "label": "test: symbols",
+            "label": "run all tests",
             "type": "shell",
-            "command": "java -cp bin Main -lexer tests/symbols.c symbols.out",
-            "group": "test",
-        },
-        {
-            "label": "test: fibonacci",
-            "type": "shell",
-            "command": "java -cp bin Main -lexer tests/fibonacci.c fibonacci.out",
+            "command": "python py-tester/main.py",
             "group": {
                 "kind": "test",
-                "isDefault": true
+                "isDefault": true,
             }
-        },
-        {
-            "label": "test: tictactoe",
-            "type": "shell",
-            "command": "java -cp bin Main -lexer tests/tictactoe.c tictactoe.out",
-            "group": "test"
         }
     ]
 }
