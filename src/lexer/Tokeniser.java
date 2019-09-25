@@ -129,27 +129,33 @@ public class Tokeniser {
         // string literals
         // "abcdef\""
         if (c == '"') {
-            StringBuilder sb = new StringBuilder();
-            // delimited by double quotes so no need to peek
-            c = scanner.next();
-            
-            // until current character is string terminator
-            while (c != '"') {
-                if (c == '\\') {
-                    // escaped character
-                    c = scanner.next();
-                    if (escapedChars.containsKey(c)) {
-                        // valid escape character
-                        sb.append(escapedChars.get(c));
-                    } else {
-                        error("\\" + c, line, column);
-                    }
-                } else {
-                    sb.append(c);
-                }
+            try {
+                StringBuilder sb = new StringBuilder();
+                // delimited by double quotes so no need to peek
                 c = scanner.next();
+                
+                // until current character is string terminator
+                while (c != '"') {
+                    if (c == '\\') {
+                        // escaped character
+                        c = scanner.next();
+                        if (escapedChars.containsKey(c)) {
+                            // valid escape character
+                            sb.append(escapedChars.get(c));
+                        } else {
+                            error("\\" + c, line, column);
+                        }
+                    } else {
+                        sb.append(c);
+                    }
+                    c = scanner.next();
+                }
+                return new Token(TokenClass.STRING_LITERAL, sb.toString(), line, column);
+            } catch (EOFException e) {
+                // unclosed string - invalid
+                error("unclosed string literal", line, column);
+                return new Token(TokenClass.INVALID, "unclosed string literal", line, column);
             }
-            return new Token(TokenClass.STRING_LITERAL, sb.toString(), line, column);
         }
 
         // int literals
