@@ -40,7 +40,7 @@ def run_tests(mode, tests, logfile):
         logging.info(f"  ─┬─ {i+1:2d}: {f} [{c:3d}]")
         code = run_test(mode, f, c, logfile=logfile)
         result = c == code
-
+        failures += int(not result)
         logging.info(f"   └─── {test_result[int(result)]}! [{code:3d}]")
 
     logging.info("")
