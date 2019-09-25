@@ -162,6 +162,7 @@ public class Tokeniser {
         if (Character.isDigit(c)) {
             StringBuilder sb = new StringBuilder();
             sb.append(c);
+            
             c = scanner.peek();
             // read digits
             while (Character.isDigit(c)) {
@@ -169,18 +170,9 @@ public class Tokeniser {
                 scanner.next();
                 c = scanner.peek();
             }
-            // finished reading digits, check proper termination
-            if (!Character.isLetter(c)) {
-                return new Token(TokenClass.INT_LITERAL, sb.toString(), line, column);
-            } else {
-                // improper termination, get whole invalid token
-                while (Character.isLetterOrDigit(c)) {
-                    sb.append(scanner.next());
-                    c = scanner.peek();
-                }
-                error(sb.toString(), line, column);
-                return new Token(TokenClass.INVALID, "bad int: " + sb.toString(), line, column);
-            }
+
+            return new Token(TokenClass.INT_LITERAL, sb.toString(), line, column);
+            
         }
         
         // character literals
