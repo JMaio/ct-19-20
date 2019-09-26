@@ -137,8 +137,14 @@ public class Parser {
         }
     }
 
+    private void parseStructType() {
+        expect(TokenClass.STRUCT);
+        expect(TokenClass.IDENTIFIER);
+    }
+
     private void parseStructDecls() {
-        // to be completed ...
+        parseStructType();
+        expect(TokenClass.LBRA);
     }
 
     private void parseVarDecls() {
