@@ -1,4 +1,27 @@
+lexer/char/0.c, PASS
+lexer/char/a.c, PASS
+lexer/char/esc_0.c, PASS
+lexer/char/esc_n.c, PASS
+lexer/char/esc_dquote.c, PASS
+lexer/char/esc_squote.c, PASS
+lexer/char/sym.c, PASS
+
+lexer/str/patrick.c, PASS
+lexer/str/esc_dquote.c, PASS
+
 lexer/symbols.c, PASS
-lexer/invalid.c, LEXER_FAIL
+
 fibonacci.c, PASS
-lexer/bad_end.c, LEXER_FAIL
+
+
+lexer/char/long_char.c, LEXER_FAIL
+lexer/char/esc_a.c, LEXER_FAIL
+lexer/char/esc_dquote_2.c, LEXER_FAIL
+lexer/char/empty_char.c, LEXER_FAIL
+lexer/char/bad_end.c, LEXER_FAIL
+
+lexer/str/esc_v.c, LEXER_FAIL
+lexer/str/bad_end.c, LEXER_FAIL
+
+
+lexer/invalid.c, LEXER_FAIL
