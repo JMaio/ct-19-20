@@ -127,10 +127,9 @@ public class Tokeniser {
         }
 
         // string literals
-        // "abcdef\""
         if (c == '"') {
+            StringBuilder sb = new StringBuilder();
             try {
-                StringBuilder sb = new StringBuilder();
                 // delimited by double quotes so no need to peek
                 c = scanner.next();
                 
@@ -144,6 +143,7 @@ public class Tokeniser {
                             sb.append(escapedChars.get(c));
                         } else {
                             error("\\" + c, line, column);
+                            sb.append('\\' + c);
                         }
                     } else {
                         sb.append(c);
