@@ -1,0 +1,4 @@
+/*
+a multi line comment immediately
+followed by an EOF
+*/

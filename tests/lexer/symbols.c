@@ -1,3 +1,5 @@
+// generic test file for straight-forward cases
+
 { } ( ) [ ] ; , 
 int void char 
 if else while return struct sizeof

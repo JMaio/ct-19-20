@@ -1,27 +1,38 @@
 lexer/char/0.c, PASS
 lexer/char/a.c, PASS
 lexer/char/esc_0.c, PASS
-lexer/char/esc_n.c, PASS
 lexer/char/esc_dquote.c, PASS
+lexer/char/esc_n.c, PASS
 lexer/char/esc_squote.c, PASS
 lexer/char/sym.c, PASS
 
-lexer/str/patrick.c, PASS
+lexer/comment/multi_empty.c, PASS
+lexer/comment/multi.c, PASS
+lexer/comment/single_empty.c, PASS
+lexer/comment/single.c, PASS
+
+include.c, PASS
+lexer/include/include_123.c, PASS
+lexer/include/include_str.c, PASS
+
+lexer/str/empty.c, PASS
+lexer/str/esc_0.c, PASS
 lexer/str/esc_dquote.c, PASS
+lexer/str/patrick.c, PASS
 
 lexer/symbols.c, PASS
+lexer/int_string.c, PASS
 
 fibonacci.c, PASS
 
 
-lexer/char/long_char.c, LEXER_FAIL
-lexer/char/esc_a.c, LEXER_FAIL
-lexer/char/esc_dquote_2.c, LEXER_FAIL
-lexer/char/empty_char.c, LEXER_FAIL
-lexer/char/bad_end.c, LEXER_FAIL
+lexer/char/bad.empty_char.c, LEXER_FAIL
+lexer/char/bad.esc_a.c, LEXER_FAIL
+lexer/char/bad.esc_dquote_2.c, LEXER_FAIL
+lexer/char/bad.long_char.c, LEXER_FAIL
+lexer/char/bad.no_end.c, LEXER_FAIL
 
-lexer/str/esc_v.c, LEXER_FAIL
-lexer/str/bad_end.c, LEXER_FAIL
-
+lexer/str/bad.esc_v.c, LEXER_FAIL
+lexer/str/bad.no_end.c, LEXER_FAIL
 
 lexer/invalid.c, LEXER_FAIL
