@@ -2,6 +2,25 @@ program    ::= (include)* (structdecl)* (vardecl)* (fundecl)* EOF
 
 include    ::= "#include" STRING_LITERAL
 
-structdecl ::= structtype "{" (vardecl)+ "}" ";"    # structure declaration
+structdecl ::= structtype "{" vardecls "}" ";"    # structure declaration
 
 structtype ::= "struct" IDENT
+
+vardecls   ::= vardecl vardecls
+             | nothing
+
+vardecl    ::= type IDENT arraydecl ";"
+
+arraydecl  ::= "[" INT_LITERAL "]"
+             | nothing
+
+
+types      ::= type types
+             | nothing
+
+type       ::= ( "int" | "char" | "void" | structtype )
+
+params     ::= 
+
+
+
