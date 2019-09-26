@@ -112,18 +112,18 @@ public class Tokeniser {
             sb.append(c);
             c = scanner.peek();
             
-            while(Character.isLetterOrDigit(c)) {
+            // keep going for letters
+            while(Character.isLetter(c)) {
                 sb.append(c);
                 scanner.next();
+                
+                if (sb.toString().equals("#include")) {
+                    return new Token(TokenClass.INCLUDE, line, column);
+                }
+                
                 c = scanner.peek();
             }
 
-            if (sb.toString().equals("#include")) {
-                return new Token(TokenClass.INCLUDE, line, column);
-            } else {
-                error(sb.toString(), line, column);
-                return new Token(TokenClass.INVALID, "bad include: " + sb.toString(), line, column);
-            }
         }
 
         // string literals
