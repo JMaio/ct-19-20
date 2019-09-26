@@ -179,11 +179,19 @@ public class Parser {
 
     private void parseVarDecls() {
         parseVarDecl();
-        parseVarDecls();
+        parseExtraVarDecl();
     }
 
     private void parseExtraVarDecl() {
-        parseVarDecl();
+        if (accept(
+                TokenClass.STRUCT,
+                TokenClass.INT,
+                TokenClass.CHAR,
+                TokenClass.VOID
+            )) {
+            parseVarDecl();
+            parseExtraVarDecl();
+        };
     }
 
     private void parseArrayDecl() {
