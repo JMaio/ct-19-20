@@ -24,7 +24,7 @@ vardecl     ::= decl arraydecl ";"
 
 vardecls    ::= vardecl extravardecl
 
-extravardecl::= vardecl
+extravardecl::= vardecl extravardecl
               | nothing
 
 
