@@ -1,26 +1,43 @@
-program    ::= (include)* (structdecl)* (vardecl)* (fundecl)* EOF
+program     ::= (include)* (structdecl)* (vardecl)* (fundecl)* EOF
 
-include    ::= "#include" STRING_LITERAL
 
-structdecl ::= structtype "{" vardecls "}" ";"    # structure declaration
+# include
+include     ::= "#include" STRING_LITERAL
 
-structtype ::= "struct" IDENT
 
-vardecls   ::= vardecl vardecls
+structtype  ::= "struct" IDENT
+
+
+# structdecl
+structdecl  ::= structtype "{" vardecls "}" ";"    # structure declaration
+
+
+# vardecl
+type        ::= ( "int" | "char" | "void" | structtype ) reference
+
+reference   ::= "*"
              | nothing
 
-vardecl    ::= type IDENT arraydecl ";"
+decl        ::= type IDENT
 
-arraydecl  ::= "[" INT_LITERAL "]"
+vardecl     ::= decl arraydecl ";"
+
+vardecls    ::= vardecl extravardecl
+
+extravardecl::= vardecl
+              | nothing
+
+
+arraydecl   ::= "[" INT_LITERAL "]"
              | nothing
 
 
-types      ::= type types
+# fundecl
+fundecl     ::= decl "(" params ")" block
+
+params      ::= decl extra
              | nothing
 
-type       ::= ( "int" | "char" | "void" | structtype )
-
-params     ::= 
-
-
+extra       ::= "," decl extra
+             | nothing
 

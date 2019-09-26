@@ -146,9 +146,52 @@ public class Parser {
         parseStructType();
         expect(TokenClass.LBRA);
     }
+    
+    private void parseType() {
+        if (accept(TokenClass.STRUCT)) {
+            parseStructType();
+        } else {
+            expect(
+                TokenClass.INT,
+                TokenClass.CHAR,
+                TokenClass.VOID
+            );
+        }
+        parseReference();
+    }
+
+    private void parseReference() {
+        if (accept(TokenClass.ASTERIX)) {
+            nextToken();
+        }
+    }
+    
+    private void parseDecl() {
+        parseType();
+        expect(TokenClass.IDENTIFIER);
+    }
+
+    private void parseVarDecl() {
+        parseDecl();
+        parseArrayDecl();
+        expect(TokenClass.SC);
+    }
 
     private void parseVarDecls() {
-        // to be completed ...
+        parseVarDecl();
+        parseVarDecls();
+    }
+
+    private void parseExtraVarDecl() {
+        parseVarDecl();
+    }
+
+    private void parseArrayDecl() {
+        if (accept(TokenClass.LSBR)) {
+            nextToken();
+            expect(TokenClass.INT_LITERAL);
+            expect(TokenClass.RSBR);
+        }
     }
 
     private void parseFunDecls() {
