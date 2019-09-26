@@ -60,8 +60,8 @@ __ = 3
 + - * / %
 .
 
-// invalid
-
+// triple eq
+===
 
 // line comment 
 []

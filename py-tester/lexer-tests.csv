@@ -13,6 +13,7 @@ lexer/comment/single.c, PASS
 
 include.c, PASS
 lexer/include/include_123.c, PASS
+lexer/include/include_eof.c, PASS
 lexer/include/include_str.c, PASS
 
 lexer/str/empty.c, PASS
@@ -24,6 +25,8 @@ lexer/symbols.c, PASS
 lexer/int_string.c, PASS
 
 fibonacci.c, PASS
+
+eof.c, PASS
 
 
 lexer/char/bad.empty_char.c, LEXER_FAIL
