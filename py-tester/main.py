@@ -34,7 +34,7 @@ def run_tests(mode, tests, logfile):
     logging.info(f"====== running tests for: {mode} [ {len(tests)} ] ====== ")
 
     with open(logfile, 'a') as f:
-        f.write(f"====== {mode} [ {len(tests)} ] ====== " + '\n')
+        f.write(f"====== {mode} [ {len(tests)} ] ====== \n")
 
     for i, (f, c) in enumerate(tests):
         logging.info(f" {i+1:2d} ─┬─[{c:3d}] {f}")
@@ -42,11 +42,9 @@ def run_tests(mode, tests, logfile):
         result = c == code
         failures += int(not result)
         
-        logging.info(f"     └─[{code:3d}] {test_result[int(result)]}! ")
-        logging.info("")
+        logging.info(f"     └─[{code:3d}] {test_result[int(result)]}! \n")
 
-    logging.info(f" {mode}: - [ {len(tests) - failures} / {len(tests)} ] ")
-    logging.info("")
+    logging.info(f" {mode}: - [ {len(tests) - failures} / {len(tests)} ] \n")
 
     return failures
 
@@ -78,8 +76,7 @@ if __name__ == "__main__":
         global_tests += len(tests)
         global_fails += run_tests(mode, tests, logfile=logfile)
     
-    logging.info("_______________________________________________________")
-    logging.info("")
+    logging.info("_______________________________________________________\n")
     logging.info(f" => all tests completed!")
     logging.info(f"    └── [ {global_tests - global_fails} / {global_tests} ] passed")
 
