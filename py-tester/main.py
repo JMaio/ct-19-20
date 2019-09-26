@@ -4,7 +4,7 @@ import os
 import logging
 import datetime
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.DEBUG, format='%(message)s')
 
 codes = {
     'FILE_NOT_FOUND': 2,
@@ -31,19 +31,20 @@ def run_test(mode, filename, expected, out="a.out", logfile="test.log"):
 def run_tests(mode, tests, logfile):
     failures = 0
 
-    logging.info(f" ====== running tests for: {mode} [ {len(tests)} ] ====== ")
+    logging.info(f"====== running tests for: {mode} [ {len(tests)} ] ====== ")
 
     with open(logfile, 'a') as f:
-        f.write(f" ====== {mode} [ {len(tests)} ] ====== " + '\n')
+        f.write(f"====== {mode} [ {len(tests)} ] ====== " + '\n')
 
     for i, (f, c) in enumerate(tests):
-        logging.info(f"  ─┬─ {i+1:2d}: {f} [{c:3d}]")
+        logging.info(f" {i+1:2d} ─┬─[{c:3d}] {f}")
         code = run_test(mode, f, c, logfile=logfile)
         result = c == code
         failures += int(not result)
-        logging.info(f"   └─── {test_result[int(result)]}! [{code:3d}]")
+        
+        logging.info(f"     └─[{code:3d}] {test_result[int(result)]}! ")
+        logging.info("")
 
-    logging.info("")
     logging.info(f" {mode}: - [ {len(tests) - failures} / {len(tests)} ] ")
     logging.info("")
 
