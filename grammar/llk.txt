@@ -1,0 +1,7 @@
+program    ::= (include)* (structdecl)* (vardecl)* (fundecl)* EOF
+
+include    ::= "#include" STRING_LITERAL
+
+structdecl ::= structtype "{" (vardecl)+ "}" ";"    # structure declaration
+
+structtype ::= "struct" IDENT
