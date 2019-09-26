@@ -179,30 +179,35 @@ public class Tokeniser {
         // 'a', '\\', '\n', ...
         if (c == '\'') {
             StringBuilder sb = new StringBuilder();
-            c = scanner.next();
-
-            while (c != '\'') {
-                if (c == '\\') {
-                    c = scanner.next();
-                    if (escapedChars.containsKey(c)) {
-                        sb.append(escapedChars.get(c));
-                    } else {
-                        // invalid escape sequence
-                        error("\\" + c, line, column);
-                        sb.append('\\' + c);
-                    }
-                } else {
-                    sb.append(c);
-                }
+            try {
                 c = scanner.next();
+    
+                while (c != '\'') {
+                    if (c == '\\') {
+                        c = scanner.next();
+                        if (escapedChars.containsKey(c)) {
+                            sb.append(escapedChars.get(c));
+                        } else {
+                            // invalid escape sequence
+                            error("\\" + c, line, column);
+                            sb.append('\\' + c);
+                        }
+                    } else {
+                        sb.append(c);
+                    }
+                    c = scanner.next();
+                }                
+                if (sb.length() == 1) {
+                    return new Token(TokenClass.CHAR_LITERAL, sb.toString(), line, column);
+                } else {
+                    error("illegal char literal", line, column);
+                    return new Token(TokenClass.INVALID, "illegal char literal: " + sb.toString(), line, column);
+                }
+            } catch (EOFException e) {
+                error("unclosed char literal", line, column);
+                return new Token(TokenClass.INVALID, "unclosed char literal: " + sb.toString(), line, column);
             }
 
-            if (sb.length() == 1) {
-                return new Token(TokenClass.CHAR_LITERAL, sb.toString(), line, column);
-            } else {
-                error("illegal char literal", line, column);
-                return new Token(TokenClass.INVALID, "illegal char literal: " + sb.toString(), line, column);
-            }
 
         }
 
