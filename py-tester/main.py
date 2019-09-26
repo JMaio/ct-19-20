@@ -70,8 +70,10 @@ if __name__ == "__main__":
         file = os.path.join(dir_path, f"{mode}-{filename}")
         with open(file) as f:
             for line in f.readlines():
-                f, c = line.strip().split(',')
-                tests.append([f, codes[c.strip()]])
+                l = line.strip()
+                if l:
+                    f, c = l.split(',')
+                    tests.append([f, codes[c.strip()]])
 
         global_tests += len(tests)
         global_fails += run_tests(mode, tests, logfile=logfile)
