@@ -119,6 +119,15 @@ public class Parser {
         return result;
     }
 
+    private boolean acceptsType() {
+        return accept(
+            TokenClass.INT,
+            TokenClass.CHAR,
+            TokenClass.VOID,
+            TokenClass.STRUCT
+        );
+    }
+
 
     private void parseProgram() {
         parseIncludes();
@@ -143,8 +152,15 @@ public class Parser {
     }
 
     private void parseStructDecls() {
-        parseStructType();
-        expect(TokenClass.LBRA);
+        if (accept(TokenClass.STRUCT)) {
+            parseStructType();
+            expect(TokenClass.LBRA);
+            parseVarDecl();     // at least one var
+            parseVarDecls();    // extra vars
+            expect(TokenClass.RBRA);
+            expect(TokenClass.SC);
+            parseStructDecls();
+        }
     }
     
     private void parseType() {
@@ -166,32 +182,18 @@ public class Parser {
         }
     }
     
-    private void parseDecl() {
+    private void parseVarDecl() {
         parseType();
         expect(TokenClass.IDENTIFIER);
-    }
-
-    private void parseVarDecl() {
-        parseDecl();
         parseArrayDecl();
         expect(TokenClass.SC);
     }
 
     private void parseVarDecls() {
-        parseVarDecl();
-        parseExtraVarDecl();
-    }
-
-    private void parseExtraVarDecl() {
-        if (accept(
-                TokenClass.STRUCT,
-                TokenClass.INT,
-                TokenClass.CHAR,
-                TokenClass.VOID
-            )) {
+        if (acceptsType()) {
             parseVarDecl();
-            parseExtraVarDecl();
-        };
+            parseVarDecls();
+        }
     }
 
     private void parseArrayDecl() {
@@ -202,9 +204,37 @@ public class Parser {
         }
     }
 
-    private void parseFunDecls() {
-        // to be completed ...
+    private void parseFunDecl() {
+        parseType();
+        expect(TokenClass.IDENTIFIER);
+        expect(TokenClass.LPAR);
+        parseParams();
+        expect(TokenClass.RPAR);
+        // parseBlock();
     }
 
-    // to be completed ...
+    private void parseFunDecls() {
+        if (acceptsType()) {
+            parseFunDecl();
+            parseFunDecls();
+        }
+    }
+    
+    private void parseParams() {
+        if (acceptsType()) {
+            parseType();
+            expect(TokenClass.IDENTIFIER);
+            parseParamsPlus();
+        }
+    }
+
+    private void parseParamsPlus() {
+        if (accept(TokenClass.COMMA)) {
+            nextToken();
+            parseType();
+            expect(TokenClass.IDENTIFIER);
+            parseParamsPlus();
+        }
+    }
+
 }
