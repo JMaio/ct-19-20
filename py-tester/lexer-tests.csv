@@ -39,3 +39,6 @@ lexer/str/bad.esc_v.c, LEXER_FAIL
 lexer/str/bad.no_end.c, LEXER_FAIL
 
 lexer/invalid.c, LEXER_FAIL
+
+
+parser/struct.c, PASS
