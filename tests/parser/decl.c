@@ -1,2 +1,2 @@
 int hello;
-char firstletter;
+char firstLetter;

@@ -41,5 +41,78 @@ paramsplus  ::= "," type IDENT paramsplus
               | nothing
 
 
+block       ::= "{" vardecls stmts "}"
+
+stmts       ::= stmt stmts
+              | nothing
+
+elsestmt    ::= "else" stmt
+              | nothing
+
+stmt        ::= block
+              | "while" "(" exp ")" stmt
+              | "if" "(" exp ")" stmt elsestmt
+              | "return" optexp ";"
+              | exp "=" exp ";"
+              | exp ";"
+
+optexp      ::= exp
+              | nothing
+
+exp         ::= "(" exp ")"
+              | exp8
+
+# expression precedence rules
+exp8        ::= exp8 "||" exp8
+              | exp7
+
+exp7        ::= exp7 "&&" exp7
+              | exp6
+
+exp6        ::= exp6 "=="  exp6
+              | exp6 "!=" exp6
+              | exp5
+
+exp5        ::= exp5 "<"  exp5
+              | exp5 "<=" exp5
+              | exp5 ">"  exp5
+              | exp5 ">=" exp5
+              | exp4
+
+exp4        ::= exp4 "+" exp4
+              | exp4 "-" exp4
+              | exp3
+
+exp3        ::= exp3 "*" exp3
+              | exp3 "/" exp3
+              | exp3 "%" exp3
+              | exp2
+
+exp2        ::= "-" exp2   # negates itself
+              | valueat    # "*" exp
+              | typecast   # "(" type ")"
+              | sizeof     # "sizeof" "(" type ")"
+              | exp1
+
+# final expression
+exp1        ::= funcall     # IDENT "(" ... --> LL2!!
+              | IDENT | INT_LITERAL | STRING_LITERAL | CHAR_LITERAL
+              | arrayaccess # exp "["
+              | fieldaccess # exp "." IDENT
+
+
+funcall     ::= IDENT "(" optexpplus ")"
+
+optexpplus  ::= exp expplus
+              | nothing
+
+expplus     ::= "," exp expplus
+              | nothing
+
+
+arrayaccess ::= exp "[" exp "]"
+fieldaccess ::= exp "." IDENT
+
+
 
 

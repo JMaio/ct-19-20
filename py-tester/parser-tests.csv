@@ -1,3 +1,6 @@
 fibonacci.c, PASS
+tictactoe.c, PASS
 
 parser/struct.c, PASS
+parser/compare.c, PASS
+parser/decl.c, PASS

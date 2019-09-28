@@ -41,4 +41,5 @@ lexer/str/bad.no_end.c, LEXER_FAIL
 lexer/invalid.c, LEXER_FAIL
 
 
+parser/decl.c, PASS
 parser/struct.c, PASS
