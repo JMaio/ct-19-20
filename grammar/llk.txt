@@ -97,7 +97,7 @@ exp2        ::= "-" exp2   # negates itself
 # final expression
 exp1        ::= funcall     # IDENT "(" ... --> LL2!!
               | IDENT | INT_LITERAL | STRING_LITERAL | CHAR_LITERAL
-              | arrayaccess # exp "["
+              | arrayaccess # exp "[" --> also LL2
               | fieldaccess # exp "." IDENT
 
 
@@ -109,10 +109,9 @@ optexpplus  ::= exp expplus
 expplus     ::= "," exp expplus
               | nothing
 
-
 arrayaccess ::= exp "[" exp "]"
 fieldaccess ::= exp "." IDENT
 
-
-
-
+valueat      ::= "*" exp                          # Value at operator (pointer indirection)
+sizeof       ::= "sizeof" "(" type ")"            # size of type
+typecast     ::= "(" type ")" exp                 # type casting
