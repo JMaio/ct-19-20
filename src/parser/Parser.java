@@ -159,7 +159,8 @@ public class Parser {
         parseStructDecls();
         // parseVarDecls();
         parseGlobalVarDecls();
-        parseFunDecls();
+        // parseFunDecls();
+        parseGlobalFunDecls();
         expect(TokenClass.EOF);
     }
 
@@ -221,8 +222,9 @@ public class Parser {
         expect(TokenClass.SC);
     }
 
+    // can scoop up function declarations if no lookahead
     private void parseVarDecls() {
-        if (acceptsType()) {
+        if (acceptsType() && isVarDecl()) {
             parseVarDecl();
             parseVarDecls();
         }
@@ -236,17 +238,23 @@ public class Parser {
         }
     }
 
+    private void parseGlobalFunDecls() {
+        if (acceptsType() && isFunDecl()) {
+            parseFunDecls();
+        }
+    }
+
     private void parseFunDecl() {
         parseType();
         expect(TokenClass.IDENTIFIER);
         expect(TokenClass.LPAR);
         parseParams();
         expect(TokenClass.RPAR);
-        // parseBlock();
+        parseBlock();
     }
 
     private void parseFunDecls() {
-        if (acceptsType()) {
+        if (acceptsType() && isFunDecl()) {
             parseFunDecl();
             parseFunDecls();
         }
