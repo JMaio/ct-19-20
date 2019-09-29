@@ -336,5 +336,59 @@ public class Parser {
     }
 
     private void parseExp() {
+
+    private void parseExp1() {
+        // check for function calls
+        TokenClass la = lookAhead(1).tokenClass;
+        if (accept(TokenClass.IDENTIFIER) && la == TokenClass.LPAR) {
+            parseFunCall();
+        } else {
+            parseExp0();
+        }
+        parseAccess();
+    }
+
+    private void parseAccess() {
+        if (accept(TokenClass.LSBR)) {
+            nextToken();
+            parseExp();
+            expect(TokenClass.RSBR);
+            parseAccess();
+        } else if (accept(TokenClass.DOT)) {
+            nextToken();
+            expect(TokenClass.IDENTIFIER);
+            parseAccess();
+        }
+    }
+
+    private void parseExp0() {
+        expect(
+            TokenClass.IDENTIFIER,
+            TokenClass.INT_LITERAL,
+            TokenClass.STRING_LITERAL,
+            TokenClass.CHAR_LITERAL
+        );
+    }
+
+    private void parseFunCall() {
+        expect(TokenClass.IDENTIFIER);
+        expect(TokenClass.LPAR);
+        if (!accept(TokenClass.RPAR)) {
+            parseOptExpPlus();
+        }
+        expect(TokenClass.RPAR);
+    }
+    
+    private void parseOptExpPlus() {
+        parseExp();
+        parseExpPlus();
+    }
+
+    private void parseExpPlus() {
+        if (accept(TokenClass.COMMA)) {
+            nextToken();
+            parseExp();
+            parseExpPlus();
+        }
     }
 }
