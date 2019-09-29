@@ -237,4 +237,64 @@ public class Parser {
         }
     }
 
+    private void parseBlock() {
+        expect(TokenClass.LBRA);
+        parseVarDecls();
+        parseStmts();
+        expect(TokenClass.RBRA);
+    }
+
+    private void parseStmts() {
+        // if next token not a closing brace, still in block
+        if (!accept(TokenClass.RBRA)) {
+            parseStmt();
+            parseStmts();
+        }
+    }
+
+    private void parseElseStmt() {
+        if (accept(TokenClass.ELSE)) {
+            nextToken();
+            parseStmt();
+        }
+    }
+
+    private void parseStmt() {
+        if (accept(TokenClass.LBRA)) {
+            parseBlock();
+        } else if (accept(TokenClass.WHILE)) {
+            nextToken();
+            expect(TokenClass.LPAR);
+            parseExp();
+            expect(TokenClass.RPAR);
+            parseStmt();
+        } else if (accept(TokenClass.IF)) {
+            nextToken();
+            expect(TokenClass.LPAR);
+            parseExp();
+            expect(TokenClass.RPAR);
+            parseStmt();
+            parseElseStmt();
+        } else if (accept(TokenClass.RETURN)) {
+            nextToken();
+            parseOptExp();
+            expect(TokenClass.SC);
+        } else {
+            parseExp();
+            if (accept(TokenClass.ASSIGN)) {
+                nextToken();
+                parseExp();
+            }
+            expect(TokenClass.SC);
+        }
+    }
+
+    private void parseOptExp() {
+        if (!accept(TokenClass.SC)) {
+            parseExp();
+        }
+    }
+
+    private void parseExp() {
+    }
 }
