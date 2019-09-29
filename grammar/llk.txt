@@ -95,12 +95,18 @@ exp2        ::= "-" exp    # negates
               | exp1
 
 # final expression
-exp1        ::= funcall     # IDENT "(" ... --> LL2!!
-              | arrayaccess # exp "[" --> also LL2
-              | fieldaccess # exp "." IDENT
-              | exp0
+exp1        ::= funcall access # IDENT "(" ... --> LL2!!
+              | exp0 access
 
-exp0        ::= IDENT | INT_LITERAL | STRING_LITERAL | CHAR_LITERAL
+access      ::= "[" exp "]" access  // arrayaccess
+              | "." IDENT access    // fieldaccess
+              | nothing
+
+exp0        ::= IDENT 
+              | INT_LITERAL 
+              | STRING_LITERAL 
+              | CHAR_LITERAL
+
 
 funcall     ::= IDENT "(" optexpplus ")"
 
@@ -110,9 +116,22 @@ optexpplus  ::= exp expplus
 expplus     ::= "," exp expplus
               | nothing
 
-arrayaccess ::= exp "[" exp "]"
-fieldaccess ::= exp "." IDENT
-
 valueat      ::= "*" exp                          # Value at operator (pointer indirection)
 sizeof       ::= "sizeof" "(" type ")"            # size of type
 typecast     ::= "(" type ")" exp                 # type casting
+
+
+
+
+// motivation for 'access' recursion elimination
+===
+exp         ::= exp "[" exp "]"
+              | exp "." IDENT
+              | IDENT | INT_LITERAL | CHAR_LITERAL | STRING_LITERAL
+
+--> exp     ::= nextexp
+nextexp     ::= 
+              | "[" exp "]" nextexp 
+              | "." IDENT nextexp
+              | nothing
+===
