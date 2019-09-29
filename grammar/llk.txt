@@ -63,29 +63,29 @@ exp         ::= "(" exp ")"
               | exp8
 
 # expression precedence rules
-exp8        ::= exp8 "||" exp8
+exp8        ::= exp7 "||" exp8
               | exp7
 
-exp7        ::= exp7 "&&" exp7
+exp7        ::= exp6 "&&" exp7
               | exp6
 
-exp6        ::= exp6 "=="  exp6
-              | exp6 "!=" exp6
+exp6        ::= exp5 "==" exp6
+              | exp5 "!=" exp6
               | exp5
 
-exp5        ::= exp5 "<"  exp5
-              | exp5 "<=" exp5
-              | exp5 ">"  exp5
-              | exp5 ">=" exp5
+exp5        ::= exp4 "<"  exp5
+              | exp4 "<=" exp5
+              | exp4 ">"  exp5
+              | exp4 ">=" exp5
               | exp4
 
-exp4        ::= exp4 "+" exp4
-              | exp4 "-" exp4
+exp4        ::= exp3 "+" exp4
+              | exp3 "-" exp4
               | exp3
 
-exp3        ::= exp3 "*" exp3
-              | exp3 "/" exp3
-              | exp3 "%" exp3
+exp3        ::= exp2 "*" exp3
+              | exp2 "/" exp3
+              | exp2 "%" exp3
               | exp2
 
 exp2        ::= "-" exp2   # negates itself
