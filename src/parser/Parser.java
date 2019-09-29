@@ -336,6 +336,103 @@ public class Parser {
     }
 
     private void parseExp() {
+        if (accept(TokenClass.LPAR)) {
+            nextToken();
+            if (acceptsType()) {
+                // typecast!!
+                parseType();
+                expect(TokenClass.RPAR);
+                parseExp();
+            } else {
+                // just a _regular_ expression
+                parseExp();
+                expect(TokenClass.RPAR);
+            }
+        } else {
+            parseExp8();
+        }
+    }
+
+    private void parseExp8() {
+        parseExp7();
+        if (accept(TokenClass.OR)) {
+            nextToken();
+            parseExp8();
+        }
+    }
+    
+    private void parseExp7() {
+        parseExp6();
+        if (accept(TokenClass.AND)) {
+            nextToken();
+            parseExp7();
+        }
+    }
+
+    private void parseExp6() {
+        parseExp5();
+        if (accept(
+            TokenClass.EQ,
+            TokenClass.NE
+        )) {
+            nextToken();
+            parseExp6();
+        }
+    }
+
+    private void parseExp5() {
+        parseExp4();
+        if (accept(
+            TokenClass.LT,
+            TokenClass.LE,
+            TokenClass.GT,
+            TokenClass.GE
+        )) {
+            nextToken();
+            parseExp5();
+        }
+    }
+
+    private void parseExp4() {
+        parseExp3();
+        if (accept(
+            TokenClass.PLUS,
+            TokenClass.MINUS
+        )) {
+            nextToken();
+            parseExp4();
+        }
+    }
+
+    private void parseExp3() {
+        parseExp2();
+        if (accept(
+            TokenClass.ASTERIX,
+            TokenClass.DIV,
+            TokenClass.REM
+        )) {
+            nextToken();
+            parseExp3();
+        }
+    }
+
+    private void parseExp2() {
+        if (accept(
+            TokenClass.MINUS,
+            TokenClass.ASTERIX
+        )) {
+            // minus or valueat
+            nextToken();
+            parseExp();
+        } else if (accept(TokenClass.SIZEOF)) {
+            nextToken();
+            expect(TokenClass.LPAR);
+            parseType();
+            expect(TokenClass.RPAR);
+        } else {
+            parseExp1();
+        }
+    }
 
     private void parseExp1() {
         // check for function calls
