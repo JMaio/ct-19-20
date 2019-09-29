@@ -88,18 +88,19 @@ exp3        ::= exp2 "*" exp3
               | exp2 "%" exp3
               | exp2
 
-exp2        ::= "-" exp2   # negates itself
+exp2        ::= "-" exp    # negates
               | valueat    # "*" exp
-              | typecast   # "(" type ")"
+              | typecast   # "(" type ")" --- !exp lookahead
               | sizeof     # "sizeof" "(" type ")"
               | exp1
 
 # final expression
 exp1        ::= funcall     # IDENT "(" ... --> LL2!!
-              | IDENT | INT_LITERAL | STRING_LITERAL | CHAR_LITERAL
               | arrayaccess # exp "[" --> also LL2
               | fieldaccess # exp "." IDENT
+              | exp0
 
+exp0        ::= IDENT | INT_LITERAL | STRING_LITERAL | CHAR_LITERAL
 
 funcall     ::= IDENT "(" optexpplus ")"
 
