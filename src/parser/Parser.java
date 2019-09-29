@@ -128,11 +128,37 @@ public class Parser {
         );
     }
 
+    private boolean isFunDecl() {
+        // starting lookahead position
+        int offset = 1;
+        // struct has 1 extra token (IDENT)
+        if (accept(TokenClass.STRUCT)) { offset++; }
+        // reference has 1 extra token ("*")
+        if (lookAhead(offset).tokenClass == TokenClass.ASTERIX) { offset++; }
+        // final offset to next token
+        offset++;
+        TokenClass tc = lookAhead(offset).tokenClass;
+        return tc == TokenClass.LPAR;
+    }
+
+    private boolean isVarDecl() {
+        // starting lookahead position
+        int offset = 1;
+        // struct has 1 extra token (IDENT)
+        if (accept(TokenClass.STRUCT)) { offset++; }
+        // reference has 1 extra token ("*")
+        if (lookAhead(offset).tokenClass == TokenClass.ASTERIX) { offset++; }
+        // final offset to next token
+        offset++;
+        TokenClass tc = lookAhead(offset).tokenClass;
+        return (tc == TokenClass.SC || tc == TokenClass.LSBR);
+    }
 
     private void parseProgram() {
         parseIncludes();
         parseStructDecls();
-        parseVarDecls();
+        // parseVarDecls();
+        parseGlobalVarDecls();
         parseFunDecls();
         expect(TokenClass.EOF);
     }
@@ -179,6 +205,12 @@ public class Parser {
     private void parseReference() {
         if (accept(TokenClass.ASTERIX)) {
             nextToken();
+        }
+    }
+
+    private void parseGlobalVarDecls() {
+        if (acceptsType() && isVarDecl()) {
+            parseVarDecls();
         }
     }
     
