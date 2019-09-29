@@ -1,7 +1,138 @@
-program    ::= (include)* (structdecl)* (vardecl)* (fundecl)* EOF
+program     ::= includes structdecls vardecls fundecls EOF
 
-include    ::= "#include" STRING_LITERAL
+# include --------------------------
+includes    ::= "#include" STRING_LITERAL includes
+              | nothing
 
-structdecl ::= structtype "{" (vardecl)+ "}" ";"    # structure declaration
 
-structtype ::= "struct" IDENT
+structtype  ::= "struct" IDENT
+
+# structdecl -----------------------
+structdecls  ::= structtype "{" vardecl vardecls "}" ";" structdecls    # structure declaration
+               | nothing
+
+# vardecl --------------------------
+type        ::= ( "int" | "char" | "void" | structtype ) reference
+
+reference   ::= "*"
+             | nothing
+
+
+vardecl     ::= type IDENT arraydecl ";"
+
+vardecls    ::= vardecl vardecls
+              | nothing
+
+
+arraydecl   ::= "[" INT_LITERAL "]"
+             | nothing
+
+
+# fundecl ---------------------
+fundecl     ::= type IDENT "(" params ")" block
+
+fundecls    ::= fundecl fundecls
+              | nothing
+
+params      ::= type IDENT paramsplus
+              | nothing
+
+paramsplus  ::= "," type IDENT paramsplus
+              | nothing
+
+
+block       ::= "{" vardecls stmts "}"
+
+stmts       ::= stmt stmts
+              | nothing
+
+elsestmt    ::= "else" stmt
+              | nothing
+
+stmt        ::= block
+              | "while" "(" exp ")" stmt
+              | "if" "(" exp ")" stmt elsestmt
+              | "return" optexp ";"
+              | exp "=" exp ";"
+              | exp ";"
+
+optexp      ::= exp
+              | nothing
+
+exp         ::= "(" exp ")" 
+              | "(" type ")" exp    // look ahead for typecast
+              | exp8
+
+# expression precedence rules
+exp8        ::= exp7 "||" exp8
+              | exp7
+
+exp7        ::= exp6 "&&" exp7
+              | exp6
+
+exp6        ::= exp5 "==" exp6
+              | exp5 "!=" exp6
+              | exp5
+
+exp5        ::= exp4 "<"  exp5
+              | exp4 "<=" exp5
+              | exp4 ">"  exp5
+              | exp4 ">=" exp5
+              | exp4
+
+exp4        ::= exp3 "+" exp4
+              | exp3 "-" exp4
+              | exp3
+
+exp3        ::= exp2 "*" exp3
+              | exp2 "/" exp3
+              | exp2 "%" exp3
+              | exp2
+
+exp2        ::= "-" exp    # negates
+              | valueat    # "*" exp
+              --| typecast   # "(" type ")" --- !exp lookahead
+              | sizeof     # "sizeof" "(" type ")"
+              | exp1
+
+# final expression
+exp1        ::= funcall access # IDENT "(" ... --> LL2!!
+              | exp0 access
+
+access      ::= "[" exp "]" access  // arrayaccess
+              | "." IDENT access    // fieldaccess
+              | nothing
+
+exp0        ::= IDENT 
+              | INT_LITERAL 
+              | STRING_LITERAL 
+              | CHAR_LITERAL
+
+
+funcall     ::= IDENT "(" optexpplus ")"
+
+optexpplus  ::= exp expplus
+              | nothing
+
+expplus     ::= "," exp expplus
+              | nothing
+
+valueat      ::= "*" exp                          # Value at operator (pointer indirection)
+sizeof       ::= "sizeof" "(" type ")"            # size of type
+typecast     ::= "(" type ")" exp                 # type casting
+
+
+
+
+// motivation for 'access' recursion elimination
+===
+exp         ::= exp "[" exp "]"
+              | exp "." IDENT
+              | IDENT | INT_LITERAL | CHAR_LITERAL | STRING_LITERAL
+
+--> exp     ::= nextexp
+nextexp     ::= 
+              | "[" exp "]" nextexp 
+              | "." IDENT nextexp
+              | nothing
+===

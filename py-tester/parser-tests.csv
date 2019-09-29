@@ -1,1 +1,16 @@
+parser/prec/0.c, PASS
+parser/prec/1.c, PASS
+parser/prec/2.c, PASS
+parser/prec/3.c, PASS
+parser/prec/4.c, PASS
+parser/prec/5.c, PASS
+parser/prec/6.c, PASS
+parser/prec/7.c, PASS
+parser/prec/8.c, PASS
+
 fibonacci.c, PASS
+tictactoe.c, PASS
+
+parser/struct.c, PASS
+parser/compare.c, PASS
+parser/decl.c, PASS
