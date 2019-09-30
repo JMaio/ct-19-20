@@ -91,7 +91,7 @@ exp3        ::= exp2 "*" exp3
 
 exp2        ::= "-" exp    # negates
               | valueat    # "*" exp
-              --| typecast   # "(" type ")" --- !exp lookahead
+              | typecast   # "(" type ")" --- !exp lookahead
               | sizeof     # "sizeof" "(" type ")"
               | exp1
 

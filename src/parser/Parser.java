@@ -340,9 +340,7 @@ public class Parser {
             nextToken();
             if (acceptsType()) {
                 // typecast!!
-                parseType();
-                expect(TokenClass.RPAR);
-                parseExp();
+                parseTypecast();
             } else {
                 // just a _regular_ expression
                 parseExp();
@@ -416,6 +414,14 @@ public class Parser {
         }
     }
 
+    // does not consume first parenthesis as checking 
+    // for typecast requires using nextToken()
+    private void parseTypecast() {
+        parseType();
+        expect(TokenClass.RPAR);
+        parseExp();
+    }
+
     private void parseExp2() {
         if (accept(
             TokenClass.MINUS,
@@ -429,6 +435,10 @@ public class Parser {
             expect(TokenClass.LPAR);
             parseType();
             expect(TokenClass.RPAR);
+        } else if (accept(TokenClass.LPAR)) {
+            // typecast #2
+            nextToken();
+            parseTypecast();
         } else {
             parseExp1();
         }
