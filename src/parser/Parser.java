@@ -44,6 +44,7 @@ public class Parser {
 
         if (lastErrorToken == token) {
             // skip this error, same token causing trouble
+            nextToken();
             return;
         }
 
