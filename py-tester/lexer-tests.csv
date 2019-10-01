@@ -50,5 +50,10 @@ parser/prec/6.c, PASS
 parser/prec/7.c, PASS
 parser/prec/8.c, PASS
 
-parser/decl.c, PASS
-parser/struct.c, PASS
+parser/base-rules/fundecl.c, PASS
+parser/base-rules/include.c, PASS
+parser/base-rules/struct.c, PASS
+parser/base-rules/vardecl.c, PASS
+
+parser/compare.c, PASS
+parser/bad.2d_pointer.c, PASS

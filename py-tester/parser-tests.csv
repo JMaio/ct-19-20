@@ -10,7 +10,21 @@ parser/prec/8.c, PASS
 
 fibonacci.c, PASS
 tictactoe.c, PASS
+eof.c, PASS
 
-parser/struct.c, PASS
+parser/base-rules/fundecl.c, PASS
+parser/base-rules/include.c, PASS
+parser/base-rules/struct.c, PASS
+parser/base-rules/vardecl.c, PASS
+
+parser/stmt/block.c, PASS
+parser/stmt/conditionals.c, PASS
+
 parser/compare.c, PASS
-parser/decl.c, PASS
+parser/fundecl_params.c, PASS
+
+
+parser/base-rules/bad.assign.c, PARSER_FAIL
+parser/base-rules/bad.lone_else.c, PARSER_FAIL
+parser/base-rules/bad.empty_struct.c, PARSER_FAIL
+parser/bad.2d_pointer.c, PARSER_FAIL
