@@ -59,6 +59,7 @@ public class Parser {
 
         error++;
         lastErrorToken = token;
+
     }
 
     /*
@@ -127,6 +128,20 @@ public class Parser {
             TokenClass.VOID,
             TokenClass.STRUCT
         );
+    }
+
+    /**
+     * utility function for accept with arbitrary lookahead
+     * @param i lookahead value
+     * @param expected list of TokenClasses to be accepted
+     * @return true if lookahead token's class matches expected
+     */
+    private boolean acceptWithLookahead(int i, TokenClass...expected) {
+        boolean result = false;
+        TokenClass la = lookAhead(i).tokenClass;
+        for (TokenClass e : expected)
+            result |= (e == la);
+        return result;
     }
 
     private boolean isFunDecl() {
@@ -281,7 +296,9 @@ public class Parser {
     private void parseBlock() {
         expect(TokenClass.LBRA);
         parseVarDecls();
-        parseStmts();
+        // if (!accept(TokenClass.RBRA)) {
+            parseStmts();
+        // }
         expect(TokenClass.RBRA);
     }
 
@@ -337,19 +354,19 @@ public class Parser {
     }
 
     private void parseExp() {
-        if (accept(TokenClass.LPAR)) {
-            nextToken();
-            if (acceptsType()) {
-                // typecast!!
-                parseTypecast();
-            } else {
-                // just a _regular_ expression
-                parseExp();
-                expect(TokenClass.RPAR);
-            }
-        } else {
-            parseExp8();
-        }
+        // if (accept(TokenClass.LPAR)) {
+        //     nextToken();
+        //     if (acceptsType()) {
+        //         // typecast!!
+        //         parseTypecast();
+        //     // } else {
+        //     //     // just a _regular_ expression
+        //     //     parseExp();
+        //     //     expect(TokenClass.RPAR);
+        //     // }
+        // } else {
+        parseExp8();
+        // }
     }
 
     private void parseExp8() {
@@ -415,12 +432,11 @@ public class Parser {
         }
     }
 
-    // does not consume first parenthesis as checking 
-    // for typecast requires using nextToken()
     private void parseTypecast() {
+        expect(TokenClass.LPAR);
         parseType();
         expect(TokenClass.RPAR);
-        parseExp();
+        parseExp2();
     }
 
     private void parseExp2() {
@@ -430,17 +446,21 @@ public class Parser {
         )) {
             // minus or valueat
             nextToken();
-            parseExp();
+            parseExp2();
         } else if (accept(TokenClass.SIZEOF)) {
             nextToken();
             expect(TokenClass.LPAR);
             parseType();
             expect(TokenClass.RPAR);
-        } else if (accept(TokenClass.LPAR)) {
-            // typecast #2
-            nextToken();
-            parseTypecast();
-        } else {
+        } else if (
+            accept(TokenClass.LPAR) && 
+            acceptWithLookahead(1, 
+                TokenClass.INT,
+                TokenClass.CHAR,
+                TokenClass.VOID,
+                TokenClass.STRUCT
+            )) { parseTypecast(); }
+        else {
             parseExp1();
         }
     }
@@ -470,12 +490,18 @@ public class Parser {
     }
 
     private void parseExp0() {
-        expect(
-            TokenClass.IDENTIFIER,
-            TokenClass.INT_LITERAL,
-            TokenClass.STRING_LITERAL,
-            TokenClass.CHAR_LITERAL
-        );
+        if (accept(TokenClass.LPAR)) {
+            nextToken();
+            parseExp();
+            expect(TokenClass.RPAR);
+        } else {
+            expect(
+                TokenClass.IDENTIFIER,
+                TokenClass.INT_LITERAL,
+                TokenClass.STRING_LITERAL,
+                TokenClass.CHAR_LITERAL
+            );
+        }
     }
 
     private void parseFunCall() {

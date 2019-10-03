@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "debug parser",
+            "request": "launch",
+            "mainClass": "Main",
+            "args": "-parser tests/parser/prec/1.c f.o"
+        },
+        {
+            "type": "java",
             "name": "CodeLens (Launch) - Main",
             "request": "launch",
             "mainClass": "Main"
