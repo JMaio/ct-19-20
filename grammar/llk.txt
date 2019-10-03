@@ -59,8 +59,7 @@ stmt        ::= block
 optexp      ::= exp
               | nothing
 
-exp         ::= "(" exp ")" 
-              | "(" type ")" exp    // look ahead for typecast
+exp         ::= "(" type ")" exp    // look ahead for typecast
               | exp8
 
 # expression precedence rules
@@ -89,7 +88,7 @@ exp3        ::= exp2 "*" exp3
               | exp2 "%" exp3
               | exp2
 
-exp2        ::= "-" exp    # negates
+exp2        ::= "-" exp2    # negates
               | valueat    # "*" exp
               | typecast   # "(" type ")" --- !exp lookahead
               | sizeof     # "sizeof" "(" type ")"
@@ -103,7 +102,8 @@ access      ::= "[" exp "]" access  // arrayaccess
               | "." IDENT access    // fieldaccess
               | nothing
 
-exp0        ::= IDENT 
+exp0        ::= "(" exp ")"
+              | IDENT 
               | INT_LITERAL 
               | STRING_LITERAL 
               | CHAR_LITERAL

@@ -22,6 +22,7 @@ parser/stmt/conditionals.c, PASS
 
 parser/compare.c, PASS
 parser/fundecl_params.c, PASS
+parser/nested_conditionals.c, PASS
 
 
 parser/base-rules/bad.assign.c, PARSER_FAIL
