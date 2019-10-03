@@ -59,8 +59,7 @@ stmt        ::= block
 optexp      ::= exp
               | nothing
 
-exp         ::= "(" type ")" exp    // look ahead for typecast
-              | exp8
+exp         ::= exp8
 
 # expression precedence rules
 exp8        ::= exp7 "||" exp8
