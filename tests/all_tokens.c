@@ -19,7 +19,7 @@ char          var;
 void          var;
 struct vector var;
 
-int main(int argc, char* argv[]) {
+int main(int argc, char* argv) {
     int a;
 
     while ((char) a) {}

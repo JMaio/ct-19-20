@@ -11,6 +11,7 @@ parser/prec/8.c, PASS
 fibonacci.c, PASS
 tictactoe.c, PASS
 eof.c, PASS
+all_tokens.c, PASS
 
 parser/base-rules/fundecl.c, PASS
 parser/base-rules/include.c, PASS
@@ -28,4 +29,8 @@ parser/nested_conditionals.c, PASS
 parser/base-rules/bad.assign.c, PARSER_FAIL
 parser/base-rules/bad.lone_else.c, PARSER_FAIL
 parser/base-rules/bad.empty_struct.c, PARSER_FAIL
+parser/stmt/bad.bad_params.c, PARSER_FAIL
+parser/stmt/bad.return_return.c, PARSER_FAIL
+parser/stmt/bad.unclosed_exp_block.c, PARSER_FAIL
+parser/stmt/bad.unclosed_func_block.c, PARSER_FAIL
 parser/bad.2d_pointer.c, PARSER_FAIL
