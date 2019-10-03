@@ -173,9 +173,7 @@ public class Parser {
     private void parseProgram() {
         parseIncludes();
         parseStructDecls();
-        // parseVarDecls();
         parseGlobalVarDecls();
-        // parseFunDecls();
         parseGlobalFunDecls();
         expect(TokenClass.EOF);
     }
@@ -296,15 +294,13 @@ public class Parser {
     private void parseBlock() {
         expect(TokenClass.LBRA);
         parseVarDecls();
-        // if (!accept(TokenClass.RBRA)) {
-            parseStmts();
-        // }
+        parseStmts();
         expect(TokenClass.RBRA);
     }
 
     private void parseStmts() {
-        // if next token not a closing brace, still in block
-        if (!accept(TokenClass.RBRA)) {
+        // if next token not a closing brace, still in block [also check if EOF - prevent infinite recursion]
+        if (!accept(TokenClass.RBRA, TokenClass.EOF)) {
             parseStmt();
             parseStmts();
         }
@@ -354,19 +350,7 @@ public class Parser {
     }
 
     private void parseExp() {
-        // if (accept(TokenClass.LPAR)) {
-        //     nextToken();
-        //     if (acceptsType()) {
-        //         // typecast!!
-        //         parseTypecast();
-        //     // } else {
-        //     //     // just a _regular_ expression
-        //     //     parseExp();
-        //     //     expect(TokenClass.RPAR);
-        //     // }
-        // } else {
         parseExp8();
-        // }
     }
 
     private void parseExp8() {
