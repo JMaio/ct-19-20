@@ -1,10 +1,13 @@
 package parser;
 
+import ast.*;
+
 import lexer.Token;
 import lexer.Tokeniser;
 import lexer.Token.TokenClass;
 
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 
 
@@ -26,11 +29,11 @@ public class Parser {
         this.tokeniser = tokeniser;
     }
 
-    public void parse() {
+    public Program parse() {
         // get the first token
         nextToken();
 
-        parseProgram();
+        return parseProgram();
     }
 
     public int getErrorCount() {
@@ -170,12 +173,13 @@ public class Parser {
         return (tc == TokenClass.SC || tc == TokenClass.LSBR);
     }
 
-    private void parseProgram() {
+    private Program parseProgram() {
         parseIncludes();
-        parseStructDecls();
-        parseGlobalVarDecls();
-        parseGlobalFunDecls();
+        List<StructTypeDecl> stds = parseStructDecls();
+        List<VarDecl> vds = parseGlobalVarDecls();
+        List<FunDecl> fds = parseGlobalFunDecls();
         expect(TokenClass.EOF);
+        return new Program(stds, vds, fds);
     }
 
     // includes are ignored, so does not need to return an AST node
@@ -192,7 +196,7 @@ public class Parser {
         expect(TokenClass.IDENTIFIER);
     }
 
-    private void parseStructDecls() {
+    private List<StructTypeDecl> parseStructDecls() {
         if (accept(TokenClass.STRUCT)) {
             parseStructType();
             expect(TokenClass.LBRA);
@@ -202,6 +206,7 @@ public class Parser {
             expect(TokenClass.SC);
             parseStructDecls();
         }
+        return null;
     }
     
     private void parseType() {
@@ -223,10 +228,11 @@ public class Parser {
         }
     }
 
-    private void parseGlobalVarDecls() {
+    private List<VarDecl> parseGlobalVarDecls() {
         if (acceptsType() && isVarDecl()) {
             parseVarDecls();
         }
+        return null;
     }
     
     private void parseVarDecl() {
@@ -237,11 +243,12 @@ public class Parser {
     }
 
     // can scoop up function declarations if no lookahead
-    private void parseVarDecls() {
+    private List<VarDecl> parseVarDecls() {
         if (acceptsType() && isVarDecl()) {
             parseVarDecl();
             parseVarDecls();
         }
+        return null;
     }
 
     private void parseArrayDecl() {
@@ -252,10 +259,11 @@ public class Parser {
         }
     }
 
-    private void parseGlobalFunDecls() {
+    private List<FunDecl> parseGlobalFunDecls() {
         if (acceptsType() && isFunDecl()) {
             parseFunDecls();
         }
+        return null;
     }
 
     private void parseFunDecl() {
@@ -267,11 +275,12 @@ public class Parser {
         parseBlock();
     }
 
-    private void parseFunDecls() {
+    private List<FunDecl> parseFunDecls() {
         if (acceptsType() && isFunDecl()) {
             parseFunDecl();
             parseFunDecls();
         }
+        return null;
     }
     
     private void parseParams() {
