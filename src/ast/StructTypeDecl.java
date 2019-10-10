@@ -8,7 +8,7 @@ public class StructTypeDecl implements ASTNode {
 
     public StructTypeDecl(StructType st, List<VarDecl> vds) {
         this.st = st;
-        this.vds = vds;
+        this.vds = vds.isEmpty() ? null : vds;
     }
 
     public <T> T accept(ASTVisitor<T> v) {

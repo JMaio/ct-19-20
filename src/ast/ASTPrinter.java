@@ -65,7 +65,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
     public Void visitVarDecl(VarDecl vd) {
         writer.print("VarDecl(");
         vd.type.accept(this);
-        writer.print(","+vd.varName);
+        writer.print(","+vd.name);
         writer.print(")");
         return null;
     }
