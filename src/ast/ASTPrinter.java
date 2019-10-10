@@ -35,11 +35,21 @@ public class ASTPrinter implements ASTVisitor<Void> {
         return null;
     }
     
-    // type
+    @Override
+    public Void visitType(Type t) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     @Override
     public Void visitBaseType(BaseType bt) {
         // to complete ...
+        return null;
+    }
+
+    @Override
+    public Void visitPointerType(PointerType pt) {
+        // TODO Auto-generated method stub
         return null;
     }
 

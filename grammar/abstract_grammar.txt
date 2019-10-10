@@ -3,7 +3,8 @@ Program    ::= StructTypeDecl* VarDecl* FunDecl*
 
 
 // Types
-Type        ::= BaseType | PointerType | StructType | ArrayType
+Type        ::= BaseType | PointerType 
+              | StructType | ArrayType
 
 BaseType    ::= INT | CHAR | VOID
 PointerType ::= Type              // use to represent pointers to other types
@@ -21,7 +22,10 @@ FunDecl  ::= Type String VarDecl* Block
 
 
 // Expressions
-Expr       ::= IntLiteral | StrLiteral | ChrLiteral | VarExpr | FunCallExpr | BinOp | ArrayAccessExpr | FieldAccessExpr | ValueAtExpr | SizeOfExpr | TypecastExpr
+Expr       ::= IntLiteral | StrLiteral | ChrLiteral 
+             | VarExpr | FunCallExpr | BinOp 
+             | ArrayAccessExpr | FieldAccessExpr 
+             | ValueAtExpr | SizeOfExpr | TypecastExpr
 
 // Literals
 IntLiteral ::= int     // int stores the value of the integer
@@ -36,7 +40,9 @@ FunCallExpr ::= String Expr*
 
 // Binary operations
 BinOp      ::= Expr Op Expr
-Op         ::= ADD | SUB | MUL | DIV | MOD | GT | LT | GE | LE | NE | EQ | OR | AND
+Op         ::= ADD | SUB | MUL | DIV 
+             | MOD | GT | LT | GE | LE 
+             | NE | EQ | OR | AND
 
 // Array access expression : Expr[Expr] (e.g. a[10])
 ArrayAccessExpr ::= Expr Expr // the first Expr is the array, the second one the index
@@ -56,7 +62,8 @@ TypecastExpr ::= Type Expr
 
 
 // Statements
-Stmt       ::= Block | While | If | Assign | Return | ExprStmt
+Stmt       ::= Block | While | If | Assign 
+             | Return | ExprStmt
 
 // An expression statement (e.g. x+2;)
 ExprStmt ::= Expr

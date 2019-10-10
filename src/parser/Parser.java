@@ -6,6 +6,7 @@ import lexer.Token;
 import lexer.Tokeniser;
 import lexer.Token.TokenClass;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
@@ -196,40 +197,55 @@ public class Parser {
 
     private StructType parseStructType() {
         expect(TokenClass.STRUCT);
-        expect(TokenClass.IDENTIFIER);
-        return null;
+        String st = expect(TokenClass.IDENTIFIER).data;
+
+        return new StructType(st);
     }
 
     private List<StructTypeDecl> parseStructDecls() {
+        List<StructTypeDecl> stds = new ArrayList<StructTypeDecl>();
+
         if (accept(TokenClass.STRUCT)) {
-            parseStructType();
+            StructType st = parseStructType();
+            List<VarDecl> vds = new ArrayList<VarDecl>();
+
             expect(TokenClass.LBRA);
-            parseVarDecl();     // at least one var
-            parseVarDecls();    // extra vars
+
+            vds.add(parseVarDecl());     // at least one var
+            vds.addAll(parseVarDecls());    // extra vars
+
             expect(TokenClass.RBRA);
             expect(TokenClass.SC);
-            parseStructDecls();
+
+            stds.add(new StructTypeDecl(st, vds));
+
+            stds.addAll(parseStructDecls());
         }
-        return null;
+        return stds;
     }
     
-    private void parseType() {
+    private Type parseType() {
         if (accept(TokenClass.STRUCT)) {
-            parseStructType();
+            StructType st = parseStructType();
+            if (parseReference()) {
+                return PointerType(st, );
+            }
         } else {
             expect(
                 TokenClass.INT,
                 TokenClass.CHAR,
                 TokenClass.VOID
             );
+            parseReference();
         }
-        parseReference();
     }
 
-    private void parseReference() {
+    private boolean parseReference() {
         if (accept(TokenClass.ASTERIX)) {
             nextToken();
+            return true;
         }
+        return false;
     }
 
     private List<VarDecl> parseGlobalVarDecls() {
@@ -239,7 +255,7 @@ public class Parser {
         return null;
     }
     
-    private void parseVarDecl() {
+    private VarDecl parseVarDecl() {
         parseType();
         expect(TokenClass.IDENTIFIER);
         parseArrayDecl();

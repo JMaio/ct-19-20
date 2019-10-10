@@ -6,12 +6,12 @@ public interface ASTVisitor<T> {
     
 
 
-    // public T visitType(Type t);
+    public T visitType(Type t);
     
     public T visitBaseType(BaseType bt);
-    // public T visitPointerType(PointerType pt);
-    // public T visitStructType(StructType st);
-    // public T visitArrayType(ArrayType at);
+    public T visitPointerType(PointerType pt);
+    public T visitStructType(StructType st);
+    public T visitArrayType(ArrayType at);
     
     public T visitStructTypeDecl(StructTypeDecl std);
     
@@ -21,7 +21,7 @@ public interface ASTVisitor<T> {
     
 
 
-    // public T visitExpr(Expr e);
+    public T visitExpr(Expr e);
 
     public T visitIntLiteral(IntLiteral i);
     public T visitStrLiteral(StrLiteral s);
@@ -29,31 +29,35 @@ public interface ASTVisitor<T> {
     
     public T visitVarExpr(VarExpr v);
 
-    // public T visitFunCallExpr(FunCallExpr fce);
+    public T visitFunCallExpr(FunCallExpr fce);
 
-    // public T visitBinOp(BinOp bo);
-    // public T visitOp(Op o);
+    public T visitBinOp(BinOp bo);
+    public T visitOp(Op o);
 
-    // public T visitArrayAccessExpr(ArrayAccessExpr aae);
+    public T visitArrayAccessExpr(ArrayAccessExpr aae);
 
-    // public T visitFieldAccessExpr(FieldAccessExpr fae);
+    public T visitFieldAccessExpr(FieldAccessExpr fae);
 
-    // public T visitValueAtExpr(ValueAtExpr vae);
+    public T visitValueAtExpr(ValueAtExpr vae);
 
-    // public T visitSizeOfExpr(SizeOfExpr soe);
+    public T visitSizeOfExpr(SizeOfExpr soe);
 
-    // public T visitTypecastExpr(TypecastExpr te);
+    public T visitTypecastExpr(TypecastExpr te);
 
 
 
-    // public T visitStmt(Stmt s);
+    public T visitStmt(Stmt s);
 
-    // public T visitExprStmt(ExprStmt es);
+    public T visitExprStmt(ExprStmt es);
+
+    public T visitWhile(While w);
     
+    public T visitIf(If i);
 
+    public T visitAssign(Assign a);
+    
+    public T visitReturn(Return r);
     
     public T visitBlock(Block b);
 
-
-    // to complete ... (should have one visit method for each concrete AST node class)
 }
