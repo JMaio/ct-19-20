@@ -9,29 +9,8 @@ public class ASTPrinter implements ASTVisitor<Void> {
     public ASTPrinter(PrintWriter writer) {
             this.writer = writer;
     }
-
-    @Override
-    public Void visitBlock(Block b) {
-        writer.print("Block(");
-        // to complete
-        writer.print(")");
-        return null;
-    }
-
-    @Override
-    public Void visitFunDecl(FunDecl fd) {
-        writer.print("FunDecl(");
-        fd.type.accept(this);
-        writer.print(","+fd.name+",");
-        for (VarDecl vd : fd.params) {
-            vd.accept(this);
-            writer.print(",");
-        }
-        fd.block.accept(this);
-        writer.print(")");
-        return null;
-    }
-
+    
+    
     @Override
     public Void visitProgram(Program p) {
         writer.print("Program(");
@@ -52,18 +31,51 @@ public class ASTPrinter implements ASTVisitor<Void> {
             fd.accept(this);
         }
         writer.print(")");
-	    writer.flush();
+        writer.flush();
+        return null;
+    }
+    
+    // type
+
+    @Override
+    public Void visitBaseType(BaseType bt) {
+        // to complete ...
+        return null;
+    }
+
+
+
+    @Override
+    public Void visitStructTypeDecl(StructTypeDecl st) {
+        // to complete ...
         return null;
     }
 
     @Override
-    public Void visitVarDecl(VarDecl vd){
+    public Void visitVarDecl(VarDecl vd) {
         writer.print("VarDecl(");
         vd.type.accept(this);
         writer.print(","+vd.varName);
         writer.print(")");
         return null;
     }
+
+    @Override
+    public Void visitFunDecl(FunDecl fd) {
+        writer.print("FunDecl(");
+        fd.type.accept(this);
+        writer.print(","+fd.name+",");
+        for (VarDecl vd : fd.params) {
+            vd.accept(this);
+            writer.print(",");
+        }
+        fd.block.accept(this);
+        writer.print(")");
+        return null;
+    }
+
+
+
 
     @Override
     public Void visitVarExpr(VarExpr v) {
@@ -73,18 +85,14 @@ public class ASTPrinter implements ASTVisitor<Void> {
         return null;
     }
 
-    @Override
-    public Void visitBaseType(BaseType bt) {
-        // to complete ...
-        return null;
-    }
-
-    @Override
-    public Void visitStructTypeDecl(StructTypeDecl st) {
-        // to complete ...
-        return null;
-    }
-
-    // to complete ...
     
+
+    @Override
+    public Void visitBlock(Block b) {
+        writer.print("Block(");
+        // to complete
+        writer.print(")");
+        return null;
+    }
+
 }

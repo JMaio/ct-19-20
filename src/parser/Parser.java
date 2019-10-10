@@ -173,6 +173,9 @@ public class Parser {
         return (tc == TokenClass.SC || tc == TokenClass.LSBR);
     }
 
+
+    // ------------------- parse functions ---------------
+
     private Program parseProgram() {
         parseIncludes();
         List<StructTypeDecl> stds = parseStructDecls();
@@ -191,9 +194,10 @@ public class Parser {
         }
     }
 
-    private void parseStructType() {
+    private StructType parseStructType() {
         expect(TokenClass.STRUCT);
         expect(TokenClass.IDENTIFIER);
+        return null;
     }
 
     private List<StructTypeDecl> parseStructDecls() {

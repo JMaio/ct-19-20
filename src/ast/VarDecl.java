@@ -9,7 +9,7 @@ public class VarDecl implements ASTNode {
 	    this.varName = varName;
     }
 
-     public <T> T accept(ASTVisitor<T> v) {
-	return v.visitVarDecl(this);
+    public <T> T accept(ASTVisitor<T> v) {
+        return v.visitVarDecl(this);
     }
 }
