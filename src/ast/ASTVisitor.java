@@ -23,9 +23,9 @@ public interface ASTVisitor<T> {
 
     // public T visitExpr(Expr e);
 
-    // public T visitIntLiteral(IntLiteral i);
-    // public T visitStrLiteral(StrLiteral s);
-    // public T visitChrLiteral(ChrLiteral c);
+    public T visitIntLiteral(IntLiteral i);
+    public T visitStrLiteral(StrLiteral s);
+    public T visitChrLiteral(ChrLiteral c);
     
     public T visitVarExpr(VarExpr v);
 

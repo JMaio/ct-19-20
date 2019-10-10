@@ -1,10 +1,11 @@
 package ast;
 
 public class IntLiteral implements ASTNode {
-    public final int i;
+    
+    public final int value;
     
     public IntLiteral(int i) {
-        this.i = i;
+        this.value = i;
     }
 
     public <T> T accept(ASTVisitor<T> v) {
