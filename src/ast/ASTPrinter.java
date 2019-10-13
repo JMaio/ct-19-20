@@ -35,33 +35,40 @@ public class ASTPrinter implements ASTVisitor<Void> {
         return null;
     }
     
-    @Override
+    // Types --------------
+    
     public Void visitType(Type t) {
         // TODO Auto-generated method stub
         return null;
     }
 
-    @Override
     public Void visitBaseType(BaseType bt) {
         // to complete ...
         return null;
     }
 
-    @Override
     public Void visitPointerType(PointerType pt) {
         // TODO Auto-generated method stub
         return null;
     }
 
+    public Void visitStructType(StructType st) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public Void visitArrayType(ArrayType at) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
 
-    @Override
     public Void visitStructTypeDecl(StructTypeDecl st) {
         // to complete ...
         return null;
     }
 
-    @Override
+
     public Void visitVarDecl(VarDecl vd) {
         writer.print("VarDecl(");
         vd.type.accept(this);
@@ -70,7 +77,6 @@ public class ASTPrinter implements ASTVisitor<Void> {
         return null;
     }
 
-    @Override
     public Void visitFunDecl(FunDecl fd) {
         writer.print("FunDecl(");
         fd.type.accept(this);
@@ -81,6 +87,14 @@ public class ASTPrinter implements ASTVisitor<Void> {
         }
         fd.block.accept(this);
         writer.print(")");
+        return null;
+    }
+
+
+
+    @Override
+    public Void visitExpr(Expr e) {
+        // TODO Auto-generated method stub
         return null;
     }
 
@@ -113,8 +127,95 @@ public class ASTPrinter implements ASTVisitor<Void> {
     }
 
     
+    @Override
+    public Void visitFunCallExpr(FunCallExpr fce) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    
+    @Override
+    public Void visitBinOp(BinOp bo) {
+        // TODO Auto-generated method stub
+        return null;
+    }
 
     @Override
+    public Void visitOp(Op o) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+
+    @Override
+    public Void visitArrayAccessExpr(ArrayAccessExpr aae) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Void visitFieldAccessExpr(FieldAccessExpr fae) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Void visitValueAtExpr(ValueAtExpr vae) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public Void visitSizeOfExpr(SizeOfExpr soe) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public Void visitTypecastExpr(TypecastExpr te) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    
+
+    public Void visitStmt(Stmt s) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public Void visitExprStmt(ExprStmt es) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public Void visitWhile(While w) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public Void visitIf(If i) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public Void visitAssign(Assign a) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+
+    public Void visitReturn(Return r) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    
     public Void visitBlock(Block b) {
         writer.print("Block(");
         // to complete
