@@ -228,15 +228,29 @@ public class Parser {
         if (accept(TokenClass.STRUCT)) {
             StructType st = parseStructType();
             if (parseReference()) {
-                return PointerType(st, );
+                return new PointerType(st);
+            } else {
+                return st;
             }
         } else {
-            expect(
+            Token t = expect(
                 TokenClass.INT,
                 TokenClass.CHAR,
                 TokenClass.VOID
             );
-            parseReference();
+            BaseType bt = null;
+            switch (t.tokenClass) {
+                case INT:  bt = BaseType.INT;
+                case CHAR: bt = BaseType.CHAR;
+                case VOID: bt = BaseType.VOID;
+                default:
+                    break;
+            }
+            if(parseReference()) {
+               return new PointerType(bt); 
+            } else {
+                return bt;
+            }
         }
     }
 
@@ -249,58 +263,75 @@ public class Parser {
     }
 
     private List<VarDecl> parseGlobalVarDecls() {
+        List<VarDecl> vds = new ArrayList<>();
         if (acceptsType() && isVarDecl()) {
-            parseVarDecls();
+            vds.addAll(parseVarDecls());
         }
-        return null;
+        return vds;
     }
     
     private VarDecl parseVarDecl() {
-        parseType();
-        expect(TokenClass.IDENTIFIER);
-        parseArrayDecl();
+        Type t = parseType();
+        String name = expect(TokenClass.IDENTIFIER).data;
+        int i = parseArrayDecl();
         expect(TokenClass.SC);
+        if (i > -1) {
+            t = new ArrayType(t, i);
+        }
+        return new VarDecl(t, name);
     }
 
     // can scoop up function declarations if no lookahead
     private List<VarDecl> parseVarDecls() {
+        List<VarDecl> vds = new ArrayList<>();
         if (acceptsType() && isVarDecl()) {
-            parseVarDecl();
-            parseVarDecls();
+            vds.add(parseVarDecl());
+            vds.addAll(parseVarDecls());
         }
-        return null;
+        return vds;
     }
 
-    private void parseArrayDecl() {
+    private int parseArrayDecl() {
         if (accept(TokenClass.LSBR)) {
             nextToken();
-            expect(TokenClass.INT_LITERAL);
+            int i = Integer.parseInt(expect(TokenClass.INT_LITERAL).data);
             expect(TokenClass.RSBR);
+            return i;
         }
+        // no array declaration
+        return -1;
     }
 
     private List<FunDecl> parseGlobalFunDecls() {
+        List<FunDecl> fds = new ArrayList<>();
         if (acceptsType() && isFunDecl()) {
-            parseFunDecls();
+            fds.addAll(parseFunDecls());
         }
-        return null;
+        return fds;
     }
 
-    private void parseFunDecl() {
+    private FunDecl parseFunDecl() {
         parseType();
         expect(TokenClass.IDENTIFIER);
         expect(TokenClass.LPAR);
         parseParams();
         expect(TokenClass.RPAR);
         parseBlock();
+        return new FunDecl(
+            BaseType.INT, 
+            "no name mista", 
+            new ArrayList<>(), 
+            new Block(new ArrayList<>(), new ArrayList<>())
+        );
     }
 
     private List<FunDecl> parseFunDecls() {
+        List<FunDecl> fds = new ArrayList<>();
         if (acceptsType() && isFunDecl()) {
-            parseFunDecl();
-            parseFunDecls();
+            fds.add(parseFunDecl());
+            fds.addAll(parseFunDecls());
         }
-        return null;
+        return fds;
     }
     
     private void parseParams() {
