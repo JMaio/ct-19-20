@@ -51,12 +51,22 @@ public class ASTPrinter implements ASTVisitor<Void> {
     }
 
     public Void visitStructType(StructType st) {
-        // TODO Auto-generated method stub
+        writer.print(st.getClass().getSimpleName() + "(");
+
+        writer.print(st.structType);
+
+        writer.print(")");
         return null;
     }
 
     public Void visitArrayType(ArrayType at) {
-        // TODO Auto-generated method stub
+        writer.print(at.getClass().getSimpleName() + "(");
+        
+        at.t.accept(this);
+        writer.print(defaultDelimiter);
+
+        writer.print(at.size);
+        writer.print(")");
         return null;
     }
 
