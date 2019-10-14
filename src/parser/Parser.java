@@ -209,11 +209,11 @@ public class Parser {
     }
 
     private List<StructTypeDecl> parseStructDecls() {
-        List<StructTypeDecl> stds = new ArrayList<StructTypeDecl>();
+        List<StructTypeDecl> stds = new ArrayList<>();
 
         if (accept(TokenClass.STRUCT)) {
             StructType st = parseStructType();
-            List<VarDecl> vds = new ArrayList<VarDecl>();
+            List<VarDecl> vds = new ArrayList<>();
 
             expect(TokenClass.LBRA);
 
