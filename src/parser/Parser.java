@@ -551,16 +551,20 @@ public class Parser {
         expect(TokenClass.RPAR);
     }
     
-    private void parseOptExpPlus() {
-        parseExp();
-        parseExpPlus();
+    private List<Expr> parseOptExpPlus() {
+        List<Expr> exprs = new ArrayList<>();
+        exprs.add(parseExp());
+        exprs.addAll(parseExpPlus());
+        return exprs;
     }
 
-    private void parseExpPlus() {
+    private List<Expr> parseExpPlus() {
+        List<Expr> exprs = new ArrayList<>();
         if (accept(TokenClass.COMMA)) {
             nextToken();
-            parseExp();
-            parseExpPlus();
+            exprs.add(parseExp());
+            exprs.addAll(parseExpPlus());
         }
+        return exprs;
     }
 }
