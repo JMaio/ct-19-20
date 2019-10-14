@@ -527,19 +527,31 @@ public class Parser {
         }
     }
 
-    private void parseExp0() {
+    private Expr parseExp0() {
+        Expr e = null;
         if (accept(TokenClass.LPAR)) {
             nextToken();
-            parseExp();
+            e = parseExp();
             expect(TokenClass.RPAR);
         } else {
-            expect(
+            Token t = expect(
                 TokenClass.IDENTIFIER,
                 TokenClass.INT_LITERAL,
                 TokenClass.STRING_LITERAL,
                 TokenClass.CHAR_LITERAL
             );
+            if (t != null) {
+                switch (t.tokenClass) {
+                    case IDENTIFIER    : e = new VarExpr(t.data);
+                    case INT_LITERAL   : e = new IntLiteral(t.data);
+                    case STRING_LITERAL: e = new StrLiteral(t.data);
+                    case CHAR_LITERAL  : e = ChrLiteral.fromString(t.data);
+                    default: break;
+                }
+            }
         }
+
+        return e;
     }
 
     private FunCallExpr parseFunCall() {
