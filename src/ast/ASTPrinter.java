@@ -13,7 +13,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
     public final String defaultDelimiter = ",";
     
     public Void visitProgram(Program p) {
-        writer.print("Program(");
+        writer.print(p.getClass().getSimpleName() + "(");
         String delimiter = "";
         for (StructTypeDecl std : p.structTypeDecls) {
             writer.print(delimiter);
@@ -35,7 +35,6 @@ public class ASTPrinter implements ASTVisitor<Void> {
         return null;
     }
     
-    // Types --------------
 
     public Void visitBaseType(BaseType bt) {
         writer.write(bt.name());
@@ -43,9 +42,10 @@ public class ASTPrinter implements ASTVisitor<Void> {
     }
 
     public Void visitPointerType(PointerType pt) {
-        writer.write(pt.getClass().getSimpleName());
-        writer.write("(");
+        writer.write(pt.getClass().getSimpleName() + "(");
+
         pt.t.accept(this);
+
         writer.write(")");
         return null;
     }
@@ -88,8 +88,10 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     public Void visitVarDecl(VarDecl vd) {
         writer.print(vd.getClass().getSimpleName() + "(");
+        
         vd.type.accept(this);
         writer.print(defaultDelimiter);
+
         writer.print(vd.name);
         writer.print(")");
         return null;
@@ -97,6 +99,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     public Void visitFunDecl(FunDecl fd) {
         writer.print(fd.getClass().getSimpleName() + "(");
+        
         fd.type.accept(this);
         writer.print(defaultDelimiter);
 
@@ -116,23 +119,29 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
 
     public Void visitIntLiteral(IntLiteral i) {
+        writer.print(i.getClass().getSimpleName() + "(");
         writer.print(i.value);
+        writer.print(")");
         return null;
     }
 
     public Void visitStrLiteral(StrLiteral s) {
+        writer.print(s.getClass().getSimpleName() + "(");
         writer.print(s.value);
+        writer.print(")");
         return null;
     }
 
     public Void visitChrLiteral(ChrLiteral c) {
+        writer.print(c.getClass().getSimpleName() + "(");
         writer.print(c.value);
+        writer.print(")");
         return null;
     }
 
 
     public Void visitVarExpr(VarExpr v) {
-        writer.print("VarExpr(");
+        writer.print(v.getClass().getSimpleName() + "(");
         writer.print(v.name);
         writer.print(")");
         return null;
@@ -143,10 +152,8 @@ public class ASTPrinter implements ASTVisitor<Void> {
         writer.print(fce.getClass().getSimpleName() + "(");
         writer.print(fce.name);
         
-        String d = "";
         for (Expr e : fce.args) {
-            writer.print(d);
-            d = defaultDelimiter;
+            writer.print(defaultDelimiter);
             e.accept(this);
         }
 
@@ -177,8 +184,10 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     public Void visitArrayAccessExpr(ArrayAccessExpr aae) {
         writer.print(aae.getClass().getSimpleName() + "(");
+
         aae.array.accept(this);
         writer.print(defaultDelimiter);
+        
         aae.index.accept(this);
         writer.print(")");
         return null;
@@ -186,8 +195,10 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     public Void visitFieldAccessExpr(FieldAccessExpr fae) {
         writer.print(fae.getClass().getSimpleName() + "(");
+        
         fae.struct.accept(this);
         writer.print(defaultDelimiter);
+        
         writer.print(fae.field);
         writer.print(")");
         return null;
@@ -210,8 +221,10 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     public Void visitTypecastExpr(TypecastExpr te) {
         writer.print(te.getClass().getSimpleName() + "(");
+
         te.t.accept(this);
         writer.print(defaultDelimiter);
+
         te.expr.accept(this);
         writer.print(")");
         return null;
@@ -221,6 +234,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     public Void visitExprStmt(ExprStmt es) {
         writer.print(es.getClass().getSimpleName() + "(");
+        es.accept(this);
         writer.print(")");
         return null;
     }
@@ -228,8 +242,10 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     public Void visitWhile(While w) {
         writer.print(w.getClass().getSimpleName() + "(");
+
         w.expr.accept(this);
         writer.print(defaultDelimiter);
+
         w.stmt.accept(this);
         writer.print(")");
         return null;
@@ -238,8 +254,10 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     public Void visitIf(If i) {
         writer.print(i.getClass().getSimpleName() + "(");
+
         i.cond.accept(this);
         writer.print(defaultDelimiter);
+
         i.stmt.accept(this);
         writer.print(")");
         return null;
@@ -248,8 +266,10 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     public Void visitAssign(Assign a) {
         writer.print(a.getClass().getSimpleName() + "(");
+
         a.left.accept(this);
         writer.print(defaultDelimiter);
+
         a.right.accept(this);
         writer.print(")");
         return null;
@@ -269,6 +289,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
     
     public Void visitBlock(Block b) {
         writer.print("Block(");
+        
         String d = "";
         for (VarDecl vd : b.vds) {
             writer.print(d);
