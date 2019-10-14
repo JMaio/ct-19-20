@@ -44,7 +44,10 @@ public class ASTPrinter implements ASTVisitor<Void> {
     }
 
     public Void visitPointerType(PointerType pt) {
-        // TODO Auto-generated method stub
+        writer.write(pt.getClass().getSimpleName());
+        writer.write("(");
+        pt.t.accept(this);
+        writer.write(")");
         return null;
     }
 
