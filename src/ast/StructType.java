@@ -9,7 +9,7 @@ public class StructType implements Type {
     }
 
     public <T> T accept(ASTVisitor<T> v) {
-        return null;
+        return v.visitStructType(this);
     }
     
 }
