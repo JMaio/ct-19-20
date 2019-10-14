@@ -495,13 +495,24 @@ public class Parser {
 
     private Expr parseExp3() {
         Expr e = parseExp2();
+        
+        TokenClass opClass = token.tokenClass;
         if (accept(
             TokenClass.ASTERIX,
             TokenClass.DIV,
             TokenClass.REM
         )) {
             nextToken();
-            parseExp3();
+            Expr right = parseExp3();
+            Op op = null;
+            switch (opClass) {
+                case ASTERIX: op = Op.MUL; break;
+                case DIV    : op = Op.DIV; break;
+                case REM    : op = Op.MOD; break;
+                default:
+                    break;
+            }
+            e = new BinOp(e, op, right);
         }
         return e;
     }
