@@ -8,8 +8,8 @@ public class Block extends Stmt {
     public final List<Stmt> stmts;
 
     public Block(List<VarDecl> vds, List<Stmt> stmts) {
-        this.vds = vds.isEmpty() ? null : vds;
-        this.stmts = stmts.isEmpty() ? null : stmts;
+        this.vds = vds;
+        this.stmts = stmts;
     }
 
     public <T> T accept(ASTVisitor<T> v) {
