@@ -469,6 +469,8 @@ public class Parser {
 
     private Expr parseExp5() {
         Expr e = parseExp4();
+        TokenClass opClass = token.tokenClass;
+
         if (accept(
             TokenClass.LT,
             TokenClass.LE,
@@ -476,7 +478,20 @@ public class Parser {
             TokenClass.GE
         )) {
             nextToken();
-            parseExp5();
+            Expr right = parseExp5();
+            Op op = null;
+
+            switch (opClass) {
+                case LT: op = Op.LT; break;
+                case LE: op = Op.LE; break;
+                case GT: op = Op.GT; break;
+                case GE: op = Op.GE; break;
+            
+                default:
+                    break;
+            }
+
+            e = new BinOp(e, op, right);
         }
         return e;
     }
