@@ -1,6 +1,6 @@
 package ast;
 
-public class StrLiteral implements ASTNode {
+public class StrLiteral extends Expr {
     
     public final String value;
 
