@@ -457,12 +457,25 @@ public class Parser {
 
     private Expr parseExp6() {
         Expr e = parseExp5();
+        TokenClass opClass = token.tokenClass;
+
         if (accept(
             TokenClass.EQ,
             TokenClass.NE
         )) {
             nextToken();
-            parseExp6();
+            Expr right = parseExp6();
+            Op op = null;
+
+            switch (opClass) {
+                case EQ: op = Op.EQ; break;
+                case NE: op = Op.NE; break;
+
+                default:
+                    break;
+            }
+            
+            e = new BinOp(e, op, right);
         }
         return e;
     }
@@ -515,7 +528,7 @@ public class Parser {
                 default:
                     break;
             }
-            
+
             e = new BinOp(e, op, right);
         }
         return e;
