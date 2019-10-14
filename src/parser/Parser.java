@@ -483,12 +483,25 @@ public class Parser {
 
     private Expr parseExp4() {
         Expr e = parseExp3();
+        TokenClass opClass = token.tokenClass;
+
         if (accept(
             TokenClass.PLUS,
             TokenClass.MINUS
         )) {
             nextToken();
-            parseExp4();
+            Expr right = parseExp4();
+            Op op = null;
+
+            switch (opClass) {
+                case PLUS : op = Op.ADD; break;
+                case MINUS: op = Op.SUB; break;
+
+                default:
+                    break;
+            }
+            
+            e = new BinOp(e, op, right);
         }
         return e;
     }
