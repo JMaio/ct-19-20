@@ -1,6 +1,6 @@
 package ast;
 
-public class BinOp implements ASTNode {
+public class BinOp extends Expr {
 
     public final Expr left;
     public final Op op;
@@ -10,6 +10,11 @@ public class BinOp implements ASTNode {
         this.left = left;
         this.op = op;
         this.right = right;
+    }
+
+    // factory for negative expressions
+    public static BinOp negative(Expr e) {
+        return new BinOp(new IntLiteral(0), Op.SUB, e);
     }
 
     public <T> T accept(ASTVisitor<T> v) {
