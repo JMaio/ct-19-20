@@ -196,9 +196,15 @@ public class Parser {
     }
 
     private StructType parseStructType() {
-        expect(TokenClass.STRUCT);
-        String st = expect(TokenClass.IDENTIFIER).data;
+        // sane default
+        String st = "-- invalid struct --";
 
+        expect(TokenClass.STRUCT);
+        Token t = expect(TokenClass.IDENTIFIER);
+        // error handling for null token
+        if (t != null) {
+            st = t.data;
+        }
         return new StructType(st);
     }
 
