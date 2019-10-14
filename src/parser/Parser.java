@@ -366,19 +366,22 @@ public class Parser {
         return new Block(vds, stmts);
     }
 
-    private void parseStmts() {
+    private List<Stmt> parseStmts() {
+        List<Stmt> stmts = new ArrayList<>();
         // if next token not a closing brace, still in block [also check if EOF - prevent infinite recursion]
         if (!accept(TokenClass.RBRA, TokenClass.EOF)) {
             parseStmt();
             parseStmts();
         }
+        return stmts;
     }
 
-    private void parseElseStmt() {
+    private Stmt parseElseStmt() {
         if (accept(TokenClass.ELSE)) {
             nextToken();
-            parseStmt();
+            return parseStmt();
         }
+        return null;
     }
 
     private Stmt parseStmt() {
@@ -422,34 +425,37 @@ public class Parser {
         return stmt;
     }
 
-    private void parseOptExp() {
+    private Expr parseOptExp() {
         if (!accept(TokenClass.SC)) {
-            parseExp();
+            return parseExp();
         }
+        return null;
     }
 
-    private void parseExp() {
-        parseExp8();
+    private Expr parseExp() {
+        return parseExp8();
     }
 
-    private void parseExp8() {
-        parseExp7();
+    private Expr parseExp8() {
+        Expr e = parseExp7();
         if (accept(TokenClass.OR)) {
             nextToken();
             parseExp8();
         }
+        return e;
     }
     
-    private void parseExp7() {
-        parseExp6();
+    private Expr parseExp7() {
+        Expr e = parseExp6();
         if (accept(TokenClass.AND)) {
             nextToken();
             parseExp7();
         }
+        return e;
     }
 
-    private void parseExp6() {
-        parseExp5();
+    private Expr parseExp6() {
+        Expr e = parseExp5();
         if (accept(
             TokenClass.EQ,
             TokenClass.NE
@@ -457,10 +463,11 @@ public class Parser {
             nextToken();
             parseExp6();
         }
+        return e;
     }
 
-    private void parseExp5() {
-        parseExp4();
+    private Expr parseExp5() {
+        Expr e = parseExp4();
         if (accept(
             TokenClass.LT,
             TokenClass.LE,
@@ -470,10 +477,11 @@ public class Parser {
             nextToken();
             parseExp5();
         }
+        return e;
     }
 
-    private void parseExp4() {
-        parseExp3();
+    private Expr parseExp4() {
+        Expr e = parseExp3();
         if (accept(
             TokenClass.PLUS,
             TokenClass.MINUS
@@ -481,10 +489,11 @@ public class Parser {
             nextToken();
             parseExp4();
         }
+        return e;
     }
 
-    private void parseExp3() {
-        parseExp2();
+    private Expr parseExp3() {
+        Expr e = parseExp2();
         if (accept(
             TokenClass.ASTERIX,
             TokenClass.DIV,
@@ -493,6 +502,7 @@ public class Parser {
             nextToken();
             parseExp3();
         }
+        return e;
     }
 
     private void parseTypecast() {
