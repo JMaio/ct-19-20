@@ -334,21 +334,18 @@ public class Parser {
         return fds;
     }
     
-    private void parseParams() {
+    private List<VarDecl> parseParams() {
+        List<VarDecl> params = new ArrayList<>();
         if (acceptsType()) {
-            parseType();
-            expect(TokenClass.IDENTIFIER);
-            parseParamsPlus();
+            Type t = parseType();
+            String name = expect(TokenClass.IDENTIFIER).data;
+            params.add(new VarDecl(t, name));
+            if (accept(TokenClass.COMMA)) {
+                nextToken();
+                params.addAll(parseParams());
+            }
         }
-    }
-
-    private void parseParamsPlus() {
-        if (accept(TokenClass.COMMA)) {
-            nextToken();
-            parseType();
-            expect(TokenClass.IDENTIFIER);
-            parseParamsPlus();
-        }
+        return params;
     }
 
     private void parseBlock() {
