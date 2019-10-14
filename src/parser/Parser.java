@@ -238,7 +238,8 @@ public class Parser {
                 TokenClass.CHAR,
                 TokenClass.VOID
             );
-            BaseType bt = null;
+            // initialize bt to default to INT
+            BaseType bt = BaseType.INT;
             switch (t.tokenClass) {
                 case INT:  bt = BaseType.INT;
                 case CHAR: bt = BaseType.CHAR;
