@@ -234,7 +234,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     public Void visitExprStmt(ExprStmt es) {
         writer.print(es.getClass().getSimpleName() + "(");
-        es.accept(this);
+        es.expr.accept(this);
         writer.print(")");
         return null;
     }
