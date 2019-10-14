@@ -37,11 +37,6 @@ public class ASTPrinter implements ASTVisitor<Void> {
     }
     
     // Types --------------
-    
-    public Void visitType(Type t) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
     public Void visitBaseType(BaseType bt) {
         // to complete ...
@@ -93,33 +88,22 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
 
 
-    @Override
-    public Void visitExpr(Expr e) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-
-    @Override
     public Void visitIntLiteral(IntLiteral i) {
         writer.print(i.value);
         return null;
     }
 
-    @Override
     public Void visitStrLiteral(StrLiteral s) {
         writer.print(s.value);
         return null;
     }
 
-    @Override
     public Void visitChrLiteral(ChrLiteral c) {
         writer.print(c.value);
         return null;
     }
 
 
-    @Override
     public Void visitVarExpr(VarExpr v) {
         writer.print("VarExpr(");
         writer.print(v.name);
@@ -179,12 +163,6 @@ public class ASTPrinter implements ASTVisitor<Void> {
         return null;
     }
 
-    
-
-    public Void visitStmt(Stmt s) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 
 
     public Void visitExprStmt(ExprStmt es) {
