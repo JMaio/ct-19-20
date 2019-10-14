@@ -513,30 +513,39 @@ public class Parser {
         parseExp2();
     }
 
-    private void parseExp2() {
-        if (accept(
-            TokenClass.MINUS,
-            TokenClass.ASTERIX
-        )) {
-            // minus or valueat
+    private Expr parseExp2() {
+        Expr e;
+        if (accept(TokenClass.ASTERIX)) {
             nextToken();
-            parseExp2();
-        } else if (accept(TokenClass.SIZEOF)) {
+            e = new ValueAtExpr(parseExp2());
+        }
+        else if (accept(TokenClass.MINUS)){
+            nextToken();
+            e = BinOp.negative(parseExp2());
+        }
+        else if (accept(TokenClass.SIZEOF)) {
             nextToken();
             expect(TokenClass.LPAR);
-            parseType();
+            Type t = parseType();
             expect(TokenClass.RPAR);
-        } else if (
+            e = new SizeOfExpr(t);
+        }
+        else if (
             accept(TokenClass.LPAR) && 
             acceptWithLookahead(1, 
                 TokenClass.INT,
                 TokenClass.CHAR,
                 TokenClass.VOID,
                 TokenClass.STRUCT
-            )) { parseTypecast(); }
+            )) { 
+                Type t = parseTypecast();
+                Expr tce = parseExp2();
+                e = new TypecastExpr(t, tce);
+            }
         else {
-            parseExp1();
+            e = parseExp1();
         }
+        return e;
     }
 
     private Expr parseExp1() {
