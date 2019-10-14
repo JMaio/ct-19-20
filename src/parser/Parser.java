@@ -371,8 +371,8 @@ public class Parser {
         List<Stmt> stmts = new ArrayList<>();
         // if next token not a closing brace, still in block [also check if EOF - prevent infinite recursion]
         if (!accept(TokenClass.RBRA, TokenClass.EOF)) {
-            parseStmt();
-            parseStmts();
+            stmts.add(parseStmt());
+            stmts.addAll(parseStmts());
         }
         return stmts;
     }
