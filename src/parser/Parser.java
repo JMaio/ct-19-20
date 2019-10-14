@@ -506,11 +506,11 @@ public class Parser {
         return e;
     }
 
-    private void parseTypecast() {
+    private Type parseTypecast() {
         expect(TokenClass.LPAR);
-        parseType();
+        Type t = parseType();
         expect(TokenClass.RPAR);
-        parseExp2();
+        return t;
     }
 
     private Expr parseExp2() {
