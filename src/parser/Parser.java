@@ -244,20 +244,21 @@ public class Parser {
                 TokenClass.CHAR,
                 TokenClass.VOID
             );
-            // initialize bt to default to INT
-            BaseType bt = BaseType.INT;
-            switch (t.tokenClass) {
-                case INT:  bt = BaseType.INT;
-                case CHAR: bt = BaseType.CHAR;
-                case VOID: bt = BaseType.VOID;
-                default:
-                    break;
-            }
-            if(parseReference()) {
-               return new PointerType(bt); 
-            } else {
-                return bt;
-            }
+            // initialize bt to default to VOID
+            BaseType bt = BaseType.VOID;
+            if (t != null) {
+                switch (t.tokenClass) {
+                    case INT:  bt = BaseType.INT; break;
+                    case CHAR: bt = BaseType.CHAR; break;
+                    case VOID: bt = BaseType.VOID; break;
+                    default:
+                        break;
+                }
+                if(parseReference()) {
+                    return new PointerType(bt); 
+                }
+            } 
+            return bt;
         }
     }
 
