@@ -539,13 +539,15 @@ public class Parser {
         }
     }
 
-    private void parseExp1() {
-        // check for function calls
+    private Expr parseExp1() {
+        Expr e;
         TokenClass la = lookAhead(1).tokenClass;
+        // check for function calls
         if (accept(TokenClass.IDENTIFIER) && la == TokenClass.LPAR) {
-            parseFunCall();
+            e = parseFunCall();
         } else {
-            parseExp0();
+            e = parseExp0();
+        }
 
         while (accept(TokenClass.LSBR, TokenClass.DOT)) {
             if (accept(TokenClass.LSBR)) {
