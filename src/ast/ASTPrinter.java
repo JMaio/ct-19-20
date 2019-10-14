@@ -184,7 +184,8 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
 
     public Void visitExprStmt(ExprStmt es) {
-        // TODO Auto-generated method stub
+        writer.print(es.getClass().getName() + "(");
+        writer.print(")");
         return null;
     }
 
