@@ -546,21 +546,33 @@ public class Parser {
             parseFunCall();
         } else {
             parseExp0();
+
+        while (accept(TokenClass.LSBR, TokenClass.DOT)) {
+            if (accept(TokenClass.LSBR)) {
+                e = new ArrayAccessExpr(e, parseArrayAccess());
+            } else if (accept(TokenClass.DOT)) {
+                e = new FieldAccessExpr(e, parseFieldAccess());
+            }
         }
-        parseAccess();
+
+        return e;
     }
 
-    private void parseAccess() {
-        if (accept(TokenClass.LSBR)) {
-            nextToken();
-            parseExp();
-            expect(TokenClass.RSBR);
-            parseAccess();
-        } else if (accept(TokenClass.DOT)) {
-            nextToken();
-            expect(TokenClass.IDENTIFIER);
-            parseAccess();
+    private String parseFieldAccess() {
+        expect(TokenClass.DOT);
+        String field = "-- invalid field access identifier --";
+        Token t = expect(TokenClass.IDENTIFIER);
+        if (t != null) {
+            field = t.data;
         }
+        return field;
+    }
+
+    private Expr parseArrayAccess() {
+        expect(TokenClass.LSBR);
+        Expr e = parseExp();
+        expect(TokenClass.RSBR);
+        return e;
     }
 
     private Expr parseExp0() {
