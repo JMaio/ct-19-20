@@ -153,23 +153,35 @@ public class ASTPrinter implements ASTVisitor<Void> {
     }
 
     public Void visitFieldAccessExpr(FieldAccessExpr fae) {
-        // TODO Auto-generated method stub
+        writer.print(fae.getClass().getSimpleName() + "(");
+        fae.struct.accept(this);
+        writer.print(defaultDelimiter);
+        writer.print(fae.field);
+        writer.print(")");
         return null;
     }
 
     public Void visitValueAtExpr(ValueAtExpr vae) {
-        // TODO Auto-generated method stub
+        writer.print(vae.getClass().getSimpleName() + "(");
+        vae.expr.accept(this);
+        writer.print(")");
         return null;
     }
 
     public Void visitSizeOfExpr(SizeOfExpr soe) {
-        // TODO Auto-generated method stub
+        writer.print(soe.getClass().getSimpleName() + "(");
+        soe.t.accept(this);
+        writer.print(")");
         return null;
     }
 
 
     public Void visitTypecastExpr(TypecastExpr te) {
-        // TODO Auto-generated method stub
+        writer.print(te.getClass().getSimpleName() + "(");
+        te.t.accept(this);
+        writer.print(defaultDelimiter);
+        te.expr.accept(this);
+        writer.print(")");
         return null;
     }
 
@@ -183,19 +195,31 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
 
     public Void visitWhile(While w) {
-        // TODO Auto-generated method stub
+        writer.print(w.getClass().getSimpleName() + "(");
+        w.expr.accept(this);
+        writer.print(defaultDelimiter);
+        w.stmt.accept(this);
+        writer.print(")");
         return null;
     }
 
 
     public Void visitIf(If i) {
-        // TODO Auto-generated method stub
+        writer.print(i.getClass().getSimpleName() + "(");
+        i.cond.accept(this);
+        writer.print(defaultDelimiter);
+        i.stmt.accept(this);
+        writer.print(")");
         return null;
     }
 
 
     public Void visitAssign(Assign a) {
-        // TODO Auto-generated method stub
+        writer.print(a.getClass().getSimpleName() + "(");
+        a.left.accept(this);
+        writer.print(defaultDelimiter);
+        a.right.accept(this);
+        writer.print(")");
         return null;
     }
 
