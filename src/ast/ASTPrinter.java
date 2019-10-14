@@ -39,7 +39,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
     // Types --------------
 
     public Void visitBaseType(BaseType bt) {
-        // to complete ...
+        writer.write(bt.name());
         return null;
     }
 
