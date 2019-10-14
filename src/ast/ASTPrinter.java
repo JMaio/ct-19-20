@@ -148,7 +148,11 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
 
     public Void visitArrayAccessExpr(ArrayAccessExpr aae) {
-        // TODO Auto-generated method stub
+        writer.print(aae.getClass().getSimpleName() + "(");
+        aae.array.accept(this);
+        writer.print(defaultDelimiter);
+        aae.index.accept(this);
+        writer.print(")");
         return null;
     }
 
