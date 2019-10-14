@@ -542,13 +542,21 @@ public class Parser {
         }
     }
 
-    private void parseFunCall() {
-        expect(TokenClass.IDENTIFIER);
+    private FunCallExpr parseFunCall() {
+        String name = "-- invalid function name --";
+        List<Expr> args = new ArrayList<>();
+
+        Token t = expect(TokenClass.IDENTIFIER);
+        if (t != null) {
+            name = t.data;
+        }
+
         expect(TokenClass.LPAR);
         if (!accept(TokenClass.RPAR)) {
-            parseOptExpPlus();
+            args.addAll(parseOptExpPlus());
         }
         expect(TokenClass.RPAR);
+        return new FunCallExpr(name, args);
     }
     
     private List<Expr> parseOptExpPlus() {
