@@ -10,6 +10,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
             this.writer = writer;
     }
     
+    public final String defaultDelimiter = ",";
     
     @Override
     public Void visitProgram(Program p) {
@@ -218,7 +219,19 @@ public class ASTPrinter implements ASTVisitor<Void> {
     
     public Void visitBlock(Block b) {
         writer.print("Block(");
-        // to complete
+        String d = "";
+        for (VarDecl vd : b.vds) {
+            writer.print(d);
+            d = defaultDelimiter;
+            vd.accept(this);
+        }
+        
+        for (Stmt stmt : b.stmts) {
+            writer.print(d);
+            d = defaultDelimiter;
+            stmt.accept(this);
+        }
+
         writer.print(")");
         return null;
     }
