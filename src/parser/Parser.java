@@ -311,18 +311,13 @@ public class Parser {
     }
 
     private FunDecl parseFunDecl() {
-        parseType();
-        expect(TokenClass.IDENTIFIER);
+        Type t = parseType();
+        String name = expect(TokenClass.IDENTIFIER).data;
         expect(TokenClass.LPAR);
-        parseParams();
+        List<VarDecl> params = parseParams();
         expect(TokenClass.RPAR);
-        parseBlock();
-        return new FunDecl(
-            BaseType.INT, 
-            "no name mista", 
-            new ArrayList<>(), 
-            new Block(new ArrayList<>(), new ArrayList<>())
-        );
+        Block b = parseBlock();
+        return new FunDecl(t, name, params, b);
     }
 
     private List<FunDecl> parseFunDecls() {
@@ -348,11 +343,12 @@ public class Parser {
         return params;
     }
 
-    private void parseBlock() {
+    private Block parseBlock() {
         expect(TokenClass.LBRA);
         parseVarDecls();
         parseStmts();
         expect(TokenClass.RBRA);
+        return new Block(new ArrayList<>(), new ArrayList<>());
     }
 
     private void parseStmts() {
