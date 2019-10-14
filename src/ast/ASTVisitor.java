@@ -6,8 +6,6 @@ public interface ASTVisitor<T> {
     
 
 
-    // public T visitType(Type t);
-    
     public T visitBaseType(BaseType bt);
     public T visitPointerType(PointerType pt);
     public T visitStructType(StructType st);
@@ -20,8 +18,6 @@ public interface ASTVisitor<T> {
     public T visitFunDecl(FunDecl fd);
     
 
-
-    // public T visitExpr(Expr e);
 
     public T visitIntLiteral(IntLiteral i);
     public T visitStrLiteral(StrLiteral s);
@@ -45,8 +41,6 @@ public interface ASTVisitor<T> {
     public T visitTypecastExpr(TypecastExpr te);
 
 
-
-    public T visitStmt(Stmt s);
 
     public T visitExprStmt(ExprStmt es);
 
