@@ -279,7 +279,13 @@ public class Parser {
     
     private VarDecl parseVarDecl() {
         Type t = parseType();
-        String name = expect(TokenClass.IDENTIFIER).data;
+        Token tok = expect(TokenClass.IDENTIFIER);
+        
+        // bad identifier
+        String name = "-- invalid variable identifier --";
+        if (tok != null) {
+            name = tok.data;
+        }
         int i = parseArrayDecl();
         expect(TokenClass.SC);
         if (i > -1) {
