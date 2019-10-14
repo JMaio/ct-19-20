@@ -87,13 +87,18 @@ public class ASTPrinter implements ASTVisitor<Void> {
     }
 
     public Void visitFunDecl(FunDecl fd) {
-        writer.print("FunDecl(");
+        writer.print(fd.getClass().getSimpleName() + "(");
         fd.type.accept(this);
-        writer.print(","+fd.name+",");
+        writer.print(defaultDelimiter);
+
+        writer.print(fd.name);
+        writer.print(defaultDelimiter);
+        
         for (VarDecl vd : fd.params) {
             vd.accept(this);
-            writer.print(",");
+            writer.print(defaultDelimiter);
         }
+
         fd.block.accept(this);
         writer.print(")");
         return null;
