@@ -577,10 +577,10 @@ public class Parser {
             );
             if (t != null) {
                 switch (t.tokenClass) {
-                    case IDENTIFIER    : e = new VarExpr(t.data);
-                    case INT_LITERAL   : e = new IntLiteral(t.data);
-                    case STRING_LITERAL: e = new StrLiteral(t.data);
-                    case CHAR_LITERAL  : e = ChrLiteral.fromString(t.data);
+                    case IDENTIFIER    : e = new VarExpr(t.data); break;
+                    case INT_LITERAL   : e = IntLiteral.fromString(t.data); break;
+                    case STRING_LITERAL: e = new StrLiteral(t.data); break;
+                    case CHAR_LITERAL  : e = ChrLiteral.fromString(t.data); break;
                     default: break;
                 }
             }
