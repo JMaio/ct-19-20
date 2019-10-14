@@ -439,10 +439,14 @@ public class Parser {
 
     private Expr parseExp8() {
         Expr e = parseExp7();
+
         if (accept(TokenClass.OR)) {
             nextToken();
-            parseExp8();
+            Expr right = parseExp8();
+
+            e = new BinOp(e, Op.AND, right);
         }
+
         return e;
     }
     
