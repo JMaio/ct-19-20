@@ -367,34 +367,45 @@ public class Parser {
         }
     }
 
-    private void parseStmt() {
+    private Stmt parseStmt() {
+        Stmt stmt;
         if (accept(TokenClass.LBRA)) {
-            parseBlock();
-        } else if (accept(TokenClass.WHILE)) {
+            stmt = parseBlock();
+        } 
+        else if (accept(TokenClass.WHILE)) {
             nextToken();
             expect(TokenClass.LPAR);
-            parseExp();
+            Expr e = parseExp();
             expect(TokenClass.RPAR);
-            parseStmt();
-        } else if (accept(TokenClass.IF)) {
+            Stmt s = parseStmt();
+            stmt = new While(e, s);
+        } 
+        else if (accept(TokenClass.IF)) {
             nextToken();
             expect(TokenClass.LPAR);
-            parseExp();
+            Expr e = parseExp();
             expect(TokenClass.RPAR);
-            parseStmt();
-            parseElseStmt();
-        } else if (accept(TokenClass.RETURN)) {
+            Stmt s = parseStmt();
+            stmt = new If(e, s, parseElseStmt());
+        } 
+        else if (accept(TokenClass.RETURN)) {
             nextToken();
-            parseOptExp();
+            Expr e = parseOptExp();
             expect(TokenClass.SC);
-        } else {
-            parseExp();
+            stmt = new Return(e);
+        } 
+        else {
+            Expr e = parseExp();
             if (accept(TokenClass.ASSIGN)) {
                 nextToken();
-                parseExp();
+                Expr right = parseExp();
+                stmt = new Assign(e, right);
+            } else {
+                stmt = new ExprStmt(e);
             }
             expect(TokenClass.SC);
         }
+        return stmt;
     }
 
     private void parseOptExp() {
