@@ -357,11 +357,13 @@ public class Parser {
     }
 
     private Block parseBlock() {
+        List<VarDecl> vds = new ArrayList<>();
+        List<Stmt> stmts = new ArrayList<>();
         expect(TokenClass.LBRA);
-        parseVarDecls();
-        parseStmts();
+        vds.addAll(parseVarDecls());
+        stmts.addAll(parseStmts());
         expect(TokenClass.RBRA);
-        return new Block(new ArrayList<>(), new ArrayList<>());
+        return new Block(vds, stmts);
     }
 
     private void parseStmts() {
