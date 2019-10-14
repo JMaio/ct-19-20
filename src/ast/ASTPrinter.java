@@ -130,18 +130,36 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     
     public Void visitFunCallExpr(FunCallExpr fce) {
-        // TODO Auto-generated method stub
+        writer.print(fce.getClass().getSimpleName() + "(");
+        writer.print(fce.name);
+        
+        String d = "";
+        for (Expr e : fce.args) {
+            writer.print(d);
+            d = defaultDelimiter;
+            e.accept(this);
+        }
+
+        writer.print(")");
         return null;
     }
 
     
     public Void visitBinOp(BinOp bo) {
-        // TODO Auto-generated method stub
+        writer.print(bo.getClass().getSimpleName() + "(");
+        bo.left.accept(this);
+        writer.print(defaultDelimiter);
+
+        bo.op.accept(this);
+        writer.print(defaultDelimiter);
+
+        bo.left.accept(this);
+        writer.print(")");
         return null;
     }
 
     public Void visitOp(Op o) {
-        // TODO Auto-generated method stub
+        writer.print(o.name());
         return null;
     }
 
@@ -192,7 +210,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
 
     public Void visitExprStmt(ExprStmt es) {
-        writer.print(es.getClass().getName() + "(");
+        writer.print(es.getClass().getSimpleName() + "(");
         writer.print(")");
         return null;
     }
@@ -229,7 +247,12 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
 
     public Void visitReturn(Return r) {
-        // TODO Auto-generated method stub
+        writer.print(r.getClass().getSimpleName());
+        if (r.expr != null) {
+            writer.print("(");
+            r.expr.accept(this);
+            writer.print(")");
+        }
         return null;
     }
 
