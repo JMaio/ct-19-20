@@ -61,12 +61,12 @@ public class ASTPrinter implements ASTVisitor<Void> {
     }
 
 
-    public Void visitStructTypeDecl(StructTypeDecl st) {
-        writer.print(st.getClass().getSimpleName() + "(");
+    public Void visitStructTypeDecl(StructTypeDecl std) {
+        writer.print(std.getClass().getSimpleName() + "(");
         
-        st.st.accept(this);
+        std.st.accept(this);
         
-        for (VarDecl vd : st.vds) {
+        for (VarDecl vd : std.vds) {
             writer.print(defaultDelimiter);
             vd.accept(this);
         }
