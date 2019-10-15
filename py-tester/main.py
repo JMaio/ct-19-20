@@ -22,7 +22,7 @@ def run_test(mode, filename, expected, out="a.out", logfile="test.log"):
     with open(logfile, 'a') as f:
         f.write(f" {filename} [{expected}]\n"), f.flush()
         code = subprocess.run(['java', '-cp', 'bin', 'Main',
-                               f'-{mode}', f'tests/{filename}', out], stdout=f).returncode
+                               f'-{mode}', f'tests/{filename}', f'{filename}-dump'], stdout=f).returncode
         # print(f"{filename}: ({expected}) => {code}")
         f.write("\n")
         return code
@@ -52,8 +52,9 @@ def run_tests(mode, tests, logfile):
 if __name__ == "__main__":
     filename = "tests.csv"
     modes = [
-        "lexer",
-        "parser"
+        # "lexer",
+        "parser",
+        "ast",
     ]
     dir_path = os.path.dirname(os.path.realpath(__file__))
 

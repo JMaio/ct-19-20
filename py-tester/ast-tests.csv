@@ -1,0 +1,2 @@
+parser/prec/0.c, PASS
+parser/base-rules/fundecl.c, PASS

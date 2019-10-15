@@ -21,6 +21,13 @@
                 "isDefault": true,
             },
             "dependsOn": "ant: build"
+        },
+        {
+            "label": "test ast",
+            "type": "shell",
+            "command": "java -cp bin Main -ast tests/parser/base-rules/fundecl.c fundecl.c-ast-dump",
+            "group": "test",
+            "dependsOn": "ant: build",
         }
     ]
 }
