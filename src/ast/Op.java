@@ -8,8 +8,7 @@ public enum Op implements ASTNode {
     OR, AND;
 
     public <T> T accept(ASTVisitor<T> v) {
-        // TODO Auto-generated method stub
-        return null;
+        return v.visitOp(this);
     }
     
 }

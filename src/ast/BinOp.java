@@ -18,8 +18,7 @@ public class BinOp extends Expr {
     }
 
     public <T> T accept(ASTVisitor<T> v) {
-        // TODO Auto-generated method stub
-        return null;
+        return v.visitBinOp(this);
     }
 
 }

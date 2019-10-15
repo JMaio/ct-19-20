@@ -170,7 +170,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
         bo.op.accept(this);
         writer.print(defaultDelimiter);
 
-        bo.left.accept(this);
+        bo.right.accept(this);
         writer.print(")");
         return null;
     }
@@ -259,6 +259,12 @@ public class ASTPrinter implements ASTVisitor<Void> {
         writer.print(defaultDelimiter);
 
         i.stmt.accept(this);
+
+        if (i.elseStmt != null) {
+            writer.print(defaultDelimiter);
+            i.elseStmt.accept(this);
+        }
+
         writer.print(")");
         return null;
     }
