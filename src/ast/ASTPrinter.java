@@ -283,12 +283,11 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
 
     public Void visitReturn(Return r) {
-        writer.print(r.getClass().getSimpleName());
+        writer.print(r.getClass().getSimpleName() + "(");
         if (r.expr != null) {
-            writer.print("(");
             r.expr.accept(this);
-            writer.print(")");
         }
+        writer.print(")");
         return null;
     }
 
