@@ -305,15 +305,29 @@ public class Parser {
         return vds;
     }
 
+    // private int parseArrayDecl() {
+    //     if (accept(TokenClass.LSBR)) {
+    //         nextToken();
+    //         int i = Integer.parseInt(expect(TokenClass.INT_LITERAL).data);
+    //         expect(TokenClass.RSBR);
+    //         return i;
+    //     }
+    //     // no array declaration
+    //     return -1;
+    // }
+
     private int parseArrayDecl() {
+        int i = -1;
         if (accept(TokenClass.LSBR)) {
             nextToken();
-            int i = Integer.parseInt(expect(TokenClass.INT_LITERAL).data);
+            Token t = expect(TokenClass.INT_LITERAL);
+            if (t != null) {
+                i = Integer.parseInt(t.data);
+            }
             expect(TokenClass.RSBR);
-            return i;
         }
         // no array declaration
-        return -1;
+        return i;
     }
 
     private List<FunDecl> parseGlobalFunDecls() {
