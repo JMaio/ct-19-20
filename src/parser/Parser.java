@@ -305,17 +305,6 @@ public class Parser {
         return vds;
     }
 
-    // private int parseArrayDecl() {
-    //     if (accept(TokenClass.LSBR)) {
-    //         nextToken();
-    //         int i = Integer.parseInt(expect(TokenClass.INT_LITERAL).data);
-    //         expect(TokenClass.RSBR);
-    //         return i;
-    //     }
-    //     // no array declaration
-    //     return -1;
-    // }
-
     private int parseArrayDecl() {
         int i = -1;
         if (accept(TokenClass.LSBR)) {

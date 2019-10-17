@@ -10,7 +10,6 @@ public class ArrayType implements Type {
         this.size = size;
     }
 
-    @Override
     public <T> T accept(ASTVisitor<T> v) {
         return v.visitArrayType(this);
     }

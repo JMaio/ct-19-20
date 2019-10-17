@@ -293,7 +293,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
 
     
     public Void visitBlock(Block b) {
-        writer.print("Block(");
+        writer.print(b.getClass().getSimpleName() + "(");
         
         String d = "";
         for (VarDecl vd : b.vds) {
