@@ -25,7 +25,7 @@
         {
             "label": "test ast",
             "type": "shell",
-            "command": "java -cp bin Main -ast tests/parser/base-rules/fundecl.c fundecl.c-ast-dump",
+            "command": "java -cp bin Main -ast tests/fibonacci.c ast.c-ast > tests/ast.c-ast",
             "group": "test",
             "dependsOn": "ant: build",
         }
