@@ -27,7 +27,8 @@ parser/nested_conditionals.c, PASS
 
 
 parser/base-rules/bad.assign.c, PARSER_FAIL
-parser/base-rules/bad.empty_struct.c, PARSER_FAIL
+parser/base-rules/bad.struct_empty.c, PARSER_FAIL
+parser/base-rules/bad.struct.c, PARSER_FAIL
 parser/base-rules/bad.extra_func_params.c, PARSER_FAIL
 parser/base-rules/bad.lone_else.c, PARSER_FAIL
 parser/base-rules/bad.unclosed_arrayaccess.c, PARSER_FAIL

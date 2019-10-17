@@ -1,2 +1,5 @@
 parser/prec/0.c, PASS
 parser/base-rules/fundecl.c, PASS
+all_tokens.c, PASS
+fibonacci.c, PASS
+tictactoe.c, PASS

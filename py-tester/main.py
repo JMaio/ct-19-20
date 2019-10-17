@@ -52,9 +52,9 @@ def run_tests(mode, tests, logfile):
 if __name__ == "__main__":
     filename = "tests.csv"
     modes = [
-        # "lexer",
-        "parser",
         "ast",
+        "parser",
+        # "lexer",
     ]
     dir_path = os.path.dirname(os.path.realpath(__file__))
 
