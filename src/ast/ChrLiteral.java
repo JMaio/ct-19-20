@@ -10,13 +10,14 @@ public class ChrLiteral extends Expr {
     
     public static ChrLiteral fromString(String s) {
         // assert s.length() == 1;
-        ChrLiteral c = new ChrLiteral('0');
+        char c = '\0';
+        if (s.length() == 1) { c = s.charAt(0); }
         try {
-            c = new ChrLiteral(s.toCharArray()[0]);    
+            c = s.charAt(0);    
         } catch (Exception e) {
             //TODO: handle exception
         }
-        return c;
+        return new ChrLiteral(c);
     }
 
     public <T> T accept(ASTVisitor<T> v) {
