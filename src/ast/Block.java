@@ -1,5 +1,6 @@
 package ast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Block extends Stmt {
@@ -10,6 +11,10 @@ public class Block extends Stmt {
     public Block(List<VarDecl> vds, List<Stmt> stmts) {
         this.vds = vds;
         this.stmts = stmts;
+    }
+
+    public Block() {
+        this(new ArrayList<>(), new ArrayList<>());
     }
 
     public <T> T accept(ASTVisitor<T> v) {
