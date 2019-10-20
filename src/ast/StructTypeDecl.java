@@ -22,4 +22,11 @@ public class StructTypeDecl implements ASTNode {
         return false;
     }
 
+    public Type getFieldType(String f) {
+        for (VarDecl vd : vds) {
+            if (vd.name.equals(f)) { return vd.type; }
+        }
+        return null;
+    }
+
 }

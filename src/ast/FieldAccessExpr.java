@@ -14,4 +14,7 @@ public class FieldAccessExpr extends Expr {
         return v.visitFieldAccessExpr(this);
     }
 
+    @Override
+    public boolean isFieldAccessExpr() { return true; }
+
 }
