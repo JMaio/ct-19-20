@@ -70,10 +70,18 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitStructTypeDecl(StructTypeDecl std) {
-		if (currentScope.lookupCurrent(std.st.structType) != null) {
-			error("duplicate struct name in scope");
+		String name = std.st.structType;
+		if (currentScope.lookupCurrent(name) != null) {
+			error("duplicate struct name in scope: " + name);
 		} else {
 			currentScope.put(new StructSymbol(std));
+			// name analysis on variables in struct scope
+			Scope structScope = new Scope(currentScope, name);
+			currentScope = structScope;
+			for (VarDecl vd : std.vds) {
+				vd.accept(this);
+			}
+			currentScope = structScope.getOuter();
 		}
 		return null;
 	}
