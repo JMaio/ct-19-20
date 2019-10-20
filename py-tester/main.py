@@ -52,6 +52,7 @@ def run_tests(mode, tests, logfile):
 if __name__ == "__main__":
     filename = "tests.csv"
     modes = [
+        "sem",
         "ast",
         "parser",
         # "lexer",
