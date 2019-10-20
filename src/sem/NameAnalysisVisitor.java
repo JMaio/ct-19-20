@@ -52,7 +52,16 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitStructType(StructType st) {
-		// TODO Auto-generated method stub
+		Symbol s = currentScope.lookup(st.structType);
+		if (s != null && s.isStruct()) {
+			// cast to structsymbol
+			StructSymbol ss = (StructSymbol) s;
+			// set expression's structdecl field
+			st.std = ss.std;
+		} else {
+			error("unknown struct usage");
+		}
+
 		return null;
 	}
 
@@ -61,7 +70,11 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitStructTypeDecl(StructTypeDecl std) {
-		// TODO Auto-generated method stub
+		if (currentScope.lookupCurrent(std.st.structType) != null) {
+			error("duplicate struct name in scope");
+		} else {
+			currentScope.put(new StructSymbol(std));
+		}
 		return null;
 	}
 
