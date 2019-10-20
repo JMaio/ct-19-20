@@ -1,3 +1,7 @@
+fibonacci.c, PASS
+tictactoe.c, PASS
+
+sem/global/fun.shadow.c, PASS
 
 sem/mag2.c, PASS
 
@@ -6,3 +10,4 @@ sem/global/bad.dupe.struct.c, SEM_FAIL
 sem/global/bad.dupe.var.c, SEM_FAIL
 
 sem/local/bad.dupe.struct.c, SEM_FAIL
+sem/local/bad.dupe.fun.c, SEM_FAIL

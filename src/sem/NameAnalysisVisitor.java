@@ -60,7 +60,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 			// set expression's structdecl field
 			st.std = ss.std;
 		} else {
-			error("unknown struct usage");
+			error("unknown struct usage: " + st.structType);
 		}
 
 		return null;
@@ -103,15 +103,15 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		} else {
 			currentScope.put(new FunSymbol(fd));
 		}
-		Scope oldScope = currentScope;
 		// create new empty scope for function parameters
-		currentScope = new Scope(null, "function " + fd.name + " params");
+		currentScope = new Scope(currentScope, "function " + fd.name + " params");
 		for (VarDecl vd : fd.params) {
 			vd.accept(this);
 		}
-		currentScope = oldScope;
 
 		fd.block.accept(this);
+		
+		currentScope = currentScope.getOuter();
 		return null;
 	}
 
