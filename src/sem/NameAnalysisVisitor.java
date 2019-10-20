@@ -29,7 +29,17 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	private Scope currentScope = globalScope;
 	
 	public Void visitProgram(Program p) {
-		// TODO Auto-generated method stub
+
+		for (StructTypeDecl std : p.structTypeDecls) {
+            std.accept(this);
+        }
+        for (VarDecl vd : p.varDecls) {
+            vd.accept(this);
+        }
+        for (FunDecl fd : p.funDecls) {
+            fd.accept(this);
+        }
+
 		return null;
 	}
 
