@@ -1,6 +1,8 @@
 package sem;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.List;
 
 import ast.*;
@@ -25,6 +27,8 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		
 		put(funSymFromDecl(new PointerType(BaseType.VOID), "mcmalloc", new ArrayList<VarDecl>() {{ new VarDecl(BaseType.INT, "size"); }}));
 	}};
+
+	private Map<String, StructTypeDecl> structs = new HashMap<>();
 
 	private Scope currentScope = globalScope;
 	
@@ -53,12 +57,9 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitStructType(StructType st) {
-		Symbol s = currentScope.lookup(st.structType);
-		if (s != null && s.isStruct()) {
-			// cast to structsymbol
-			StructSymbol ss = (StructSymbol) s;
-			// set expression's structdecl field
-			st.std = ss.std;
+		StructTypeDecl std = structs.get(st.structType);
+		if (std != null) {
+			st.std = std;
 		} else {
 			error("unknown struct usage: " + st.structType);
 		}
@@ -73,17 +74,16 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 
 	public Void visitStructTypeDecl(StructTypeDecl std) {
 		String name = std.st.structType;
-		if (currentScope.lookupCurrent(name) != null) {
+		if (structs.get(name) != null) {
 			error("duplicate struct name in scope: " + name);
 		} else {
-			currentScope.put(new StructSymbol(std));
+			structs.put(name, std);
 			// name analysis on variables in struct scope
-			Scope structScope = new Scope(currentScope, "struct " + name);
-			currentScope = structScope;
+			currentScope = new Scope(currentScope, "struct " + name);
 			for (VarDecl vd : std.vds) {
 				vd.accept(this);
 			}
-			currentScope = structScope.getOuter();
+			currentScope = currentScope.getOuter();
 		}
 		return null;
 	}
