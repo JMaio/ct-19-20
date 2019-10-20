@@ -54,7 +54,7 @@ if __name__ == "__main__":
     modes = [
         "sem",
         "ast",
-        "parser",
+        # "parser",
         # "lexer",
     ]
     dir_path = os.path.dirname(os.path.realpath(__file__))

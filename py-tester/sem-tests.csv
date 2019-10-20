@@ -8,4 +8,8 @@ parser/prec/6.c, PASS
 parser/prec/7.c, PASS
 parser/prec/8.c, PASS
 
-sem/bad.duplicate.c, SEM_FAIL
+sem/mag2.c, PASS
+
+sem/global/bad.dupe.fun.c, SEM_FAIL
+sem/global/bad.dupe.struct.c, SEM_FAIL
+sem/global/bad.dupe.var.c, SEM_FAIL
