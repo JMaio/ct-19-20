@@ -1,10 +1,33 @@
 package sem;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ast.*;
 
 public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 
-	@Override
+	public FunSymbol funSymFromDecl(Type t, String name, List<VarDecl> params) {
+		return new FunSymbol(new FunDecl(t, name, params));
+	}
+	public FunSymbol funSymFromDecl(Type t, String name) {
+		return funSymFromDecl(t, name, new ArrayList<>());
+	}
+
+	// dummy library functions
+	private Scope globalScope = new Scope() {{
+		put(funSymFromDecl(BaseType.VOID, "print_s", new ArrayList<VarDecl>() {{ new VarDecl(new PointerType(BaseType.CHAR), "s"); }}));
+		put(funSymFromDecl(BaseType.VOID, "print_i", new ArrayList<VarDecl>() {{ new VarDecl(BaseType.INT, "i"); }}));
+		put(funSymFromDecl(BaseType.VOID, "print_c", new ArrayList<VarDecl>() {{ new VarDecl(BaseType.CHAR, "c"); }}));
+		
+		put(funSymFromDecl(BaseType.CHAR, "read_c"));
+		put(funSymFromDecl(BaseType.INT , "read_i"));
+		
+		put(funSymFromDecl(new PointerType(BaseType.VOID), "mcmalloc", new ArrayList<VarDecl>() {{ new VarDecl(BaseType.INT, "size"); }}));
+	}};
+
+	private Scope currentScope = globalScope;
+	
 	public Void visitProgram(Program p) {
 		// TODO Auto-generated method stub
 		return null;
