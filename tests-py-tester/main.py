@@ -15,7 +15,7 @@ codes = {
     'PASS':           0,
 }
 
-test_result = ["FAIL", "PASS"]
+test_result = ["FAIL", ""]
 
 
 def run_test(mode, filename, expected, out="a.out", logfile="test.log"):
@@ -33,20 +33,19 @@ def run_test(mode, filename, expected, out="a.out", logfile="test.log"):
 def run_tests(mode, tests, logfile):
     failures = 0
 
-    logging.info(f"====== running tests for: {mode} [ {len(tests)} ] ====== ")
+    logging.info(f"====== running tests for: {mode} [ {len(tests)} ] ====== \n")
 
     with open(logfile, 'a') as f:
         f.write(f"====== {mode} [ {len(tests)} ] ====== \n")
 
     for i, (f, c) in enumerate(tests):
-        logging.info(f" {i+1:2d} ─┬─[{c:3d}] {f}")
         code = run_test(mode, f, c, logfile=logfile)
         result = c == code
         failures += int(not result)
         
-        logging.info(f"     └─[{code:3d}] {test_result[int(result)]}! \n")
+        logging.info(f" {i+1:2d} ───[{c:3d}]──>[{code:3d}] {test_result[int(result)]:4}  {f}")
 
-    logging.info(f" {mode}: - [ {len(tests) - failures} / {len(tests)} ] \n")
+    logging.info(f"\n {mode}: - [ {len(tests) - failures} / {len(tests)} ] \n")
 
     return failures
 
