@@ -13,24 +13,28 @@ public class ASTPrinter implements ASTVisitor<Void> {
     public final String defaultDelimiter = ",";
     
     public Void visitProgram(Program p) {
-        writer.print(p.getClass().getSimpleName() + "(");
-        String delimiter = "";
-        for (StructTypeDecl std : p.structTypeDecls) {
-            writer.print(delimiter);
-            delimiter = ",";
-            std.accept(this);
+        try {
+            writer.print(p.getClass().getSimpleName() + "(");
+            String delimiter = "";
+            for (StructTypeDecl std : p.structTypeDecls) {
+                writer.print(delimiter);
+                delimiter = ",";
+                std.accept(this);
+            }
+            for (VarDecl vd : p.varDecls) {
+                writer.print(delimiter);
+                delimiter = ",";
+                vd.accept(this);
+            }
+            for (FunDecl fd : p.funDecls) {
+                writer.print(delimiter);
+                delimiter = ",";
+                fd.accept(this);
+            }
+            writer.print(")");
+        } catch (Exception e) {
+            //TODO: handle exception
         }
-        for (VarDecl vd : p.varDecls) {
-            writer.print(delimiter);
-            delimiter = ",";
-            vd.accept(this);
-        }
-        for (FunDecl fd : p.funDecls) {
-            writer.print(delimiter);
-            delimiter = ",";
-            fd.accept(this);
-        }
-        writer.print(")");
         writer.flush();
         return null;
     }
