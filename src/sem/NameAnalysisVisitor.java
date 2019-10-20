@@ -88,7 +88,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 
 	public Void visitVarDecl(VarDecl vd) {
 		if (currentScope.lookupCurrent(vd.name) != null) {
-			error("duplicate var name in scope");
+			error("duplicate var name in scope: " + vd.name);
 		} else {
 			currentScope.put(new VarSymbol(vd));
 		}
@@ -96,10 +96,8 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitFunDecl(FunDecl fd) {
-		assert fd != null;
-		assert fd.name != null;
 		if (currentScope.lookupCurrent(fd.name) != null) {
-			error("duplicate func name in scope");
+			error("duplicate func name in scope: " + fd.name);
 		} else {
 			currentScope.put(new FunSymbol(fd));
 		}
@@ -126,7 +124,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 			// set expression's vardecl field
 			v.vd = vs.vd;
 		} else {
-			error("unknown variable access");
+			error("unknown variable access: " + v.name);
 		}
 
 		return null;
@@ -140,7 +138,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 			// set expression's fundecl field
 			fce.fd = fs.fd;
 		} else {
-			error("unknown function call");
+			error("unknown function call: " + fce.name);
 		}
 
 		return null;
