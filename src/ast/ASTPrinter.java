@@ -247,7 +247,7 @@ public class ASTPrinter implements ASTVisitor<Void> {
     public Void visitWhile(While w) {
         writer.print(w.getClass().getSimpleName() + "(");
 
-        w.expr.accept(this);
+        w.cond.accept(this);
         writer.print(defaultDelimiter);
 
         w.stmt.accept(this);
