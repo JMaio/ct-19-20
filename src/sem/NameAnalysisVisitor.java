@@ -88,7 +88,13 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitFunDecl(FunDecl fd) {
-		// TODO Auto-generated method stub
+		assert fd != null;
+		assert fd.name != null;
+		if (currentScope.lookupCurrent(fd.name) != null) {
+			error("duplicate func name in scope");
+		} else {
+			currentScope.put(new FunSymbol(fd));
+		}
 		return null;
 	}
 
@@ -119,7 +125,16 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitFunCallExpr(FunCallExpr fce) {
-		// TODO Auto-generated method stub
+		Symbol s = currentScope.lookup(fce.name);
+		if (s != null && s.isFun()) {
+			// cast to funsymbol
+			FunSymbol fs = (FunSymbol) s;
+			// set expression's fundecl field
+			fce.fd = fs.fd;
+		} else {
+			error("unknown function call");
+		}
+
 		return null;
 	}
 
