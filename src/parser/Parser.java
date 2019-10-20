@@ -328,7 +328,11 @@ public class Parser {
             nextToken();
             Token t = expect(TokenClass.INT_LITERAL);
             if (t != null) {
-                i = Integer.parseInt(t.data);
+                try {
+                    i = Integer.parseInt(t.data);
+                } catch (Exception e) {
+                    // oopsie
+                }
             }
             expect(TokenClass.RSBR);
         }
