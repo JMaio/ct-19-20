@@ -79,7 +79,11 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitVarDecl(VarDecl vd) {
-		// TODO Auto-generated method stub
+		if (currentScope.lookupCurrent(vd.name) != null) {
+			error("duplicate var name in scope");
+		} else {
+			currentScope.put(new VarSymbol(vd));
+		}
 		return null;
 	}
 
@@ -101,7 +105,16 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitVarExpr(VarExpr v) {
-		// TODO Auto-generated method stub
+		Symbol s = currentScope.lookup(v.name);
+		if (s != null && s.isVar()) {
+			// cast to varsymbol
+			VarSymbol vs = (VarSymbol) s;
+			// set expression's vardecl field
+			v.vd = vs.vd;
+		} else {
+			error("unknown variable access");
+		}
+
 		return null;
 	}
 
