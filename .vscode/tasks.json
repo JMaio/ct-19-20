@@ -11,11 +11,18 @@
                 "kind": "build",
                 "isDefault": true
             },
+            "dependsOn": "ant: clean",
+        },
+        {
+            "label": "ant: clean",
+            "type": "shell",
+            "command": "ant clean",
+            "group": "build",
         },
         {
             "label": "run all tests",
             "type": "shell",
-            "command": "python py-tester/main.py",
+            "command": "python tests-py-tester/main.py",
             "group": {
                 "kind": "test",
                 "isDefault": true,
