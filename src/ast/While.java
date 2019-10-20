@@ -2,11 +2,11 @@ package ast;
 
 public class While extends Stmt {
 
-    public final Expr expr;
+    public final Expr cond;
     public final Stmt stmt;
 
-    public While(Expr expr, Stmt stmt) {
-        this.expr = expr;
+    public While(Expr cond, Stmt stmt) {
+        this.cond = cond;
         this.stmt = stmt;
     }
 

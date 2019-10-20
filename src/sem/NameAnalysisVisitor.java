@@ -48,6 +48,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitPointerType(PointerType pt) {
+		pt.t.accept(this);
 		return null;
 	}
 
@@ -66,6 +67,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitArrayType(ArrayType at) {
+		at.t.accept(this);
 		return null;
 	}
 
@@ -76,7 +78,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		} else {
 			currentScope.put(new StructSymbol(std));
 			// name analysis on variables in struct scope
-			Scope structScope = new Scope(currentScope, name);
+			Scope structScope = new Scope(currentScope, "struct " + name);
 			currentScope = structScope;
 			for (VarDecl vd : std.vds) {
 				vd.accept(this);
@@ -101,6 +103,15 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		} else {
 			currentScope.put(new FunSymbol(fd));
 		}
+		Scope oldScope = currentScope;
+		// create new empty scope for function parameters
+		currentScope = new Scope(null, "function " + fd.name + " params");
+		for (VarDecl vd : fd.params) {
+			vd.accept(this);
+		}
+		currentScope = oldScope;
+
+		fd.block.accept(this);
 		return null;
 	}
 
@@ -145,67 +156,85 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitBinOp(BinOp bo) {
-		// TODO Auto-generated method stub
+		bo.left.accept(this);
+		bo.right.accept(this);
 		return null;
 	}
 
 	public Void visitOp(Op o) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public Void visitArrayAccessExpr(ArrayAccessExpr aae) {
-		// TODO Auto-generated method stub
+		aae.array.accept(this);
+		aae.index.accept(this);
 		return null;
 	}
 
 	public Void visitFieldAccessExpr(FieldAccessExpr fae) {
-		// TODO Auto-generated method stub
+		fae.struct.accept(this);
 		return null;
 	}
 
 	public Void visitValueAtExpr(ValueAtExpr vae) {
-		// TODO Auto-generated method stub
+		vae.expr.accept(this);
 		return null;
 	}
 
 	public Void visitSizeOfExpr(SizeOfExpr soe) {
-		// TODO Auto-generated method stub
+		soe.t.accept(this);
 		return null;
 	}
 
 	public Void visitTypecastExpr(TypecastExpr te) {
-		// TODO Auto-generated method stub
+		te.t.accept(this);
+		te.expr.accept(this);
 		return null;
 	}
 
 	public Void visitExprStmt(ExprStmt es) {
-		// TODO Auto-generated method stub
+		es.expr.accept(this);
 		return null;
 	}
 
 	public Void visitWhile(While w) {
-		// TODO Auto-generated method stub
+		w.cond.accept(this);
+		w.stmt.accept(this);
 		return null;
 	}
 
 	public Void visitIf(If i) {
-		// TODO Auto-generated method stub
+		i.cond.accept(this);
+		i.stmt.accept(this);
+		if (i.elseStmt != null) {
+			i.elseStmt.accept(this);
+		}
 		return null;
 	}
 
 	public Void visitAssign(Assign a) {
-		// TODO Auto-generated method stub
+		a.left.accept(this);
+		a.right.accept(this);
 		return null;
 	}
 
 	public Void visitReturn(Return r) {
-		// TODO Auto-generated method stub
+		if (r.expr != null) {
+			r.expr.accept(this);
+		}
 		return null;
 	}
 
 	public Void visitBlock(Block b) {
-		// TODO Auto-generated method stub
+		Scope blockScope = new Scope(currentScope, currentScope.namespace + " -> block");
+		currentScope = blockScope;
+			for (VarDecl vd : b.vds) {
+				vd.accept(this);
+			}
+			for (Stmt s : b.stmts) {
+				s.accept(this);
+			}
+		currentScope = blockScope.getOuter();
 		return null;
 	}
 
