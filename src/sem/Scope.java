@@ -5,14 +5,17 @@ import java.util.Map;
 
 public class Scope {
 	private Scope outer;
+	public final String namespace;
 	private Map<String, Symbol> symbolTable;
 	
-	public Scope(Scope outer) { 
+	public Scope(Scope outer, String namespace) { 
 		this.outer = outer;
+		this.namespace = namespace;
+
 		this.symbolTable = new HashMap<String,Symbol>();
 	}
 	
-	public Scope() { this(null); }
+	public Scope() { this(null, "global scope"); }
 	
 	public Symbol lookup(String name) {
 		Symbol s = lookupCurrent(name);
@@ -28,5 +31,9 @@ public class Scope {
 	
 	public void put(Symbol sym) {
 		symbolTable.put(sym.name, sym);
+	}
+
+	public Scope getOuter() {
+		return this.outer;
 	}
 }
