@@ -11,6 +11,7 @@ public class VarSymbol extends Symbol {
         this.vd = vd;
     }
     
-    
+    @Override
+    public boolean isVar() { return true; }
 
 }

@@ -11,4 +11,7 @@ public class FunSymbol extends Symbol {
         this.fd = fd;
     }
 
+    @Override
+    public boolean isFun() { return true; }
+
 }
