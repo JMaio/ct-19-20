@@ -1,4 +1,5 @@
 ast/pointers_and_arrays_and_structs.c, PASS
+stress.c, PASS
 
 
 parser/prec/0.c, PASS
@@ -27,3 +28,5 @@ parser/stmt/conditionals.c, PASS
 parser/compare.c, PASS
 parser/fundecl_params.c, PASS
 parser/nested_conditionals.c, PASS
+
+parser/bad.fundecl.c, PARSER_FAIL

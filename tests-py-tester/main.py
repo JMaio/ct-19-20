@@ -20,11 +20,13 @@ test_result = ["FAIL", "PASS"]
 
 def run_test(mode, filename, expected, out="a.out", logfile="test.log"):
     with open(logfile, 'a') as f:
-        f.write(f" {filename} [{expected}]\n"), f.flush()
+        f.write(f"[{expected:3d}] {filename} \n"), f.flush()
         code = subprocess.run(['java', '-cp', 'bin', 'Main',
-                               f'-{mode}', f'tests/{filename}', f'{filename}-dump'], stdout=f).returncode
+                               f'-{mode}', f'tests/{filename}', f'{filename}-dump'],
+                               stdout=f, stderr=f).returncode
         # print(f"{filename}: ({expected}) => {code}")
-        f.write("\n")
+        f.write(f"[{code:3d}] ----------------------------")
+        f.write(2 * "\n")
         return code
 
 
@@ -53,7 +55,7 @@ if __name__ == "__main__":
     filename = "tests.csv"
     modes = [
         "sem",
-        "ast",
+        # "ast",
         # "parser",
         # "lexer",
     ]

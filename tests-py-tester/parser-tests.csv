@@ -42,3 +42,4 @@ parser/stmt/bad.unclosed_exp_block.c, PARSER_FAIL
 parser/stmt/bad.unclosed_func_block.c, PARSER_FAIL
 
 parser/bad.2d_pointer.c, PARSER_FAIL
+parser/bad.fundecl.c, PARSER_FAIL
