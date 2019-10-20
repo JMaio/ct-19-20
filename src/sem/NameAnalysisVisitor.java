@@ -92,6 +92,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		if (currentScope.lookupCurrent(vd.name) != null) {
 			error("duplicate var name in scope: " + vd.name);
 		} else {
+			vd.type.accept(this);
 			currentScope.put(new VarSymbol(vd));
 		}
 		return null;
@@ -110,7 +111,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		}
 
 		fd.block.accept(this);
-		
+
 		currentScope = currentScope.getOuter();
 		return null;
 	}
@@ -173,6 +174,16 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 
 	public Void visitFieldAccessExpr(FieldAccessExpr fae) {
 		fae.struct.accept(this);
+		try {
+			StructType st = (StructType) ((VarExpr) fae.struct).vd.type;
+			StructTypeDecl std = structs.get(st.structType);
+			if (!std.hasField(fae.field)) {
+				error("struct '" + st.structType + "' does not contain field '" + fae.field + "'");
+			}
+		} catch (Exception e) {
+			error("expression does not contain field '" + fae.field + "'");
+		}
+
 		return null;
 	}
 

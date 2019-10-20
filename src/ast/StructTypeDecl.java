@@ -15,4 +15,11 @@ public class StructTypeDecl implements ASTNode {
         return v.visitStructTypeDecl(this);
     }
 
+    public boolean hasField(String f) {
+        for (VarDecl vd : vds) {
+            if (vd.name.equals(f)) { return true; }
+        }
+        return false;
+    }
+
 }
