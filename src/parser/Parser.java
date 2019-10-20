@@ -174,6 +174,22 @@ public class Parser {
         return (tc == TokenClass.SC || tc == TokenClass.LSBR);
     }
 
+    private boolean isStructDecl() {
+        // starting lookahead position
+        int offset = 1;
+        // check is struct
+        if (!accept(TokenClass.STRUCT) || !(lookAhead(offset).tokenClass == TokenClass.IDENTIFIER)) { 
+            return false; 
+        }
+        offset++;
+        
+        // reference has 1 extra token ("*")
+        if (lookAhead(offset).tokenClass == TokenClass.ASTERIX) { offset++; }
+        // final offset to next token
+        TokenClass tc = lookAhead(offset).tokenClass;
+        return (tc == TokenClass.LBRA);
+    }
+
 
     // ------------------- parse functions ---------------
 
@@ -211,22 +227,23 @@ public class Parser {
     private List<StructTypeDecl> parseStructDecls() {
         List<StructTypeDecl> stds = new ArrayList<>();
 
-        if (accept(TokenClass.STRUCT)) {
+        if (isStructDecl()) {
             StructType st = parseStructType();
             List<VarDecl> vds = new ArrayList<>();
-
+    
             expect(TokenClass.LBRA);
-
+    
             vds.add(parseVarDecl());     // at least one var
             vds.addAll(parseVarDecls());    // extra vars
-
+    
             expect(TokenClass.RBRA);
             expect(TokenClass.SC);
-
+    
             stds.add(new StructTypeDecl(st, vds));
-
+    
             stds.addAll(parseStructDecls());
         }
+
         return stds;
     }
     
