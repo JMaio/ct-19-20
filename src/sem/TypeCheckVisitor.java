@@ -17,34 +17,28 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		return null;
 	}
 
-	@Override
 	public Type visitBaseType(BaseType bt) {
-		// TODO Auto-generated method stub
-		return null;
+		return bt;
 	}
 
-	@Override
 	public Type visitPointerType(PointerType pt) {
-		// TODO Auto-generated method stub
-		return null;
+		return pt.t.accept(this);
 	}
 
-	@Override
 	public Type visitStructType(StructType st) {
-		// TODO Auto-generated method stub
-		return null;
+		return st;
 	}
 
-	@Override
 	public Type visitArrayType(ArrayType at) {
-		// TODO Auto-generated method stub
-		return null;
+		return at.accept(this);
 	}
 
-	@Override
 	public Type visitStructTypeDecl(StructTypeDecl std) {
-		// TODO Auto-generated method stub
-		return null;
+		for (VarDecl vd : std.vds) {
+			vd.accept(this);
+		}
+		// not necessary to return the structtype, but do it anyways
+		return std.st;
 	}
 
 	@Override
