@@ -22,7 +22,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	}
 
 	public Type visitPointerType(PointerType pt) {
-		return pt.t.accept(this);
+		return pt;
 	}
 
 	public Type visitStructType(StructType st) {
@@ -30,7 +30,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	}
 
 	public Type visitArrayType(ArrayType at) {
-		return at.accept(this);
+		return at;
 	}
 
 	public Type visitStructTypeDecl(StructTypeDecl std) {
@@ -72,10 +72,9 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		return c.type;
 	}
 
-	@Override
 	public Type visitVarExpr(VarExpr v) {
-		// TODO Auto-generated method stub
-		return null;
+		v.type = v.vd.type;
+		return v.type;
 	}
 
 	@Override
@@ -96,10 +95,15 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		return null;
 	}
 
-	@Override
 	public Type visitArrayAccessExpr(ArrayAccessExpr aae) {
-		// TODO Auto-generated method stub
-		return null;
+		Type a = aae.array.accept(this);
+		Type i = aae.index.accept(this);
+		if (!(a.isArrayType() || a.isPointerType()) || i != BaseType.INT) {
+			error(String.format("bad array access %s[%s]", a, i));
+		} else {
+			aae.type = a.getElemType();
+		}
+		return aae.type;
 	}
 
 	@Override
@@ -128,8 +132,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 
 	@Override
 	public Type visitExprStmt(ExprStmt es) {
-		// TODO Auto-generated method stub
-		return null;
+		return es.expr.accept(this);
 	}
 
 	@Override
@@ -156,9 +159,13 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		return null;
 	}
 
-	@Override
 	public Type visitBlock(Block b) {
-		// TODO Auto-generated method stub
+		for (VarDecl vd : b.vds) {
+			vd.accept(this);
+		}
+		for (Stmt s : b.stmts) {
+			s.accept(this);
+		}
 		return null;
 	}
 
