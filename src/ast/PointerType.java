@@ -13,6 +13,9 @@ public class PointerType implements Type {
     }
 
     @Override
+    public boolean isPointerType() { return true; }
+
+    @Override
     public String toString() {
         return String.format("%s(%s)", getClass().getSimpleName(), t);
     }

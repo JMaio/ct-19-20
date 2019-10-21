@@ -83,15 +83,29 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		return null;
 	}
 
-	@Override
 	public Type visitBinOp(BinOp bo) {
-		// TODO Auto-generated method stub
-		return null;
+		Type l = bo.left.accept(this);
+		Op o = bo.op;
+		Type r = bo.right.accept(this);
+
+		System.out.println(l + " " + o + " " + r);
+		if (l != r) {
+			error(String.format("incompatible types for comparison: '%s' , '%s'", 
+				bo.left.type, bo.right.type));
+		} else {
+			if (o == Op.EQ || o == Op.NE) {
+				if (!(l.isStructType() || l.isArrayType() || l == BaseType.VOID)) {
+					
+				}
+			} else {
+
+			}
+		}
+
+		return BaseType.INT;
 	}
 
-	@Override
 	public Type visitOp(Op o) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -130,20 +144,21 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		return null;
 	}
 
-	@Override
 	public Type visitExprStmt(ExprStmt es) {
 		return es.expr.accept(this);
 	}
 
-	@Override
 	public Type visitWhile(While w) {
-		// TODO Auto-generated method stub
+		if (w.cond.accept(this) != BaseType.INT) {
+			error("non-integer condition in while statement");
+		}
 		return null;
 	}
 
-	@Override
 	public Type visitIf(If i) {
-		// TODO Auto-generated method stub
+		if (i.cond.accept(this) != BaseType.INT) {
+			error("non-integer condition in if statement");
+		}
 		return null;
 	}
 

@@ -4,6 +4,7 @@ tictactoe.c, PASS
 sem/global/fun.shadow.c, PASS
 sem/global/global.scope.c, PASS
 
+sem/local/all.ops.c, PASS
 sem/local/func.name.shadow.c, PASS
 sem/local/local.scope.c, PASS
 sem/local/struct.access.c, PASS
