@@ -41,34 +41,35 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		return std.st;
 	}
 
-	@Override
 	public Type visitVarDecl(VarDecl vd) {
-		// TODO Auto-generated method stub
-		return null;
+		Type t = vd.type.accept(this);
+		if (t == BaseType.VOID) {
+			error("var '" + vd.name + "' cannot be of type void");
+		}
+		return t;
 	}
 
-	@Override
 	public Type visitFunDecl(FunDecl fd) {
-		// TODO Auto-generated method stub
-		return null;
+		for (VarDecl vd : fd.params) {
+			vd.accept(this);
+		}
+		fd.block.accept(this);
+		return fd.type;
 	}
 
-	@Override
 	public Type visitIntLiteral(IntLiteral i) {
-		// TODO Auto-generated method stub
-		return null;
+		i.type = BaseType.INT;
+		return i.type;
 	}
 
-	@Override
 	public Type visitStrLiteral(StrLiteral s) {
-		// TODO Auto-generated method stub
-		return null;
+		s.type = new ArrayType(BaseType.CHAR, s.value.length() + 1); // account for null terminator!
+		return s.type;
 	}
 
-	@Override
 	public Type visitChrLiteral(ChrLiteral c) {
-		// TODO Auto-generated method stub
-		return null;
+		c.type = BaseType.CHAR;
+		return c.type;
 	}
 
 	@Override

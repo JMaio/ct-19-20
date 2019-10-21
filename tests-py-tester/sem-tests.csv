@@ -15,6 +15,7 @@ sem/global/bad.dupe.fun.c, SEM_FAIL
 sem/global/bad.dupe.struct.c, SEM_FAIL
 sem/global/bad.dupe.var.c, SEM_FAIL
 sem/global/bad.unkn.struct.c, SEM_FAIL
+sem/global/bad.void.var.c, SEM_FAIL
 
 sem/local/bad.assign.c, SEM_FAIL
 sem/local/bad.dupe.fun.c, SEM_FAIL
