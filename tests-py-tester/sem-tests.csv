@@ -2,7 +2,12 @@ fibonacci.c, PASS
 tictactoe.c, PASS
 
 sem/global/fun.shadow.c, PASS
+sem/global/global.scope.c, PASS
+
+sem/local/func.name.shadow.c, PASS
+sem/local/local.scope.c, PASS
 sem/local/struct.access.c, PASS
+sem/local/stmts.c, PASS
 
 sem/mag2.c, PASS
 
@@ -11,6 +16,11 @@ sem/global/bad.dupe.struct.c, SEM_FAIL
 sem/global/bad.dupe.var.c, SEM_FAIL
 sem/global/bad.unkn.struct.c, SEM_FAIL
 
-sem/local/bad.dupe.struct.c, SEM_FAIL
+sem/local/bad.assign.c, SEM_FAIL
 sem/local/bad.dupe.fun.c, SEM_FAIL
+sem/local/bad.dupe.struct.c, SEM_FAIL
+sem/local/bad.func.decl.shadow.c, SEM_FAIL
+sem/local/bad.func.param.redef.c, SEM_FAIL
+sem/local/bad.op.c, SEM_FAIL
 sem/local/bad.struct.access.c, SEM_FAIL
+sem/local/bad.undefined.param.c, SEM_FAIL
