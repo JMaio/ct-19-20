@@ -83,7 +83,8 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	public Type visitFunCallExpr(FunCallExpr fce) {
 		try {
 			// params *must* be in the same order! - so no need to worry
-			for (int p = 0; p < fce.fd.params.size(); p++) {
+			int len = Math.max(fce.fd.params.size(), fce.args.size());
+			for (int p = 0; p < len; p++) {
 				// set type of this expression
 				VarDecl param = fce.fd.params.get(p);
 				Expr arg = fce.args.get(p);
