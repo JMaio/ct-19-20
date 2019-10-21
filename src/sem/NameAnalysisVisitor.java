@@ -99,7 +99,8 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitFunDecl(FunDecl fd) {
-		if (currentScope.lookupCurrent(fd.name) != null) {
+		
+		if (currentScope.lookup(fd.name) != null) {
 			error("duplicate func name in scope: " + fd.name);
 		} else {
 			currentScope.put(new FunSymbol(fd));
