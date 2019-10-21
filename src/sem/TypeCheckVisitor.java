@@ -54,6 +54,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 			vd.accept(this);
 		}
 		fd.block.accept(this);
+		// returns!
 		return fd.type;
 	}
 
@@ -149,15 +150,27 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		return aae.type;
 	}
 
-	@Override
 	public Type visitFieldAccessExpr(FieldAccessExpr fae) {
-		// TODO Auto-generated method stub
-		return null;
+		// Type t = fae.struct.accept(this);
+		// if (t.isStructType()) {
+		// 	StructTypeDecl s = ((StructType) fae.struct.type).std;
+		// 	Type fieldType = s.getFieldType(fae.field);
+		// 	fae.type = fieldType;
+
+		// 	if (fieldType == null) {
+		// 		error(String.format("field does not exist? - this error should be caught in name checking"));
+		// 	}
+		// } else {
+		// 	error(String.format("field access of non-struct type: '%s.%s'", fae.struct, fae.field));
+		// }
+		return fae.type;
 	}
 
-	@Override
 	public Type visitValueAtExpr(ValueAtExpr vae) {
-		// TODO Auto-generated method stub
+		vae.type = vae.expr.accept(this);
+		if (vae.type != null && vae.type.isPointerType()) {
+			return vae.type.getElemType();
+		}
 		return null;
 	}
 
@@ -165,14 +178,20 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		return BaseType.INT;
 	}
 
-	@Override
 	public Type visitTypecastExpr(TypecastExpr te) {
 		// TODO Auto-generated method stub
-		return null;
+		Type et = te.expr.accept(this);
+		Type toType = null;
+		if (et == BaseType.CHAR && te.t == BaseType.INT) {
+			toType = te.t;
+		} else if (et.isArrayType() && et.getElemType().equals(te.t.getElemType())) {
+			toType = te.t;
+		}
+		
+		return toType;
 	}
 
 	public Type visitExprStmt(ExprStmt es) {
-		return es.expr.accept(this);
 		es.expr.type = es.expr.accept(this);
 		return es.expr.type;
 	}
@@ -191,16 +210,29 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		return null;
 	}
 
-	@Override
 	public Type visitAssign(Assign a) {
-		// TODO Auto-generated method stub
+		Type l = a.left.accept(this);
+		Type r = a.right.accept(this);
+		try {
+			if (
+				(l == BaseType.VOID || l.isArrayType()) || 
+				(r == BaseType.VOID || r.isArrayType())) {
+				error("illegal type in assignment: " + l);
+			} else if (!l.isEqualTo(r)) {
+				error("incompatible types in assignment: " + l);
+			}
+		} catch (Exception e) {	}
+
 		return null;
 	}
 
-	@Override
-	public Type visitReturn(Return r) {
-		// TODO Auto-generated method stub
-		return null;
+	public Type visitReturn(Return r) {		
+		// r.
+		Type t = null;
+		if (r.expr != null) {
+			t = r.expr.accept(this);
+		}
+		return t;
 	}
 
 	public Type visitBlock(Block b) {
