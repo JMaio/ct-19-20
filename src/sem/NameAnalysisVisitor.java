@@ -105,7 +105,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 			currentScope.put(new FunSymbol(fd));
 		}
 		// create new empty scope for function parameters
-		currentScope = new Scope(currentScope, "function " + fd.name + " params");
+		currentScope = new Scope(currentScope, "function " + fd.name);
 		for (VarDecl vd : fd.params) {
 			vd.accept(this);
 		}
@@ -149,6 +149,9 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 			FunSymbol fs = (FunSymbol) s;
 			// set expression's fundecl field
 			fce.fd = fs.fd;
+			for (Expr e : fce.args) {
+				e.accept(this);
+			}
 		} else {
 			error("unknown function call: " + fce.name);
 		}
@@ -223,15 +226,24 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 
 	public Void visitWhile(While w) {
 		w.cond.accept(this);
+		
+		currentScope = new Scope(currentScope, currentScope.namespace + " -> while");
 		w.stmt.accept(this);
+		currentScope = currentScope.getOuter();
 		return null;
 	}
 
 	public Void visitIf(If i) {
 		i.cond.accept(this);
+		
+		currentScope = new Scope(currentScope, currentScope.namespace + " -> if");
 		i.stmt.accept(this);
+		currentScope = currentScope.getOuter();
+
 		if (i.elseStmt != null) {
+			currentScope = new Scope(currentScope, currentScope.namespace + " -> else");
 			i.elseStmt.accept(this);
+			currentScope = currentScope.getOuter();
 		}
 		return null;
 	}
@@ -250,15 +262,14 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitBlock(Block b) {
-		Scope blockScope = new Scope(currentScope, currentScope.namespace + " -> block");
-		currentScope = blockScope;
-			for (VarDecl vd : b.vds) {
-				vd.accept(this);
-			}
-			for (Stmt s : b.stmts) {
-				s.accept(this);
-			}
-		currentScope = blockScope.getOuter();
+		for (VarDecl vd : b.vds) {
+			vd.accept(this);
+		}
+		currentScope = new Scope(currentScope, currentScope.namespace + " -> stmt");
+		for (Stmt s : b.stmts) {
+			s.accept(this);
+		}
+		currentScope = currentScope.getOuter();
 		return null;
 	}
 
