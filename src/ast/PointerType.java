@@ -12,4 +12,8 @@ public class PointerType implements Type {
         return v.visitPointerType(this);
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s(%s)", getClass().getSimpleName(), t);
+    }
 }

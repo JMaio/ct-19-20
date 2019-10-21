@@ -12,5 +12,12 @@ public class StructType implements Type {
     public <T> T accept(ASTVisitor<T> v) {
         return v.visitStructType(this);
     }
+
+    public boolean isStructType() { return true; }
+
+    @Override
+    public String toString() {
+        return String.format("%s", getClass().getName());
+    }
     
 }

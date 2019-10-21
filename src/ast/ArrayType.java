@@ -14,4 +14,11 @@ public class ArrayType implements Type {
         return v.visitArrayType(this);
     }
 
+    public boolean isArrayType() { return true; }
+
+    @Override
+    public String toString() {
+        return String.format("%s(%s)", getClass().getName(), t) ;
+    }
+
 }

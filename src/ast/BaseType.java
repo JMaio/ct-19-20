@@ -6,4 +6,9 @@ public enum BaseType implements Type {
     public <T> T accept(ASTVisitor<T> v) {
         return v.visitBaseType(this);
     }
+
+    @Override
+    public String toString() {
+        return String.format("%s", name());
+    }
 }
