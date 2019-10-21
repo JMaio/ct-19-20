@@ -18,14 +18,14 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 
 	// dummy library functions
 	private Scope globalScope = new Scope() {{
-		put(funSymFromDecl(BaseType.VOID, "print_s", new ArrayList<VarDecl>() {{ new VarDecl(new PointerType(BaseType.CHAR), "s"); }}));
-		put(funSymFromDecl(BaseType.VOID, "print_i", new ArrayList<VarDecl>() {{ new VarDecl(BaseType.INT, "i"); }}));
-		put(funSymFromDecl(BaseType.VOID, "print_c", new ArrayList<VarDecl>() {{ new VarDecl(BaseType.CHAR, "c"); }}));
+		put(funSymFromDecl(BaseType.VOID, "print_s", new ArrayList<VarDecl>() {{ add(new VarDecl(new PointerType(BaseType.CHAR), "s")); }}));
+		put(funSymFromDecl(BaseType.VOID, "print_i", new ArrayList<VarDecl>() {{ add(new VarDecl(BaseType.INT, "i")); }}));
+		put(funSymFromDecl(BaseType.VOID, "print_c", new ArrayList<VarDecl>() {{ add(new VarDecl(BaseType.CHAR, "c")); }}));
 		
 		put(funSymFromDecl(BaseType.CHAR, "read_c"));
 		put(funSymFromDecl(BaseType.INT , "read_i"));
 		
-		put(funSymFromDecl(new PointerType(BaseType.VOID), "mcmalloc", new ArrayList<VarDecl>() {{ new VarDecl(BaseType.INT, "size"); }}));
+		put(funSymFromDecl(new PointerType(BaseType.VOID), "mcmalloc", new ArrayList<VarDecl>() {{ add(new VarDecl(BaseType.INT, "size")); }}));
 	}};
 
 	private Map<String, StructTypeDecl> structs = new HashMap<>();
