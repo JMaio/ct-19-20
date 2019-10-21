@@ -73,14 +73,42 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	}
 
 	public Type visitVarExpr(VarExpr v) {
-		v.type = v.vd.type;
+		// v.vd can be null if not picked up by name visitor
+		if (v.isVarExpr() && v.vd != null) { 
+			v.type = v.vd.type;
+		}
 		return v.type;
 	}
 
-	@Override
 	public Type visitFunCallExpr(FunCallExpr fce) {
-		// TODO Auto-generated method stub
-		return null;
+		try {
+			// params *must* be in the same order! - so no need to worry
+			for (int p = 0; p < fce.fd.params.size(); p++) {
+				// set type of this expression
+				VarDecl param = fce.fd.params.get(p);
+				Expr arg = fce.args.get(p);
+
+				Type paramType = param.type;
+				Type argType = arg.accept(this);
+
+				System.out.println(String.format("expected %s - got %s", paramType, argType));
+
+				if (!paramType.isEqualTo(argType)) {
+					error(String.format(
+						"bad function argument passed to '%s': '%s' (type: %s) [expected '%s' (type: %s)]", 
+						fce.name, 
+						arg, arg.type,
+						param.name, param.type));
+				}
+			}
+			fce.type = fce.fd.type;
+
+		} catch (Exception e) {
+			/* ran out of args? */
+			error("bad function call '" + fce.name + "()' -- wrong number of arguments?");
+		}
+
+		return fce.type;
 	}
 
 	public Type visitBinOp(BinOp bo) {
@@ -132,10 +160,8 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		return null;
 	}
 
-	@Override
 	public Type visitSizeOfExpr(SizeOfExpr soe) {
-		// TODO Auto-generated method stub
-		return null;
+		return BaseType.INT;
 	}
 
 	@Override
@@ -146,6 +172,8 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 
 	public Type visitExprStmt(ExprStmt es) {
 		return es.expr.accept(this);
+		es.expr.type = es.expr.accept(this);
+		return es.expr.type;
 	}
 
 	public Type visitWhile(While w) {

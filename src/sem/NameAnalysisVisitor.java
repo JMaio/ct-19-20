@@ -191,6 +191,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 			if (left != null) {
 				try {
 					String name = ((StructType) left).structType;
+					// find struct declaration for this struct
 					StructTypeDecl std = structs.get(name);
 					if (!std.hasField(fae.field)) {
 						error("struct '" + name + "' does not contain field '" + fae.field + "'");

@@ -11,4 +11,7 @@ public enum BaseType implements Type {
     public String toString() {
         return String.format("%s", name());
     }
+
+    @Override
+    public boolean isBaseType() { return true; }
 }
