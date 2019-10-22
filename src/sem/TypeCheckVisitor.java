@@ -167,8 +167,11 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	}
 
 	public Type visitValueAtExpr(ValueAtExpr vae) {
-		vae.type = vae.expr.accept(this);
-		if (vae.type != null && vae.type.isPointerType()) {
+		Type et = vae.expr.accept(this);
+		// should be pointer type
+		if (et != null && et.isPointerType()) {
+			// return the inner type (access the pointer)
+			vae.type = et;
 			return vae.type.getElemType();
 		}
 		return null;
@@ -181,14 +184,27 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	public Type visitTypecastExpr(TypecastExpr te) {
 		// TODO Auto-generated method stub
 		Type et = te.expr.accept(this);
-		Type toType = null;
-		if (et == BaseType.CHAR && te.t == BaseType.INT) {
-			toType = te.t;
-		} else if (et.isArrayType() && et.getElemType().equals(te.t.getElemType())) {
-			toType = te.t;
+		try {
+			if (et == BaseType.CHAR && te.t == BaseType.INT) {
+				// char -> int
+			} else if (et.isArrayType() && te.t.isPointerType() && 
+						et.getElemType().isEqualTo(te.t.getElemType())) {
+				// array -> pointer
+			} else if (et.isPointerType() && te.t.isPointerType() && 
+						!et.getElemType().isEqualTo(te.t.getElemType())) {
+				// pointer -> pointer
+			} else {
+				// et phone home
+				// throw new Exception(String.format("illegal typecast expression [(%s) -/-> (%s)]", te.t, et));
+				error(String.format("illegal typecast expression [(%s) -/-> (%s)]", te.t, et));
+				return null;
+			}
+		} catch (Exception e) {
+			error(String.format("error in typecast expression [(%s) -/-> (%s)]", te.t, et));
+			return null;
 		}
-		
-		return toType;
+
+		return te.t;
 	}
 
 	public Type visitExprStmt(ExprStmt es) {
@@ -227,10 +243,15 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	}
 
 	public Type visitReturn(Return r) {		
-		// r.
-		Type t = null;
+		Type t = BaseType.VOID;
 		if (r.expr != null) {
+			// returns a typed expression
 			t = r.expr.accept(this);
+		}
+		if (r.funReturnType != null && r.funReturnType.isEqualTo(t)) {
+			// good return
+		} else {
+			error(String.format("bad return: %s should return '%s' but returns '%s'", r.fd.name, r.funReturnType, t));
 		}
 		return t;
 	}

@@ -43,7 +43,7 @@ def run_tests(mode, tests, logfile):
         result = c == code
         failures += int(not result)
         
-        logging.info(f" {i+1:2d} ───[{c:3d}]──>[{code:3d}] {test_result[int(result)]:4} {f}")
+        logging.info(f"{i+1:2d}─[{c:3d}]─>[{code:3d}] {test_result[int(result)]:4} {f}")
 
     logging.info(f"\n {mode}: - [ {len(tests) - failures} / {len(tests)} ] \n")
 

@@ -9,8 +9,10 @@ sem/local/func.name.shadow.c, PASS
 sem/local/lib.func.c, PASS
 sem/local/local.scope.c, PASS
 sem/local/pointer.arg.c, PASS
-sem/local/struct.access.c, PASS
+sem/local/return.c, PASS
 sem/local/stmts.c, PASS
+sem/local/struct.access.c, PASS
+sem/local/typecast.c, PASS
 
 sem/mag2.c, PASS
 
@@ -29,6 +31,8 @@ sem/local/bad.func.arg.pointer3.c, SEM_FAIL
 sem/local/bad.func.decl.shadow.c, SEM_FAIL
 sem/local/bad.func.param.redef.c, SEM_FAIL
 sem/local/bad.op.c, SEM_FAIL
+sem/local/bad.return.type.c, SEM_FAIL
+sem/local/bad.return.void.c, SEM_FAIL
 sem/local/bad.struct.acc.type.c, SEM_FAIL
 sem/local/bad.struct.access.c, SEM_FAIL
 sem/local/bad.undefined.param.c, SEM_FAIL
