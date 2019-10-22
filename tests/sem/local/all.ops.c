@@ -9,6 +9,7 @@ void f () {
 
 
     i + i;
+
     i == i;
 
     ip == ip;
@@ -19,5 +20,19 @@ void f () {
     c == c;
     cp == cp;
 
-    // c == ca[0];
+    // go for more
+
+    i + i;
+    i - i;
+    i * i;
+    i / i;
+    i % i;
+
+    i || i;
+    i && i;
+
+    i < i;
+    i > i;
+    i <= i;
+    i >= i;
 }
