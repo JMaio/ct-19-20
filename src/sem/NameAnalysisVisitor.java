@@ -182,30 +182,40 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	public Void visitFieldAccessExpr(FieldAccessExpr fae) {
 		// recursively test left side for field
 		fae.struct.accept(this);
-		if (!fae.struct.isVarExpr() && !fae.struct.isFieldAccessExpr()) {
-			error("expression does not contain field '" + fae.field + "'");
-		} else {
-			Type left = fae.struct.type;
-			if (fae.struct.isVarExpr()) {
-				// has a struct type
-				VarExpr ve = (VarExpr) fae.struct;
-				left = (StructType) ve.vd.type;
-			}
-
-			if (left != null) {
-				try {
-					String name = ((StructType) left).structType;
-					// find struct declaration for this struct
-					StructTypeDecl std = structs.get(name);
-					if (!std.hasField(fae.field)) {
-						error("struct '" + name + "' does not contain field '" + fae.field + "'");
-					} else {
-						fae.type = std.getFieldType(fae.field);
+		try {
+			if (!fae.struct.isVarExpr() && !fae.struct.isFieldAccessExpr()) {
+				error("expression does not contain field '" + fae.field + "'");
+			} else {
+				Type left = fae.struct.type;
+				if (fae.struct.isVarExpr()) {
+					// has a struct type
+					Type vt = ((VarExpr) fae.struct).vd.type;
+					if (vt.isStructType()) {
+						left = (StructType) vt;
+					} else if (vt.isPointerType() || vt.isArrayType()) {
+						// assume it's only wrapped in a single pointer/array
+						left = (StructType) vt.getElemType();
 					}
-				} catch (Exception e) {}
+				}
+	
+				if (left != null) {
+					try {
+						String name = ((StructType) left).structType;
+						// find struct declaration for this struct
+						StructTypeDecl std = structs.get(name);
+						if (!std.hasField(fae.field)) {
+							error("struct '" + name + "' does not contain field '" + fae.field + "'");
+						} else {
+							fae.type = std.getFieldType(fae.field);
+						}
+					} catch (Exception e) {}
+				}
 			}
+		} catch (Exception e) {
+			error("bad field access: " + fae.struct + "." + fae.field);
 		}
 		return null;
+
 	}
 
 	public Void visitValueAtExpr(ValueAtExpr vae) {
