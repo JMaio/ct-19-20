@@ -194,7 +194,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 						left = (StructType) vt;
 					} else if (vt.isPointerType() || vt.isArrayType()) {
 						// assume it's only wrapped in a single pointer/array
-						left = (StructType) vt.getElemType();
+						left = (StructType) Type.getElemType(vt);
 					}
 				}
 	

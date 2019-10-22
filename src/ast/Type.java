@@ -10,32 +10,56 @@ public interface Type extends ASTNode {
     default public boolean isArrayType() { return false; }
     default public boolean isPointerType() { return false; }
 
-    default public Type getElemType() {
+    public static boolean isBaseType(Type t) {
+        try { return t.isBaseType(); }
+        catch (Exception e) { return false; }
+    }
+
+    public static boolean isStructType(Type t) {
+        try { return t.isStructType(); }
+        catch (Exception e) { return false; }
+    }
+
+    public static boolean isArrayType(Type t) {
+        try { return t.isArrayType(); }
+        catch (Exception e) { return false; }
+    }
+
+    public static boolean isPointerType(Type t) {
+        try { return t.isPointerType(); }
+        catch (Exception e) { return false; }
+    }
+
+    public static Type getElemType(Type upper) {
         Type t = null;
-        if (isArrayType()) {
-            t = ((ArrayType) this).t;
-        } else if (isPointerType()) {
-            t = ((PointerType) this).t;
+        try {
+            if (upper.isArrayType()) {
+                t = ((ArrayType) upper).t;
+            } else if (upper.isPointerType()) {
+                t = ((PointerType) upper).t;
+            }
+        } catch (Exception e) {
+            // null type? bad cast? ...
         }
         return t;
     }
 
-    default public boolean isEqualTo(Type other) {
+    public static boolean areTypesEqual(Type self, Type other) {
         boolean equal = false;
         try {
-            if (isBaseType() && other.isBaseType()) {
-                equal = this == other;
+            if (self.isBaseType() && other.isBaseType()) {
+                equal = self == other;
             } else if (
-                isArrayType()   && other.isArrayType() ||
-                isPointerType() && other.isPointerType()
-                ) {
-                    equal = getElemType().isEqualTo(other.getElemType());
-                }
-            else if (isStructType() && other.isStructType()) {
-                equal = ((StructType) this).structType.equals(((StructType) other).structType);
+                self.isArrayType()   && other.isArrayType() ||
+                self.isPointerType() && other.isPointerType()
+            ) {
+                equal = Type.areTypesEqual(Type.getElemType(self), Type.getElemType(other));
+            }
+            else if (self.isStructType() && other.isStructType()) {
+                equal = ((StructType) self).structType.equals(((StructType) other).structType);
             }
         } catch (Exception e) {}
-
+        
         return equal;
     }
 

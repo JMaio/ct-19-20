@@ -95,7 +95,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 
 				System.out.println(String.format("expected %s - got %s", paramType, argType));
 
-				if (!paramType.isEqualTo(argType)) {
+				if (!Type.areTypesEqual(paramType, argType)) {
 					error(String.format(
 						"bad function argument passed to '%s': '%s' (type: %s) [expected '%s' (type: %s)]", 
 						fce.name, 
@@ -119,7 +119,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		Type r = bo.right.accept(this);
 
 		System.out.println(l + " " + o + " " + r);
-		if (!l.isEqualTo(r)) {
+		if (!Type.areTypesEqual(l, r)) {
 			error(String.format("incompatible types for comparison: '%s' , '%s'", 
 				bo.left.type, bo.right.type));
 		} else {
@@ -150,27 +150,15 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	public Type visitArrayAccessExpr(ArrayAccessExpr aae) {
 		Type a = aae.array.accept(this);
 		Type i = aae.index.accept(this);
-		if (!(a.isArrayType() || a.isPointerType()) || i != BaseType.INT) {
+		if (!(Type.isArrayType(a) || Type.isPointerType(a)) || i != BaseType.INT) {
 			error(String.format("bad array access %s[%s]", a, i));
 		} else {
-			aae.type = a.getElemType();
+			aae.type = Type.getElemType(a);
 		}
 		return aae.type;
 	}
 
 	public Type visitFieldAccessExpr(FieldAccessExpr fae) {
-		// Type t = fae.struct.accept(this);
-		// if (t.isStructType()) {
-		// 	StructTypeDecl s = ((StructType) fae.struct.type).std;
-		// 	Type fieldType = s.getFieldType(fae.field);
-		// 	fae.type = fieldType;
-
-		// 	if (fieldType == null) {
-		// 		error(String.format("field does not exist? - this error should be caught in name checking"));
-		// 	}
-		// } else {
-		// 	error(String.format("field access of non-struct type: '%s.%s'", fae.struct, fae.field));
-		// }
 		return fae.type;
 	}
 
@@ -180,7 +168,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		if (et != null && et.isPointerType()) {
 			// return the inner type (access the pointer)
 			vae.type = et;
-			return vae.type.getElemType();
+			return Type.getElemType(vae.type);
 		}
 		return null;
 	}
@@ -196,10 +184,10 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 			if (et == BaseType.CHAR && te.t == BaseType.INT) {
 				// char -> int
 			} else if (et.isArrayType() && te.t.isPointerType() && 
-						et.getElemType().isEqualTo(te.t.getElemType())) {
+						Type.areTypesEqual(Type.getElemType(et), Type.getElemType(te.t))) {
 				// array -> pointer
 			} else if (et.isPointerType() && te.t.isPointerType() && 
-						!et.getElemType().isEqualTo(te.t.getElemType())) {
+						!Type.areTypesEqual(Type.getElemType(et), Type.getElemType(te.t))) {
 				// pointer -> pointer
 			} else {
 				// et phone home
@@ -242,7 +230,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 				(l == BaseType.VOID || l.isArrayType()) || 
 				(r == BaseType.VOID || r.isArrayType())) {
 				error("illegal type in assignment: " + l + " = " + r);
-			} else if (!l.isEqualTo(r)) {
+			} else if (!Type.areTypesEqual(l, r)) {
 				error("incompatible types in assignment: " + l + " = " + r);
 			}
 		} catch (Exception e) {	
@@ -257,7 +245,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 			// returns a typed expression
 			t = r.expr.accept(this);
 		}
-		if (r.funReturnType != null && r.funReturnType.isEqualTo(t)) {
+		if (r.funReturnType != null && Type.areTypesEqual(r.funReturnType, t)) {
 			// good return
 		} else {
 			error(String.format("bad return: %s should return '%s' but returns '%s'", r.fd.name, r.funReturnType, t));
