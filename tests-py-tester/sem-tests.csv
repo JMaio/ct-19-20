@@ -23,6 +23,8 @@ sem/global/bad.unkn.struct.c, SEM_FAIL
 sem/global/bad.void.var.c, SEM_FAIL
 
 sem/local/bad.assign.c, SEM_FAIL
+sem/local/bad.binop.add.c, SEM_FAIL
+sem/local/bad.binop.eq.c, SEM_FAIL
 sem/local/bad.dupe.fun.c, SEM_FAIL
 sem/local/bad.dupe.struct.c, SEM_FAIL
 sem/local/bad.func.arg.c, SEM_FAIL

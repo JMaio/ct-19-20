@@ -119,16 +119,24 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		Type r = bo.right.accept(this);
 
 		System.out.println(l + " " + o + " " + r);
-		if (l != r) {
+		if (!l.isEqualTo(r)) {
 			error(String.format("incompatible types for comparison: '%s' , '%s'", 
 				bo.left.type, bo.right.type));
 		} else {
 			if (o == Op.EQ || o == Op.NE) {
 				if (!(l.isStructType() || l.isArrayType() || l == BaseType.VOID)) {
-					
+					// good!
+				} else {
+					error(String.format("bad types for comparison: '%s' %s '%s'", 
+						bo.left.type, bo.op, bo.right.type));
 				}
 			} else {
-
+				if (l == BaseType.INT) {
+					// good!
+				} else {
+					error(String.format("cannot compare non-int types: '%s' %s '%s'", 
+						bo.left.type, bo.op, bo.right.type));
+				}
 			}
 		}
 
@@ -233,12 +241,13 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 			if (
 				(l == BaseType.VOID || l.isArrayType()) || 
 				(r == BaseType.VOID || r.isArrayType())) {
-				error("illegal type in assignment: " + l);
+				error("illegal type in assignment: " + l + " = " + r);
 			} else if (!l.isEqualTo(r)) {
-				error("incompatible types in assignment: " + l);
+				error("incompatible types in assignment: " + l + " = " + r);
 			}
-		} catch (Exception e) {	}
-
+		} catch (Exception e) {	
+			error("illegal type in assignment: " + l + " = " + r);
+		}
 		return null;
 	}
 
