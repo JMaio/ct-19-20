@@ -3,7 +3,8 @@ package ast;
 public class Return extends Stmt {
 
     public final Expr expr;
-    // public Type returnType; //
+    public FunDecl fd;
+    public Type funReturnType;
 
     public Return() {
         this(null);

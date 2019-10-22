@@ -28,6 +28,8 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		put(funSymFromDecl(new PointerType(BaseType.VOID), "mcmalloc", new ArrayList<VarDecl>() {{ add(new VarDecl(BaseType.INT, "size")); }}));
 	}};
 
+	private FunDecl currentFun;
+
 	private Map<String, StructTypeDecl> structs = new HashMap<>();
 
 	private Scope currentScope = globalScope;
@@ -41,7 +43,8 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
             vd.accept(this);
         }
         for (FunDecl fd : p.funDecls) {
-            fd.accept(this);
+			currentFun = fd;
+			fd.accept(this);
         }
 
 		return null;
@@ -257,6 +260,10 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitReturn(Return r) {
+		if (currentFun != null) {
+			r.fd = currentFun;
+			r.funReturnType = currentFun.type;
+		}
 		if (r.expr != null) {
 			r.expr.accept(this);
 		}
