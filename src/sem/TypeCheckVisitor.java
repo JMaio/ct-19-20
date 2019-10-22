@@ -93,7 +93,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 				Type paramType = param.type;
 				Type argType = arg.accept(this);
 
-				System.out.println(String.format("expected %s - got %s", paramType, argType));
+				// System.out.println(String.format("expected %s - got %s", paramType, argType));
 
 				if (!Type.areTypesEqual(paramType, argType)) {
 					error(String.format(
@@ -118,7 +118,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		Op o = bo.op;
 		Type r = bo.right.accept(this);
 
-		System.out.println(l + " " + o + " " + r);
+		// System.out.println(l + " " + o + " " + r);
 		if (!Type.areTypesEqual(l, r)) {
 			error(String.format("incompatible types for comparison: '%s' , '%s'", 
 				bo.left.type, bo.right.type));
@@ -192,11 +192,11 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 			} else {
 				// et phone home
 				// throw new Exception(String.format("illegal typecast expression [(%s) -/-> (%s)]", te.t, et));
-				error(String.format("illegal typecast expression [(%s) -/-> (%s)]", te.t, et));
+				error(String.format("illegal typecast expression [(%s) -/-> (%s)]", et, te.t));
 				return null;
 			}
 		} catch (Exception e) {
-			error(String.format("error in typecast expression [(%s) -/-> (%s)]", te.t, et));
+			error(String.format("error in typecast expression [(%s) -/-> (%s)]", et, te.t));
 			return null;
 		}
 
