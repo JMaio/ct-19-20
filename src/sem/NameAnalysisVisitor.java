@@ -281,10 +281,10 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	}
 
 	public Void visitBlock(Block b) {
+		currentScope = new Scope(currentScope, currentScope.namespace + " -> block");
 		for (VarDecl vd : b.vds) {
 			vd.accept(this);
 		}
-		currentScope = new Scope(currentScope, currentScope.namespace + " -> stmt");
 		for (Stmt s : b.stmts) {
 			s.accept(this);
 		}
