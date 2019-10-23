@@ -25,4 +25,11 @@ public class FunDecl implements ASTNode {
         return v.visitFunDecl(this);
     }
 
+    public boolean hasParam(String p) {
+        for (VarDecl vd : params) {
+            if (vd.name.equals(p)) { return true; };
+        }
+        return false;
+    }
+
 }

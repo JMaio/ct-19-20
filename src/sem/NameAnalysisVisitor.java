@@ -283,6 +283,9 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	public Void visitBlock(Block b) {
 		currentScope = new Scope(currentScope, currentScope.namespace + " -> block");
 		for (VarDecl vd : b.vds) {
+			if (currentFun.hasParam(vd.name)) {
+				error(String.format("cannot shadow function parameter '%s'", vd.name));
+			}
 			vd.accept(this);
 		}
 		for (Stmt s : b.stmts) {

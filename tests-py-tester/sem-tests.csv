@@ -40,6 +40,7 @@ sem/local/bad.func.arg.c, SEM_FAIL
 sem/local/bad.func.arg.length.c, SEM_FAIL
 sem/local/bad.func.arg.pointer3.c, SEM_FAIL
 sem/local/bad.func.decl.shadow.c, SEM_FAIL
+sem/local/bad.func.param.shadow.c, SEM_FAIL
 sem/local/bad.func.param.redef.c, SEM_FAIL
 sem/local/bad.op.c, SEM_FAIL
 sem/local/bad.return.type.c, SEM_FAIL
