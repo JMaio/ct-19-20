@@ -159,7 +159,16 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	}
 
 	public Type visitFieldAccessExpr(FieldAccessExpr fae) {
-		return fae.type;
+		fae.struct.type = fae.struct.accept(this);
+		if (Type.isStructType(fae.struct.type)) {
+			StructType s = ((StructType) fae.struct.type);
+			// get the type of this vardecl in structdecl
+			return s.std.getFieldType(fae.field);
+		} else {
+			error("bad field access type!");
+		}
+
+		return BaseType.VOID;
 	}
 
 	public Type visitValueAtExpr(ValueAtExpr vae) {
@@ -178,7 +187,6 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	}
 
 	public Type visitTypecastExpr(TypecastExpr te) {
-		// TODO Auto-generated method stub
 		Type et = te.expr.accept(this);
 		try {
 			if (et == BaseType.CHAR && te.t == BaseType.INT) {

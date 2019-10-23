@@ -9,6 +9,8 @@ import ast.*;
 
 public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 
+	public TypeCheckVisitor tcv = new TypeCheckVisitor();
+
 	public FunSymbol funSymFromDecl(Type t, String name, List<VarDecl> params) {
 		return new FunSymbol(new FunDecl(t, name, params));
 	}
@@ -108,6 +110,9 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		} else {
 			currentScope.put(new FunSymbol(fd));
 		}
+
+		fd.type.accept(this);
+
 		// create new empty scope for function parameters
 		currentScope = new Scope(currentScope, "function " + fd.name);
 		for (VarDecl vd : fd.params) {
@@ -183,33 +188,16 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		// recursively test left side for field
 		fae.struct.accept(this);
 		try {
-			if (!fae.struct.isVarExpr() && !fae.struct.isFieldAccessExpr()) {
-				error("expression does not contain field '" + fae.field + "'");
-			} else {
-				Type left = fae.struct.type;
-				if (fae.struct.isVarExpr()) {
-					// has a struct type
-					Type vt = ((VarExpr) fae.struct).vd.type;
-					if (vt.isStructType()) {
-						left = (StructType) vt;
-					} else if (vt.isPointerType() || vt.isArrayType()) {
-						// assume it's only wrapped in a single pointer/array
-						left = (StructType) Type.getElemType(vt);
-					}
+			// get the typechecker to do the work here:
+			// whatever is being checked *will* have been defined at this point,
+			// otherwise it is not semantically incorrect
+			StructType t = (StructType) fae.struct.accept(tcv);
+
+			if (structs.get(t.structType) != null) {
+				if (!t.std.hasField(fae.field)) {
+					error("struct '" + t.structType + "' does not contain field '" + fae.field + "'");
 				}
-	
-				if (left != null) {
-					try {
-						String name = ((StructType) left).structType;
-						// find struct declaration for this struct
-						StructTypeDecl std = structs.get(name);
-						if (!std.hasField(fae.field)) {
-							error("struct '" + name + "' does not contain field '" + fae.field + "'");
-						} else {
-							fae.type = std.getFieldType(fae.field);
-						}
-					} catch (Exception e) {}
-				}
+				fae.type = t.std.getFieldType(fae.field);
 			}
 		} catch (Exception e) {
 			error("bad field access: " + fae.struct + "." + fae.field);
@@ -285,8 +273,9 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		for (VarDecl vd : b.vds) {
 			if (currentFun.hasParam(vd.name)) {
 				error(String.format("cannot shadow function parameter '%s'", vd.name));
+			} else {
+				vd.accept(this);
 			}
-			vd.accept(this);
 		}
 		for (Stmt s : b.stmts) {
 			s.accept(this);

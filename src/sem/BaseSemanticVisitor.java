@@ -19,7 +19,7 @@ public abstract class BaseSemanticVisitor<T> implements SemanticVisitor<T> {
 	}
 	
 	protected void error(String message) {
-		System.err.println("semantic error: " + message);
+		System.err.println("semantic error (" + getClass().getSimpleName()+ "): " + message);
 		errors++;
 	}
 }
