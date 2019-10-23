@@ -28,7 +28,7 @@ sem/global/bad.dupe.struct.c, SEM_FAIL
 sem/global/bad.dupe.var.c, SEM_FAIL
 sem/global/bad.lib.shadow.c, SEM_FAIL
 sem/global/bad.shadow.var.fun.c, SEM_FAIL
-sem/global/bad.unkn.struct.c, SEM_FAIL
+sem/global/bad.unkn.struct.1.c, SEM_FAIL
 sem/global/bad.void.var.c, SEM_FAIL
 
 sem/local/bad.assign.c, SEM_FAIL
@@ -36,6 +36,7 @@ sem/local/bad.binop.add.c, SEM_FAIL
 sem/local/bad.binop.eq.c, SEM_FAIL
 sem/local/bad.dupe.fun.c, SEM_FAIL
 sem/local/bad.dupe.struct.c, SEM_FAIL
+sem/local/bad.field.access.c, SEM_FAIL
 sem/local/bad.func.arg.c, SEM_FAIL
 sem/local/bad.func.arg.length.c, SEM_FAIL
 sem/local/bad.func.arg.pointer3.c, SEM_FAIL
@@ -45,8 +46,12 @@ sem/local/bad.func.param.redef.c, SEM_FAIL
 sem/local/bad.op.c, SEM_FAIL
 sem/local/bad.return.type.c, SEM_FAIL
 sem/local/bad.return.void.c, SEM_FAIL
+sem/local/bad.shadow.1.c, SEM_FAIL
+sem/local/bad.shadow.2.c, SEM_FAIL
 sem/local/bad.shadow.c, SEM_FAIL
 sem/local/bad.struct.acc.type.c, SEM_FAIL
 sem/local/bad.struct.access.c, SEM_FAIL
 sem/local/bad.undefined.param.c, SEM_FAIL
+sem/local/bad.unkn.struct.1.c, SEM_FAIL
+sem/local/bad.unkn.struct.2.c, SEM_FAIL
 sem/local/bad.var.as.func.c, SEM_FAIL

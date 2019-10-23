@@ -15,12 +15,13 @@ void main () {
     struct b my_b;
     struct c my_c;
 
-    my_a.x = 0;
+    // my_a.x = 0;
 
-    my_b.a_field = my_a;
+    // my_b.a_field = my_a;
 
-    my_c.b_field = my_b;
+    // my_c.b_field = my_b;
 
-    print_i(my_c.b_field.a_field.x);
+    // print_i(my_c.b_field.a_field.x);
+    my_c.b_field.a_field.x;
     return;
 }

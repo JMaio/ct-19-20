@@ -1,30 +1,34 @@
 struct vector {
     int x;
     int y;
+    struct vector other;
 };
 struct point {
     int c;
 };
 
-void f () {
+void main () {
     int* i;
     char c[10];
 
     struct vector* v;
     struct point* p;
 
-    v.x = (int) 'a';
+    // v.x;
 
-    // char -> int
-    (int) 'c';
+    (*v).x = (int) 'a';
+    (*v).other.x = (int) 'a';
 
-    // array -> pointer
-    (char*) "hello world";
-    (char*) c;
+    // // char -> int
+    // (int) 'c';
 
-    // pointer -> pointer
-    (char*) i;
+    // // array -> pointer
+    // (char*) "hello world";
+    // (char*) c;
 
-    (struct vector*) p;
+    // // pointer -> pointer
+    // (char*) i;
+
+    // (struct vector*) *p;
 
 }
