@@ -77,10 +77,11 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		// v.vd can be null if not picked up by name visitor
 		if (v != null && v.isVarExpr() && v.vd != null) { 
 			v.type = v.vd.type;
+			return v.type;
 		} else {
 			error("varexpr");
+			return null;
 		}
-		return v.type;
 	}
 
 	public Type visitFunCallExpr(FunCallExpr fce) {
