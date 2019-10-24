@@ -1,7 +1,7 @@
 struct vector {
     int x;
     int y;
-    struct vector other;
+    // struct vector* other;
 };
 struct point {
     int c;
@@ -17,7 +17,7 @@ void main () {
     // v.x;
 
     (*v).x = (int) 'a';
-    (*v).other.x = (int) 'a';
+    // (*v).other.x = (int) 'a';
 
     // // char -> int
     // (int) 'c';

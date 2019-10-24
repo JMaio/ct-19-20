@@ -1,3 +1,4 @@
+
 fibonacci.c, PASS
 tictactoe.c, PASS
 
@@ -55,3 +56,4 @@ sem/local/bad.undefined.param.c, SEM_FAIL
 sem/local/bad.unkn.struct.1.c, SEM_FAIL
 sem/local/bad.unkn.struct.2.c, SEM_FAIL
 sem/local/bad.var.as.func.c, SEM_FAIL
+sem/local/bad.while.c, SEM_FAIL

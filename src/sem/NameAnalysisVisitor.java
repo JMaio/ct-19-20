@@ -190,7 +190,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		try {
 			// get the typechecker to do the work here:
 			// whatever is being checked *will* have been defined at this point,
-			// otherwise it is not semantically incorrect
+			// otherwise it is not semantically correct
 			StructType t = (StructType) fae.struct.accept(tcv);
 
 			if (structs.get(t.structType) != null) {
