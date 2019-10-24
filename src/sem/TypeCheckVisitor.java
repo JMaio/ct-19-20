@@ -124,7 +124,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 				bo.left.type, bo.right.type));
 		} else {
 			if (o == Op.EQ || o == Op.NE) {
-				if (!(l.isStructType() || l.isArrayType() || l == BaseType.VOID)) {
+				if (!(Type.isStructType(l) || Type.isArrayType(l) || l == BaseType.VOID)) {
 					// good!
 				} else {
 					error(String.format("bad types for comparison: '%s' %s '%s'", 
@@ -174,7 +174,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	public Type visitValueAtExpr(ValueAtExpr vae) {
 		Type et = vae.expr.accept(this);
 		// should be pointer type
-		if (et != null && et.isPointerType()) {
+		if (et != null && Type.isPointerType(et)) {
 			// return the inner type (access the pointer)
 			vae.type = et;
 			return Type.getElemType(vae.type);
@@ -219,6 +219,8 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	public Type visitWhile(While w) {
 		if (w.cond.accept(this) != BaseType.INT) {
 			error("non-integer condition in while statement");
+		} else {
+			w.stmt.accept(this);
 		}
 		return null;
 	}
@@ -226,6 +228,15 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	public Type visitIf(If i) {
 		if (i.cond.accept(this) != BaseType.INT) {
 			error("non-integer condition in if statement");
+		} else {
+			try {
+				i.stmt.accept(this);
+				if (i.elseStmt != null) {
+					i.elseStmt.accept(this);
+				}
+			} catch (Exception e) {
+				error("bad block in if condition");
+			}
 		}
 		return null;
 	}
@@ -235,13 +246,13 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		Type r = a.right.accept(this);
 		try {
 			if (
-				(l == BaseType.VOID || l.isArrayType()) || 
-				(r == BaseType.VOID || r.isArrayType())) {
+				(l == BaseType.VOID || Type.isArrayType(l) || 
+				(r == BaseType.VOID || Type.isArrayType(l)))) {
 				error("illegal type in assignment: " + l + " = " + r);
 			} else if (!Type.areTypesEqual(l, r)) {
 				error("incompatible types in assignment: " + l + " = " + r);
 			}
-		} catch (Exception e) {	
+		} catch (Exception e) {
 			error("illegal type in assignment: " + l + " = " + r);
 		}
 		return null;
