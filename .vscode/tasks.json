@@ -35,6 +35,26 @@
             "command": "java -cp bin Main -ast tests/fibonacci.c ast.c-ast > tests/ast.c-ast",
             "group": "test",
             "dependsOn": "ant: build",
-        }
+        },
+        {
+            "label": "compile",
+            "type": "shell",
+            "command": "java -cp bin Main -gen tests/gen/main.c main.s",
+            "group": {
+                "kind": "test",
+                "isDefault": true,
+            },
+            "dependsOn": "ant: build"
+        },
+        {
+            "label": "compile and run",
+            "type": "shell",
+            "command": "java -jar desc\\part3\\Mars4_5.jar main.s",
+            "group": {
+                "kind": "test",
+                "isDefault": true,
+            },
+            "dependsOn": "compile"
+        },
     ]
 }
