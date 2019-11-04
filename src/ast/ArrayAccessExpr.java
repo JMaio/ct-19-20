@@ -14,4 +14,7 @@ public class ArrayAccessExpr extends Expr {
         return v.visitArrayAccessExpr(this);
     }
 
+    @Override
+    public boolean isArrayAccessExpr() { return true; }
+
 }

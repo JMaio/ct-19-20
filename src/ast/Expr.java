@@ -7,4 +7,5 @@ public abstract class Expr implements ASTNode {
 
     public boolean isVarExpr() { return false; }
     public boolean isFieldAccessExpr() { return false; }
+    public boolean isArrayAccessExpr() { return false; }
 }
