@@ -165,8 +165,13 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitVarExpr(VarExpr v) {
-        // TODO: to complete
-        return null;
+        Register r = vars.get(v.name);
+        // TODO: fix this
+        if (r == null) {
+            r = getRegister();
+        }
+        return r;
+        
     }
 
     @Override
@@ -189,7 +194,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitIntLiteral(IntLiteral i) {
-        // TODO Auto-generated method stub
+        // inefficiency of assigning register here no matter what
         Register r = getRegister();
 
         writer.write("    # " + i.getClass().getSimpleName() + " \n");
@@ -205,14 +210,26 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitChrLiteral(ChrLiteral c) {
-        // TODO Auto-generated method stub
-        return null;
+        // inefficiency of assigning register here no matter what
+        Register r = getRegister();
+
+        writer.write("    # " + c.getClass().getSimpleName() + " \n");
+        writer.write("    li   " + r + ", " + Character.getNumericValue(c.value) + "\n");
+        return r;
     }
 
     @Override
     public Register visitFunCallExpr(FunCallExpr fce) {
-        // TODO Auto-generated method stub
-        return null;
+        // use argument registers. TODO: use the stack?
+        int aIndex = 0;
+        for (Expr arg : fce.args) {
+            Register aReg = Register.paramRegs[aIndex++];
+            Register thisReg = arg.accept(this);
+            writer.write(Instruction.la(aReg, thisReg));
+        }
+        writer.write(Instruction.jal(fce.name) + "\n");
+        // result should have been returned in $v0
+        return Register.v0;
     }
 
     @Override
