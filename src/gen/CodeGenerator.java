@@ -60,27 +60,36 @@ public class CodeGenerator implements ASTVisitor<Register> {
     private void writeSysFunction(String name, int opcode) {
         writer.write(name + ":\n");
 
-        writer.write("    li $v0, " + opcode + "\n");
-        // writer.write("add " + "\n");
-        writer.write("    syscall\n");
+        writer.write(Instruction.li(Register.v0, opcode));
+        writer.write(Instruction.syscall());
+        writer.write(Instruction.jr(Register.ra));
+    }
+
+    private void writeHeading(String h) {
+        writer.write("# -------------------------------\n");
+        writer.write("# " + h + "\n");
+        writer.write("# -------------------------------\n");
+        writer.write("\n");
     }
 
     @Override
     public Register visitProgram(Program p) {
-        writer.write("# jwow compiler v0.0.1\n");
-
-        writer.write("    .data\n");
+        writeHeading("jwow compiler v0.0.1");
+        writeDataSection();
         for (VarDecl vd : p.varDecls) {
             vd.accept(this);
         }
 
         writer.write("\n");
-        writer.write("    .text\n");
+        writeTextSection();
         writer.write("    .globl main            # set main\n");
         writer.write("\n");
         writer.write("exec_main:\n");
-        writer.write("    j main                 # unconditional jump to main");
+        writer.write(Instruction.j("main"));
         writer.write("\n");
+        
+        
+        writeHeading("library functions");
         HashMap<String, Integer> sysfuncs = new HashMap<String, Integer>() {{
             put("print_i", 1);
             put("print_s", 4);
@@ -95,13 +104,16 @@ public class CodeGenerator implements ASTVisitor<Register> {
             writer.print("\n");
         }
 
+        writeHeading("program functions");
+
         for (FunDecl fd : p.funDecls) {
             fd.accept(this);
         }
 
         writer.write("exit:                       #\n");
-        writer.write("    li   $v0, 10            # exit()\n");
-        writer.write("    syscall                 #\n");
+        writer.write(Instruction.li(Register.v0, 10));
+        writer.write(Instruction.syscall());
+
         return null;
     }
 
