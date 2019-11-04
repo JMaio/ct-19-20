@@ -146,6 +146,13 @@ public class CodeGenerator implements ASTVisitor<Register> {
         
         fd.block.accept(this);
         
+        // exit after main
+        if (fd.name.equals("main")) {
+            writer.write(Instruction.j("exit"));
+        } else {
+            writer.write(Instruction.jr(Register.ra));
+        }
+
         writer.write("\n");
         return null;
     }
@@ -278,6 +285,20 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitReturn(Return r) {
         // TODO Auto-generated method stub
+        writer.write(Instruction.InstrFmt("# return (%s)", r.funReturnType));
+        if (r.expr != null) {
+            // expression evaluated and placed in a register
+            Register rReg = r.expr.accept(this);
+            // this is the return of the function so set $v0 to it
+            writer.write(Instruction.la(Register.v0, rReg));
+        } else {
+            writer.write(Instruction.la(Register.v0, Register.zero));
+        }
+        
+        // return in main?
+        if (!r.fd.name.equals("main")) {
+            writer.write(Instruction.jr(Register.ra));
+        }
         return null;
     }
 }
