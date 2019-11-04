@@ -20,6 +20,8 @@ public class CodeGenerator implements ASTVisitor<Register> {
     // contains all the free temporary registers
     private Stack<Register> freeRegs = new Stack<Register>();
 
+    private HashMap<String, Register> vars = new HashMap<>();
+
     public CodeGenerator() {
         freeRegs.addAll(Register.tmpRegs);
     }
@@ -309,7 +311,18 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitAssign(Assign a) {
-        // TODO Auto-generated method stub
+        // TODO: assign goes to local or global variable?
+        Register r = a.right.accept(this);
+        // TODO: account for arrays and pointers, not just vars
+        if (a.left.isVarExpr()) {
+            String name = ((VarExpr) a.left).name;
+            vars.put(name, r);
+        } else if (a.left.isFieldAccessExpr()) {
+
+        } else if (a.left.isArrayAccessExpr()) {
+
+        }
+
         return null;
     }
 
