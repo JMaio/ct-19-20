@@ -218,8 +218,22 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitBinOp(BinOp bo) {
         // TODO Auto-generated method stub
+        Register l = bo.left.accept(this);
+        Register r = bo.right.accept(this);
 
-        return null;
+        String i = "";
+
+        switch (bo.op) {
+            // add and store in left register, saving one register
+            case ADD: i = Instruction.add(l, l, r); break;
+        
+            default:
+                break;
+        }
+
+        writer.write(i);
+        
+        return l;
     }
 
     @Override
