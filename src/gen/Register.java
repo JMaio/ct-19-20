@@ -13,6 +13,8 @@ public class Register {
      * definition of registers
      */
 
+    public static final Register zero = new Register(0,"zero");
+
     public static final Register v0 = new Register(2,"v0");
     public static final Register[] paramRegs = {
             new Register(4,"a0"),
