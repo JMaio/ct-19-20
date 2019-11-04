@@ -1,7 +1,6 @@
 package gen;
 
 import ast.*;
-import javafx.util.Pair;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -10,6 +9,7 @@ import java.util.ArrayList;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Stack;
+import java.util.Map.Entry;
 
 public class CodeGenerator implements ASTVisitor<Register> {
 
@@ -56,14 +56,6 @@ public class CodeGenerator implements ASTVisitor<Register> {
         writer.write("    .text\n");
     }
 
-    // private HashMap<Op, String> ops = new HashMap<Op, String>() {{
-    //     put(Op.ADD, "add");
-    //     put(Op.ADD, "add");
-    // }};
-
-    // private String opToInstruction(Op op) {
-
-    // }
 
     private void writeSysFunction(String name, int opcode) {
         writer.write(name + ":\n");
@@ -89,19 +81,16 @@ public class CodeGenerator implements ASTVisitor<Register> {
         writer.write("exec_main:\n");
         writer.write("    j main                 # unconditional jump to main");
         writer.write("\n");
-
-        ArrayList<Pair<String, Integer>> sysfuncs = new ArrayList<Pair<String, Integer>>() {{
-            add(new Pair<String,Integer>("print_i", 1));
-            add(new Pair<String,Integer>("print_s", 4));
-            add(new Pair<String,Integer>("print_c", 11));
-            
-            add(new Pair<String,Integer>("read_i", 5));
-            add(new Pair<String,Integer>("read_c", 12));
-            
-            add(new Pair<String,Integer>("mcmalloc", 9));
+        HashMap<String, Integer> sysfuncs = new HashMap<String, Integer>() {{
+            put("print_i", 1);
+            put("print_s", 4);
+            put("print_c", 11);
+            put("read_i", 5);
+            put("read_c", 12);
+            put("mcmalloc", 9);
         }};
 
-        for (Pair<String, Integer> f : sysfuncs) {
+        for (Entry<String, Integer> f : sysfuncs.entrySet()) {
             writeSysFunction(f.getKey(), f.getValue());
             writer.print("\n");
         }
