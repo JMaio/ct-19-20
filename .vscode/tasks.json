@@ -23,10 +23,7 @@
             "label": "run all tests",
             "type": "shell",
             "command": "python tests-py-tester/main.py",
-            "group": {
-                "kind": "test",
-                "isDefault": true,
-            },
+            "group": "test",
             "dependsOn": "ant: build"
         },
         {
@@ -40,10 +37,7 @@
             "label": "compile",
             "type": "shell",
             "command": "java -cp bin Main -gen tests/gen/main.c main.s",
-            "group": {
-                "kind": "test",
-                "isDefault": true,
-            },
+            "group": "test",
             "dependsOn": "ant: build"
         },
         {

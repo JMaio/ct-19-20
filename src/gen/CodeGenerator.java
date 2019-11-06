@@ -215,8 +215,9 @@ public class CodeGenerator implements ASTVisitor<Register> {
         // inefficiency of assigning register here no matter what
         Register r = getRegister();
 
-        writer.write("    # " + c.getClass().getSimpleName() + " \n");
-        writer.write("    li   " + r + ", " + Character.getNumericValue(c.value) + "\n");
+        // writer.write("    # " + c.getClass().getSimpleName() + " \n");
+        writer.write(Instruction.li(r, c.value));
+        // writer.write("    li   " + r + ", " + (int) c.value + "\n");
         return r;
     }
 
@@ -245,6 +246,10 @@ public class CodeGenerator implements ASTVisitor<Register> {
         switch (bo.op) {
             // add and store in left register, saving one register
             case ADD: i = Instruction.add(l, l, r); break;
+            case SUB: i = Instruction.sub(l, l, r); break;
+            case MUL: i = Instruction.mul(l, l, r); break;
+            case DIV: i = Instruction.div(l, l, r); break;
+            case MOD: i = Instruction.mod(l, l, r); break;
         
             default:
                 break;
