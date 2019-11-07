@@ -24,4 +24,7 @@ public class ChrLiteral extends Expr {
         return v.visitChrLiteral(this);
     }
 
+    @Override
+    public boolean isChrLiteral() { return true; }
+
 }

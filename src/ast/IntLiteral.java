@@ -23,4 +23,6 @@ public class IntLiteral extends Expr {
         return v.visitIntLiteral(this);
     }
 
+    public boolean isIntLiteral() { return true; }
+
 }

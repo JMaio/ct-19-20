@@ -47,6 +47,9 @@ public class CodeGenerator implements ASTVisitor<Register> {
     public void emitProgram(Program program, File outputFile) throws FileNotFoundException {
         writer = new PrintWriter(outputFile);
         
+        ExpressionSimplifier es = new ExpressionSimplifier();
+        program.accept(es);
+
         visitProgram(program);
         writer.close();
     }
