@@ -163,7 +163,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitVarDecl(VarDecl vd) {
-        // TODO: to complete
+        // writer.write(String.format("%s:", vd.name));
         return null;
     }
 
@@ -201,15 +201,21 @@ public class CodeGenerator implements ASTVisitor<Register> {
         // inefficiency of assigning register here no matter what
         Register r = getRegister();
 
-        writer.write("    # " + i.getClass().getSimpleName() + " \n");
-        writer.write("    li   " + r + ", " + i.value + "\n");
+        // writer.write("    # " + i.getClass().getSimpleName() + " \n");
+        writer.write(Instruction.li(r, i.value));
+        // writer.write("    li   " + r + ", " + i.value + "\n");
         return r;
     }
 
     @Override
     public Register visitStrLiteral(StrLiteral s) {
         // TODO Auto-generated method stub
-        return null;
+        Register r = getRegister();
+        
+        writer.write(Instruction.InstrFmt("load_str_lit(%s, \"%s\")\n", r, s.value));
+        // writer.write("# " + s.value + "\n");
+
+        return r;
     }
 
     @Override
@@ -226,13 +232,30 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitFunCallExpr(FunCallExpr fce) {
         // use argument registers. TODO: use the stack?
-        int aIndex = 0;
-        for (Expr arg : fce.args) {
-            Register aReg = Register.paramRegs[aIndex++];
-            Register thisReg = arg.accept(this);
-            writer.write(Instruction.la(aReg, thisReg));
+
+        // int aIndex = 0;
+        // for (Expr arg : fce.args) {
+        //     Register aReg = Register.paramRegs[aIndex++];
+        //     Register thisReg = arg.accept(this);
+        //     writer.write(Instruction.la(aReg, thisReg));
+        // }
+        // writer.write(Instruction.jal(fce.name) + "\n");
+        String i = "    " + fce.name;
+        String delimiter = "";
+
+        if (fce.args.size() > 0) {
+            i += "(";
+            for (Expr arg : fce.args) {
+                i += arg.accept(this);
+            }
+            i += ")";
         }
-        writer.write(Instruction.jal(fce.name) + "\n");
+
+        writer.write(i + "\n");
+        writer.write("\n");
+
+        // free temporary registers?
+
         // result should have been returned in $v0
         return Register.v0;
     }
@@ -252,12 +275,15 @@ public class CodeGenerator implements ASTVisitor<Register> {
             case MUL: i = Instruction.mul(l, l, r); break;
             case DIV: i = Instruction.div(l, l, r); break;
             case MOD: i = Instruction.mod(l, l, r); break;
+
+            // case GT:  i = Instruction.
         
             default:
                 break;
         }
 
         writer.write(i);
+        freeRegister(r);
         
         return l;
     }
@@ -294,8 +320,10 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitTypecastExpr(TypecastExpr te) {
-        // TODO Auto-generated method stub
-        return null;
+        // writer.write(s);
+        Register r = te.expr.accept(this);
+        // writer.write(te.);
+        return r;
     }
 
     @Override
