@@ -39,6 +39,18 @@ public class Instruction {
         return InstrFmt("la   %s, (%s)", r, address);
     }
 
+    public static String la(Register r, String label) {
+        return la(r, label, false);
+    }
+
+    public static String la(Register r, String label, boolean macro) {
+        if (macro) {
+            return InstrFmt("la   %s, (%s)", r, label);
+        } else {
+            return InstrFmt("la   %s, %s", r, label);
+        }
+    }
+
     public static String li(Register r, int val) {
         return InstrFmt("li   %s, %s", r, val);
     }
@@ -46,6 +58,10 @@ public class Instruction {
     public static String mod(Register dest, Register s, Register t) {
         return _div(s, t) +
         InstrFmt("mfhi %s", dest);
+    }
+        
+    public static String move(Register dest, Register src) {
+        return InstrFmt("move %s, %s", dest, src);
     }
         
     public static String mul(Register dest, Register s, Register t) {
