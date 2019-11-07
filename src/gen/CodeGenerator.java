@@ -92,19 +92,21 @@ public class CodeGenerator implements ASTVisitor<Register> {
         
         
         writeHeading("library functions");
-        HashMap<String, Integer> sysfuncs = new HashMap<String, Integer>() {{
-            put("print_i", 1);
-            put("print_s", 4);
-            put("print_c", 11);
-            put("read_i", 5);
-            put("read_c", 12);
-            put("mcmalloc", 9);
-        }};
+        // HashMap<String, Integer> sysfuncs = new HashMap<String, Integer>() {{
+        //     put("print_i", 1);
+        //     put("print_s", 4);
+        //     put("print_c", 11);
+        //     put("read_i", 5);
+        //     put("read_c", 12);
+        //     put("mcmalloc", 9);
+        // }};
 
-        for (Entry<String, Integer> f : sysfuncs.entrySet()) {
-            writeSysFunction(f.getKey(), f.getValue());
-            writer.print("\n");
-        }
+        // for (Entry<String, Integer> f : sysfuncs.entrySet()) {
+        //     writeSysFunction(f.getKey(), f.getValue());
+        //     writer.print("\n");
+        // }
+
+        writer.write(LibFunc.printSysFuncs());
 
         writeHeading("program functions");
 
