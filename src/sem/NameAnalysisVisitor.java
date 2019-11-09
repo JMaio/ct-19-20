@@ -98,7 +98,12 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 			// name analysis on variables in struct scope
 			currentScope = new Scope(currentScope, "struct " + name);
 			for (VarDecl vd : std.vds) {
-				vd.accept(this);
+				// struct cannot self-reference unless it's a pointer to itself
+				if (Type.isStructType(vd.type) && ((StructType) vd.type).structType.equals(std.st.structType)) {
+					error(String.format("cannot self-reference struct '%s'", std.st.structType));
+				} else {
+					vd.accept(this);
+				}
 			}
 			currentScope = currentScope.getOuter();
 		}
