@@ -95,7 +95,7 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
         Integer val = null;
 
-        if (left.isIntLiteral() && right.isIntLiteral()) {
+        if (Expr.isIntLiteral(left) && Expr.isIntLiteral(right)) {
             int l = ((IntLiteral) left).value;
             int r = ((IntLiteral) right).value;
 
@@ -121,7 +121,7 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
             
                 default: break;
             }
-        } else if (left.isChrLiteral() && right.isChrLiteral()) {
+        } else if (Expr.isChrLiteral(left) && Expr.isChrLiteral(right)) {
             int l = ((ChrLiteral) left).value;
             int r = ((ChrLiteral) right).value;
 
@@ -169,19 +169,19 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
         // TODO Auto-generated method stub
         // TODO
         Integer s = null;
-        if (soe.t.isBaseType()) {
+        if (Type.isBaseType(soe.t)) {
             switch ((BaseType) soe.t) {
                 case CHAR : s = 1; break;
                 case INT: s = 4; break;
                 default: break;
             }
-        } else if (soe.t.isArrayType()) {
+        } else if (Type.isArrayType(soe.t)) {
             ArrayType at = ((ArrayType) soe.t);
             int innerSize = ((IntLiteral) new SizeOfExpr(at.t).accept(this)).value;
             s = innerSize * at.size;
-        } else if (soe.t.isPointerType()) {
             
-        } else if (soe.t.isStructType()) {
+        } else if (Type.isPointerType(soe.t)) {
+        } else if (Type.isStructType(soe.t)) {
             // cannot contain struct, only pointer(struct)
             s = 0;
             for (VarDecl vd : ((StructType) soe.t).std.vds) {
@@ -201,7 +201,7 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
     public Expr visitTypecastExpr(TypecastExpr te) {
         // TODO Auto-generated method stub
         // to simplify!
-        if (te.t == BaseType.INT && te.expr.isChrLiteral()) {
+        if (te.t == BaseType.INT && Expr.isChrLiteral(te.expr)) {
             return new IntLiteral(((ChrLiteral) te.expr).value);
         }
         // if (te.t == BaseType.INT &&) {
