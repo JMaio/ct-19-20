@@ -210,6 +210,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 			error(String.format("error in typecast expression [(%s) -/-> (%s)]", et, te.t));
 			return null;
 		}
+		te.type = te.t;
 
 		return te.t;
 	}

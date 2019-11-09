@@ -58,17 +58,17 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitStrLiteral(StrLiteral s) {
-        return null;
+        return s;
     }
 
     @Override
     public Expr visitChrLiteral(ChrLiteral c) {
-        return null;
+        return c;
     }
 
     @Override
     public Expr visitVarExpr(VarExpr v) {
-        return null;
+        return v;
     }
 
     @Override
@@ -118,6 +118,16 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
                 case OR : val = (l != 0 || r != 0) ? 1 : 0; break;
                 case AND: val = (l != 0 && r != 0) ? 1 : 0; break;
+            
+                default: break;
+            }
+        } else if (left.isChrLiteral() && right.isChrLiteral()) {
+            int l = ((ChrLiteral) left).value;
+            int r = ((ChrLiteral) right).value;
+
+            switch (bo.op) {
+                case NE : val = l != r ? 1 : 0; break;
+                case EQ : val = l == r ? 1 : 0; break;
             
                 default: break;
             }
@@ -172,6 +182,7 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
         } else if (soe.t.isPointerType()) {
             
         } else if (soe.t.isStructType()) {
+            // cannot contain struct, only pointer(struct)
             s = 0;
             for (VarDecl vd : ((StructType) soe.t).std.vds) {
                 s += 4;
@@ -190,7 +201,7 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
     public Expr visitTypecastExpr(TypecastExpr te) {
         // TODO Auto-generated method stub
         // to simplify!
-        if (te.type == BaseType.INT && te.expr.isChrLiteral()) {
+        if (te.t == BaseType.INT && te.expr.isChrLiteral()) {
             return new IntLiteral(((ChrLiteral) te.expr).value);
         }
         // if (te.t == BaseType.INT &&) {
