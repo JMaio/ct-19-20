@@ -29,21 +29,28 @@
         {
             "label": "test ast",
             "type": "shell",
-            "command": "java -cp bin Main -ast tests/fibonacci.c ast.c-ast > tests/ast.c-ast",
+            "command": "java -cp bin MainPart2 -ast tests/main.c ast.c-ast > tests/ast.c-ast",
             "group": "test",
             "dependsOn": "ant: build",
         },
         {
+            "label": "draw ast",
+            "type": "shell",
+            "command": "python tests-py-tester/grapher.py",
+            "group": "test",
+            "dependsOn": "test ast",
+        },
+        {
             "label": "compile",
             "type": "shell",
-            "command": "java -cp bin Main -gen tests/gen/main.c main.s",
+            "command": "java -cp bin Main -gen tests/main.c main.s",
             "group": "test",
             "dependsOn": "ant: build"
         },
         {
             "label": "compile and run",
             "type": "shell",
-            "command": "java -jar desc\\part3\\Mars4_5.jar main.s",
+            "command": "java -jar desc\\part3\\Mars4_5.jar sm nc me main.s",
             "group": {
                 "kind": "test",
                 "isDefault": true,

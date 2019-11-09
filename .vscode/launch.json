@@ -2,6 +2,13 @@
     "configurations": [
         {
             "type": "java",
+            "name": "debug gen",
+            "request": "launch",
+            "mainClass": "Main",
+            "args": "-gen tests/main.c main.s"
+        },
+        {
+            "type": "java",
             "name": "debug parser",
             "request": "launch",
             "mainClass": "Main",

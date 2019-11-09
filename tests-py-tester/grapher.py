@@ -3,24 +3,26 @@ from anytree import Node, RenderTree
 from anytree.exporter import UniqueDotExporter as dot_exp
 
 
-# p = os.path.dirname(os.path.realpath(__file__))
-# f = "ast.c-ast"
-# filepath = os.path.join(p, "..", "tests", f)
+p = os.path.dirname(os.path.realpath(__file__))
+f = "ast.c-ast"
+filepath = os.path.join(p, "..", "tests", f)
 
-# ast_string = ""
+ast_string = ""
 
-# with open(filepath) as file:
-#     ast_string = file.read()
+with open(filepath) as file:
+    ast_string = file.read()
 # sample command for ast:
 # java -cp bin Main -[mode] tests/fibonacci.c f.out
 
-contents = []
-while True:
-    try:
-        line = input().strip()
-    except EOFError:
-        break
-    contents.append(line)
+# contents = []
+# while True:
+#     try:
+#         line = input().strip()
+#     except EOFError:
+#         break
+#     contents.append(line)
+
+contents = ast_string.strip().split()
 
 print(contents)
 ast = "".join(contents) #.split())
