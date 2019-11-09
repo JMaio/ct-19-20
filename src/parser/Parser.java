@@ -468,7 +468,7 @@ public class Parser {
             nextToken();
             Expr right = parseExp8();
 
-            e = new BinOp(e, Op.AND, right);
+            e = new BinOp(e, Op.OR, right);
         }
 
         return e;
