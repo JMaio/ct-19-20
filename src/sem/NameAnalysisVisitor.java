@@ -38,6 +38,8 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 	
 	public Void visitProgram(Program p) {
 
+		FunDecl main = null;
+
 		for (StructTypeDecl std : p.structTypeDecls) {
             std.accept(this);
         }
@@ -45,9 +47,19 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
             vd.accept(this);
         }
         for (FunDecl fd : p.funDecls) {
+			if (fd.name.equals("main")) {
+				main = fd;
+			}
 			currentFun = fd;
 			fd.accept(this);
-        }
+		}
+
+		if (main != null) {
+			p.main = main;
+		} else {
+			error("no 'main' in program");
+		}
+		
 
 		return null;
 	}
