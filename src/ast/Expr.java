@@ -19,10 +19,16 @@ public abstract class Expr implements ASTNode {
         try { return expr.isArrayAccessExpr(); }
         catch (Exception e) { return false; }
     }
+    
+    public static boolean isValueatExpr(Expr expr) {
+        try { return expr.isValueatExpr(); }
+        catch (Exception e) { return false; }
+    }
 
     public boolean isVarExpr() { return false; }
     public boolean isFieldAccessExpr() { return false; }
     public boolean isArrayAccessExpr() { return false; }
+    public boolean isValueatExpr() { return false; }
 
 
     public static boolean isIntLiteral(Expr expr) {

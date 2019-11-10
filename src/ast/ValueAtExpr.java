@@ -12,4 +12,7 @@ public class ValueAtExpr extends Expr {
         return v.visitValueAtExpr(this);
     }
 
+    @Override
+    public boolean isValueatExpr() { return true; }
+
 }

@@ -253,6 +253,11 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 				(l == BaseType.VOID || Type.isArrayType(l) || 
 				(r == BaseType.VOID || Type.isArrayType(l)))) {
 				error("illegal type in assignment: " + l + " = " + r);
+			} else if (!(Expr.isVarExpr(a.left) 
+					|| Expr.isArrayAccessExpr(a.left)
+					|| Expr.isFieldAccessExpr(a.left)
+					|| Expr.isValueatExpr(a.left))) {
+				error("incompatible expression at left of assignment");
 			} else if (!Type.areTypesEqual(l, r)) {
 				error("incompatible types in assignment: " + l + " = " + r);
 			}
