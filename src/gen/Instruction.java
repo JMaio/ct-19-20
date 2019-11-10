@@ -14,6 +14,10 @@ public class Instruction {
         return InstrFmt("add  %s, %s, %s", dest, s, t);
     }
     
+    public static String addi(Register dest, Register src, int i) {
+        return InstrFmt("addi %s, %s, %d", dest, src, i);
+    }
+    
     public static String _div(Register s, Register t) {
         return InstrFmt("div  %s, %s", s, t);
     }
@@ -35,8 +39,12 @@ public class Instruction {
         return InstrFmt("jr   %s", r);
     }
     
+    public static String la(Register r, Register address, int offset) {
+        return InstrFmt("la   %s, %d(%s)", r, offset, address);
+    }
+
     public static String la(Register r, Register address) {
-        return InstrFmt("la   %s, (%s)", r, address);
+        return la(r, address, 0);
     }
 
     public static String la(Register r, String label) {
@@ -71,9 +79,22 @@ public class Instruction {
     public static String sub(Register dest, Register s, Register t) {
         return InstrFmt("sub  %s, %s, %s", dest, s, t);
     }
+
+    public static String sw(Register dest, Register src, int offset) {
+        return InstrFmt("sw   %s, %d(%s)", src, offset, dest);
+    }
+
+    public static String sw(Register dest, Register src) {
+        return sw(dest, src, 0);
+    }
     
     public static String syscall() {
         return InstrFmt("syscall");
+    }
+
+
+    public static String incrementSp(int size) {
+        return addi(Register.sp, Register.sp, size);
     }
 
 }
