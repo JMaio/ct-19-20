@@ -19,4 +19,10 @@ public class PointerType implements Type {
     public String toString() {
         return String.format("%s(%s)", getClass().getSimpleName(), t);
     }
+
+    @Override
+    public int size() {
+        // pointers are just 32 bit addresses
+        return 4;
+    }
 }

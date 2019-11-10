@@ -63,4 +63,15 @@ public interface Type extends ASTNode {
         return equal;
     }
 
+
+    public int size();
+
+    public static int size(Type t) {
+        try {
+            return t.size();
+        } catch (Exception e) {
+            return 0;
+        }
+    }
+
 }

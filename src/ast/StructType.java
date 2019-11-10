@@ -19,5 +19,14 @@ public class StructType implements Type {
     public String toString() {
         return String.format("%s", getClass().getName());
     }
+
+    @Override
+    public int size() {
+        int s = 0;
+        for (VarDecl vd : std.vds) {
+            s += vd.type.size();
+        }
+        return s;
+    }
     
 }

@@ -14,4 +14,14 @@ public enum BaseType implements Type {
 
     @Override
     public boolean isBaseType() { return true; }
+
+    @Override
+    public int size() {
+        switch (this) {
+            case INT : return 4;
+            case CHAR: return 1;
+            case VOID: return 0;
+        }
+        return 0;
+    }
 }

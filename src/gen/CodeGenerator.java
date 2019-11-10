@@ -24,7 +24,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
     private HashMap<String, Register> vars = new HashMap<>();
 
     public CodeGenerator() {
-        freeRegs.addAll(Register.tmpRegs);
+        freeAllRegisters();
     }
 
     private class RegisterAllocationError extends Error {}
@@ -39,6 +39,11 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     private void freeRegister(Register reg) {
         freeRegs.push(reg);
+    }
+
+    private void freeAllRegisters() {
+        freeRegs.removeAllElements();
+        freeRegs.addAll(Register.tmpRegs);
     }
 
 
@@ -195,7 +200,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
         // } else {
         //     writer.write(Instruction.jr(Register.ra));
         // }
-        
+        freeAllRegisters();
 
         writer.write("\n");
         return null;

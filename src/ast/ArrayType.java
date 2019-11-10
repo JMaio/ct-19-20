@@ -21,4 +21,11 @@ public class ArrayType implements Type {
         return String.format("%s(%s)", getClass().getName(), t) ;
     }
 
+    @Override
+    public int size() {
+        // array types should never be in sizeof, 
+        // but can be in structs!
+        return this.size * this.t.size();
+    }
+
 }
