@@ -43,19 +43,26 @@
         {
             "label": "compile",
             "type": "shell",
-            "command": "java -cp bin Main -gen tests/main.c main.s",
+            "command": "java -cp bin Main -gen tests/main.c main.asm",
             "group": "test",
             "dependsOn": "ant: build"
         },
         {
             "label": "compile and run",
             "type": "shell",
-            "command": "java -jar desc\\part3\\Mars4_5.jar sm nc me main.s",
+            "command": "java -jar desc\\part3\\Mars4_5.jar sm nc me main.asm",
             "group": {
                 "kind": "test",
                 "isDefault": true,
             },
             "dependsOn": "compile"
+        },
+        {
+            "label": "run gen tests",
+            "type": "shell",
+            "command": "python tests-py-tester/gen-tester.py",
+            "group": "test",
+            "dependsOn": "ant: build"
         },
     ]
 }
