@@ -1,6 +1,7 @@
 package gen;
 
 import ast.*;
+import sem.Scope;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -21,7 +22,12 @@ public class CodeGenerator implements ASTVisitor<Register> {
     // contains all the free temporary registers
     private Stack<Register> freeRegs = new Stack<Register>();
 
-    private HashMap<String, Register> vars = new HashMap<>();
+    // 'total' stack offset
+    int stackOffset = 0;
+    // offset from last stack offset,
+    // added to stackOffset and reset when entering a new block
+    int frameOffset = 0;
+    // private HashMap<String, Register> vars = new HashMap<>();
 
     public CodeGenerator() {
         freeAllRegisters();
@@ -89,7 +95,6 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
         writeHeading("jwow compiler v0.0.1");
         writeDataSection();
-
         for (VarDecl vd : p.varDecls) {
             vd.accept(this);
         }
@@ -98,38 +103,24 @@ public class CodeGenerator implements ASTVisitor<Register> {
         writeTextSection();
         writer.write("    .globl main            # set main\n");
         writer.write("\n");
-        writer.write("exec_main:\n");
-        writer.write(Instruction.j("main"));
-        writer.write("\n");
-        
         
         writeHeading("library functions");
-        // HashMap<String, Integer> sysfuncs = new HashMap<String, Integer>() {{
-        //     put("print_i", 1);
-        //     put("print_s", 4);
-        //     put("print_c", 11);
-        //     put("read_i", 5);
-        //     put("read_c", 12);
-        //     put("mcmalloc", 9);
-        // }};
-
-        // for (Entry<String, Integer> f : sysfuncs.entrySet()) {
-        //     writeSysFunction(f.getKey(), f.getValue());
-        //     writer.print("\n");
-        // }
 
         writer.write(LibFunc.printSysFuncs());
 
         writeHeading("program functions");
 
-        // "normal" functions as macros
         for (FunDecl fd : p.funDecls) {
             if (!fd.name.equals("main")) {
                 fd.accept(this);
             }
         }
+
+        writer.write("exec_main:\n");
+        writer.write(Instruction.j("main"));
+        writer.write("\n");
         // main as a label
-        writer.write("main:");
+        writer.write("main:\n");
         // no args in main
         p.main.block.accept(this);
 
@@ -155,10 +146,18 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitBlock(Block b) {
         // TODO: to complete
-        writer.write("    # " + b.getClass().getSimpleName() + " \n");
-        List<Register> regs = new ArrayList<>();
+        // reset stack offset
+        stackOffset += frameOffset;
+        frameOffset = 0;
+        // writer.write("    # " + b.getClass().getSimpleName() + " \n");
+        // List<Register> regs = new ArrayList<>();
+        for (VarDecl vd : b.vds) {
+            vd.accept(this);
+            // vd.offset = stackOffset + frameOffset;
+            // int s = vd.type.size();
+        }
         for (Stmt s : b.stmts) {
-            regs.add(s.accept(this));
+            s.accept(this);
         }
         
 
@@ -167,39 +166,17 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitFunDecl(FunDecl fd) {
+
         // create the function label
         List<String> params = new ArrayList<>();
         for (VarDecl v : fd.params) {
             params.add("%" + v.name);
         }
 
-        writer.write(Instruction.InstrFmt(
-            ".macro %s (%s)", fd.name, String.join(", ", params)));
-        
-        writeTextSection();
+        writer.write(String.format("%s:\n", fd.name));
         
         fd.block.accept(this);
-
-        // writer.write( "" +
-        // "    .macro load_str_lit (" + r + "," + var + ")\n" +
-        // "    .data\n" +
-        // "string: .asciiz " + var + "\n" +
-        // "    .text\n" +
-        // "    la " + r + ", string\n");
-        // Instruction.la(r, "string") +
-        
-        writer.write(Instruction.InstrFmt(".end_macro"));
-        // writer.write("    # " + fd.getClass().getSimpleName() + " \n");
-        // writer.write(fd.name + ":\n");
-        
-        // fd.block.accept(this);
-        
-        // exit after main
-        // if (fd.name.equals("main")) {
-        //     writer.write(Instruction.j("exit"));
-        // } else {
-        //     writer.write(Instruction.jr(Register.ra));
-        // }
+                
         freeAllRegisters();
 
         writer.write("\n");
@@ -208,19 +185,31 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitVarDecl(VarDecl vd) {
-        // writer.write(String.format("%s:", vd.name));
+        if (vd.global) {
+            // TODO should all vars be aligned to 4 bytes?
+            writer.write(String.format("%-11s .space %d\n", vd.name + ":", vd.type.size()));
+        } else {
+            // save stack offset
+            writer.write(String.format("# '%s' stack offset = %d\n", vd.name, vd.offset));
+            vd.offset = stackOffset + frameOffset;
+            frameOffset += vd.type.size();
+        }
         return null;
     }
 
     @Override
     public Register visitVarExpr(VarExpr v) {
-        Register r = vars.get(v.name);
         // TODO: fix this
-        if (r == null) {
-            r = getRegister();
+        Register r = getRegister();
+        if (v.vd.global) {
+            // load global variable from label
+            writer.write(Instruction.la(r, v.name));
+        } else {
+            // v.vd.
+            // load from stack
         }
-        return r;
-        
+
+        return r;        
     }
 
     @Override
@@ -278,6 +267,25 @@ public class CodeGenerator implements ASTVisitor<Register> {
     public Register visitFunCallExpr(FunCallExpr fce) {
         // use argument registers. TODO: use the stack?
 
+        if (LibFunc.isLibFunc(fce.name)) {
+            // String i = "    " + fce.name;
+            // String delimiter = "";
+            // System.out.println("function: " +fce.name);
+            ArrayList<String> args = new ArrayList<>();
+
+            if (fce.args.size() > 0) {
+                // i += "(";
+                for (Expr arg : fce.args) {
+                    args.add(arg.accept(this).toString());
+                }
+                // i += ")";
+            }
+            writer.write(
+                Instruction.InstrFmt("%s (%s)\n", fce.name, String.join(", ", args)));
+            writer.write("\n");
+        } else {
+            // TODO
+        }
         // int aIndex = 0;
         // for (Expr arg : fce.args) {
         //     Register aReg = Register.paramRegs[aIndex++];
@@ -285,20 +293,17 @@ public class CodeGenerator implements ASTVisitor<Register> {
         //     writer.write(Instruction.la(aReg, thisReg));
         // }
         // writer.write(Instruction.jal(fce.name) + "\n");
-        String i = "    " + fce.name;
-        String delimiter = "";
+        // String i = "    " + fce.name;
+        // String delimiter = "";
 
-        if (fce.args.size() > 0) {
-            i += "(";
-            for (Expr arg : fce.args) {
-                i += arg.accept(this);
-            }
-            i += ")";
-        }
-
-        writer.write(i + "\n");
-        writer.write("\n");
-
+        // if (fce.args.size() > 0) {
+        //     i += "(";
+        //     for (Expr arg : fce.args) {
+        //         i += arg.accept(this);
+        //     }
+        //     i += ")";
+        // }
+        
         // free temporary registers?
 
         // result should have been returned in $v0
@@ -309,6 +314,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
     public Register visitBinOp(BinOp bo) {
         // TODO Auto-generated method stub
 
+        Register result = getRegister();
         Register l = bo.left.accept(this);
         Register r = bo.right.accept(this);
 
@@ -316,11 +322,23 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
         switch (bo.op) {
             // add and store in left register, saving one register
-            case ADD: i = Instruction.add(l, l, r); break;
-            case SUB: i = Instruction.sub(l, l, r); break;
-            case MUL: i = Instruction.mul(l, l, r); break;
-            case DIV: i = Instruction.div(l, l, r); break;
-            case MOD: i = Instruction.mod(l, l, r); break;
+            case ADD: i = Instruction.add(result, l, r); break;
+            case SUB: i = Instruction.sub(result, l, r); break;
+            case MUL: i = Instruction.mul(result, l, r); break;
+            case DIV: i = Instruction.div(result, l, r); break;
+            case MOD: i = Instruction.mod(result, l, r); break;
+
+            // case GT : i = Instruction.(); break;
+            // case LT : i = Instruction.(); break;
+
+            // case GE : i = Instruction.(); break;
+            // case LE : i = Instruction.(); break;
+
+            // case NE : i = Instruction.(); break;
+            // case EQ : i = Instruction.(); break;
+
+            // case OR : i = Instruction.(); break;
+            // case AND: i = Instruction.(); break;
 
             // case GT:  i = Instruction.
         
@@ -397,7 +415,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
         // TODO: account for arrays and pointers, not just vars
         if (a.left.isVarExpr()) {
             String name = ((VarExpr) a.left).name;
-            vars.put(name, r);
+            // vars.put(name, r);
         } else if (a.left.isFieldAccessExpr()) {
 
         } else if (a.left.isArrayAccessExpr()) {
@@ -421,9 +439,9 @@ public class CodeGenerator implements ASTVisitor<Register> {
         }
         
         // return in main?
-        if (!r.fd.name.equals("main")) {
-            writer.write(Instruction.jr(Register.ra));
-        }
+        // if (!r.fd.name.equals("main")) {
+        //     writer.write(Instruction.jr(Register.ra));
+        // }
         return null;
     }
 }

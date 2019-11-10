@@ -166,39 +166,7 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitSizeOfExpr(SizeOfExpr soe) {
-        // TODO
-        // Integer s = null;
-        // if (Type.isBaseType(soe.t)) {
-        //     switch ((BaseType) soe.t) {
-        //         case CHAR : s = 1; break;
-        //         case INT: s = 4; break;
-        //         default: break;
-        //     }
-        // } else if (Type.isArrayType(soe.t)) {
-        //     ArrayType at = ((ArrayType) soe.t);
-        //     int innerSize = ((IntLiteral) new SizeOfExpr(at.t).accept(this)).value;
-        //     s = innerSize * at.size;
-        // } else if (Type.isPointerType(soe.t)) {
-        //     // point to anything -> that's an address!
-        //     // 32 bits = 4 bytes
-        //     s = 4;
-        // } else if (Type.isStructType(soe.t)) {
-        //     // cannot contain struct, only pointer(struct)
-        //     s = 0;
-        //     for (VarDecl vd : ((StructType) soe.t).std.vds) {
-        //         s += ((IntLiteral) new SizeOfExpr(vd.type).accept(this)).value;
-        //     }
-        // } else {
-        //     // big f
-        // }
         return new IntLiteral(soe.t.size());
-
-        // if (s != null) {
-        //     return new IntLiteral(s);
-        // } else {
-        //     return new IntLiteral(0);
-        // }
-
     }
 
     @Override
@@ -208,11 +176,6 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
         if (te.t == BaseType.INT && Expr.isChrLiteral(te.expr)) {
             return new IntLiteral(((ChrLiteral) te.expr).value);
         }
-        // else if (Type.isArrayType(te.expr.type)) {
-        //     // other types? pointers / arrays?
-        // }
-        // if (te.t == BaseType.INT &&) {
-        // }
         return null;
     }
 

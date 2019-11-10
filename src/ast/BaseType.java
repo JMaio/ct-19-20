@@ -19,7 +19,7 @@ public enum BaseType implements Type {
     public int size() {
         switch (this) {
             case INT : return 4;
-            case CHAR: return 1;
+            case CHAR: return 1; // char - should it be aligned to 4 bytes?
             case VOID: return 0;
         }
         return 0;

@@ -74,4 +74,8 @@ public interface Type extends ASTNode {
         }
     }
 
+    public static int alignTo4Byte(int size) {
+        return size + (4 - size % 4) % 4;
+    }
+
 }

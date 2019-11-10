@@ -25,7 +25,8 @@ public class ArrayType implements Type {
     public int size() {
         // array types should never be in sizeof, 
         // but can be in structs!
-        return this.size * this.t.size();
+        // pad to align to 4 byte boundary
+        return Type.alignTo4Byte(this.size * this.t.size());
     }
 
 }

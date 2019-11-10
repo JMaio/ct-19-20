@@ -44,7 +44,8 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
             std.accept(this);
         }
         for (VarDecl vd : p.varDecls) {
-            vd.accept(this);
+			vd.accept(this);
+			vd.global = true;
         }
         for (FunDecl fd : p.funDecls) {
 			if (fd.name.equals("main")) {

@@ -1,9 +1,12 @@
 package ast;
 
+import java.util.HashMap;
+
 public class StructType implements Type {
     
     public final String structType;
     public StructTypeDecl std;
+    public HashMap<String, Integer> structOffset = new HashMap<>();
 
     public StructType(String structType) {
         this.structType = structType;
@@ -24,9 +27,18 @@ public class StructType implements Type {
     public int size() {
         int s = 0;
         for (VarDecl vd : std.vds) {
-            s += vd.type.size();
+            int inner = vd.type.size();
+            // inner = 5, 5%4 = 1 ==> add [4 - (n%4)] % 4
+            // pad to align to 4 byte boundary
+            s += Type.alignTo4Byte(inner);
+            structOffset.put(vd.name, s);
         }
         return s;
     }
+
+    // public int getOffset(String varname) {
+    //     int offset = 0;
+
+    // }
     
 }

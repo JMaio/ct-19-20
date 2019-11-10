@@ -1,11 +1,43 @@
 package gen;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+
+import ast.FunDecl;
 
 /**
  * LibFuncs
  */
-public class LibFunc {
+public abstract class LibFunc {
+
+    // private static HashMap<String, LibFunc> libFuncs = new HashMap<String, LibFunc>() {{
+    //     put("print_i", print_i.funcall());
+    //     put("print_c", print_c.funcall());
+    //     put("print_s", print_s.funcall());
+    //     put("read_i", read_i.funcall());
+    //     put("read_c", read_c.funcall());
+    //     put("mcmalloc", mcmalloc.funcall());
+    // }};
+    private static ArrayList<String> libFuncs = new ArrayList<String>() {{
+        add("print_i");
+        add("print_c");
+        add("print_s");
+        add("read_i");
+        add("read_c");
+        add("mcmalloc");
+    }};
+
+    public static boolean isLibFunc(String f) {
+        return libFuncs.contains(f);
+    }
+
+    // public class print_i extends LibFunc {
+
+    //     public String funcall() {
+
+    //     }
+    // }
 
     public static String print_i() {
         String var = "%i";
