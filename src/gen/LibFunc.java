@@ -44,8 +44,8 @@ public abstract class LibFunc {
         return 
         "    .macro print_i (" + var + ")\n" +
         "    .text\n" +
-        Instruction.li(Register.v0, 1) +
         Instruction.la(Register.paramRegs[0], var, true) +
+        Instruction.li(Register.v0, 1) +
         Instruction.syscall() +
         "    .end_macro\n";
     }
@@ -55,8 +55,8 @@ public abstract class LibFunc {
         return 
         "    .macro print_c (" + var + ")\n" +
         "    .text\n" +
-        Instruction.li(Register.v0, 11) +
         Instruction.la(Register.paramRegs[0], var, true) +
+        Instruction.li(Register.v0, 11) +
         Instruction.syscall() +
         "    .end_macro\n";
     }
@@ -68,8 +68,8 @@ public abstract class LibFunc {
         // "    .data\n" +
         // "string_out: .asciiz " + var + "\n" +
         "    .text\n" +
-        Instruction.li(Register.v0, 4) +
         Instruction.la(Register.paramRegs[0], var, true) +
+        Instruction.li(Register.v0, 4) +
         Instruction.syscall() +
         "    .end_macro\n";
     }
@@ -97,8 +97,8 @@ public abstract class LibFunc {
         return 
         "    .macro mcmalloc (" + var + ")\n" +
         "    .text\n" +
-        Instruction.li(Register.v0, 9) +
         Instruction.la(Register.paramRegs[0], var, true) +
+        Instruction.li(Register.v0, 9) +
         Instruction.syscall() +
         "    .end_macro\n";
     }
