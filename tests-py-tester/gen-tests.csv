@@ -1,4 +1,18 @@
+binops.c, PASS, 0;1, 1;-1;0;0;0;0;0;1;1;1;0;1;0
+binops.c, PASS, 1;1, 2;0;1;1;0;0;1;0;1;0;1;1;1
+binops.c, PASS, 1;2, 3;-1;2;0;1;0;0;1;1;1;0;1;1
+binops.c, PASS, 5;3, 8;2;15;1;2;1;1;0;0;1;0;1;1
+
+binops.c, PASS, 1;0, 1;1;0;
+
+character_comparison.c, PASS, , a==a:1;a==b:0
+
+global_var.c, PASS, , 1;2
+
+if.c, PASS, ,0
+
 hello_world.c, PASS, , hello world
 hello_world_assign.c, PASS, , hello world
+
 print_i.c, PASS, , 21
 read_i.c, PASS, 42, 42

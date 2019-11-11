@@ -25,7 +25,7 @@ def run_test(mode, filename, expected, out="main.asm", logfile="test.log", inp='
             ['java',  '-jar', 'desc/part3/Mars4_5.jar', 'sm', 'nc', 'me', f'tests/gen/asm/{filename}'],
             capture_output=True,
             # stdout=f,
-            input=inp.encode('ascii'),
+            input="\n".join(inp).encode('ascii'),
         )
 
         f.write(6*" " + proc.stdout.decode('ascii') + '\n'), f.flush()
@@ -97,7 +97,7 @@ if __name__ == "__main__":
                 l = line.strip()
                 if l:
                     f, c, inp, real = l.split(',')
-                    tests.append([f, codes[c.strip()], inp.strip(), real.strip()])
+                    tests.append([f, codes[c.strip()], inp.strip().split(';'), real.strip()])
 
         if compile_all(tests) > 0:
             exit()
