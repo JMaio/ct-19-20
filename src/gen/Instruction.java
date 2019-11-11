@@ -18,14 +18,24 @@ public class Instruction {
         return InstrFmt("addi %s, %s, %d", dest, src, i);
     }
     
-    public static String _div(Register s, Register t) {
-        return InstrFmt("div  %s, %s", s, t);
+    public static String beq(Register s, Register t, String label) {
+        return InstrFmt("beq  %s, %s, %s", s, t, label);
     }
 
-    public static String div(Register dest, Register s, Register t) {
-        return _div(s, t) +
-        InstrFmt("mflo %s", dest);
+    public static String beq(Register r, int i, String label) {
+        return InstrFmt("beq  %s, %d, %s", r, i, label);
     }
+
+    // division (integer)
+    public static String div(Register dest, Register s, Register t) {
+        return InstrFmt("div  %s, %s, %s", dest, s, t);
+    }
+    
+    // modulo
+    public static String rem(Register dest, Register s, Register t) {
+        return InstrFmt("rem  %s, %s, %s", dest, s, t);
+    }
+
 
     public static String j(String label) {
         return InstrFmt("j    %s", label);
@@ -71,11 +81,6 @@ public class Instruction {
         return InstrFmt("lw   %s, %d(%s)", r, offset, address);
     }
 
-    public static String mod(Register dest, Register s, Register t) {
-        return _div(s, t) +
-        InstrFmt("mfhi %s", dest);
-    }
-        
     public static String move(Register dest, Register src) {
         return InstrFmt("move %s, %s", dest, src);
     }
@@ -84,6 +89,50 @@ public class Instruction {
         return InstrFmt("mul  %s, %s, %s", dest, s, t);
     }
 
+
+
+    // set equal
+    public static String seq(Register t1, Register t2, Register t3) {
+        return InstrFmt("seq  %s, %s, %s", t1, t2, t3);
+    }
+    // set equal
+    public static String seq(Register t1, Register t2, int i) {
+        return InstrFmt("seq  %s, %s, %s", t1, t2, i);
+    }
+
+    // set not equal
+    public static String sne(Register t1, Register t2, Register t3) {
+        return InstrFmt("sne  %s, %s, %s", t1, t2, t3);
+    }
+    
+    // set not equal
+    public static String sne(Register s, Register t, int i) {
+        return InstrFmt("sne  %s, %s, %d", s, t, i);
+    }
+
+    // set less than
+    public static String slt(Register t1, Register t2, Register t3) {
+        return InstrFmt("slt  %s, %s, %s", t1, t2, t3);
+    }
+    
+    // set less than or eq
+    public static String sle(Register t1, Register t2, Register t3) {
+        return InstrFmt("sle  %s, %s, %s", t1, t2, t3);
+    }
+    
+    // set greater than
+    public static String sgt(Register t1, Register t2, Register t3) {
+        return InstrFmt("sgt  %s, %s, %s", t1, t2, t3);
+    }
+    
+    // set greater than or eq
+    public static String sge(Register t1, Register t2, Register t3) {
+        return InstrFmt("sge  %s, %s, %s", t1, t2, t3);
+    }
+
+
+
+    // subtract
     public static String sub(Register dest, Register s, Register t) {
         return InstrFmt("sub  %s, %s, %s", dest, s, t);
     }

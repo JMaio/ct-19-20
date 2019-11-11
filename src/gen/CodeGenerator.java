@@ -50,6 +50,8 @@ public class CodeGenerator implements ASTVisitor<Register> {
     // added to stackOffset and reset when entering a new block
     int frameOffset = 0;
 
+    UIDLabel uidLabel = new UIDLabel();
+
     public CodeGenerator() {
         freeAllRegisters();
     }
@@ -279,6 +281,8 @@ public class CodeGenerator implements ASTVisitor<Register> {
     public Register visitFunCallExpr(FunCallExpr fce) {
         // use argument registers. TODO: use the stack?
 
+        comment("%s ()", fce.name);
+
         if (LibFunc.isLibFunc(fce.name)) {
             // String i = "    " + fce.name;
             // String delimiter = "";
@@ -299,6 +303,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
         }
         
         // TODO free temporary registers?
+        freeAllRegisters();
 
         // result should have been returned in $v0
         return Register.v0;
@@ -307,42 +312,88 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitBinOp(BinOp bo) {
         Register result = getRegister();
-        Register l = bo.left.accept(this);
-        Register r = bo.right.accept(this);
+        comment(bo.toString());
+        comment("------------");
 
+        comment("left: %s", bo.left);
+        Register l = bo.left.accept(this);
+        
         String i = "";
 
-        switch (bo.op) {
-            // add and store in left register, saving one register
-            case ADD: i = Instruction.add(result, l, r); break;
-            case SUB: i = Instruction.sub(result, l, r); break;
-            case MUL: i = Instruction.mul(result, l, r); break;
-            case DIV: i = Instruction.div(result, l, r); break;
-            case MOD: i = Instruction.mod(result, l, r); break;
-
-            // case GT : i = Instruction.(); break;
-            // case LT : i = Instruction.(); break;
-
-            // case GE : i = Instruction.(); break;
-            // case LE : i = Instruction.(); break;
-
-            // case NE : i = Instruction.(); break;
-            // case EQ : i = Instruction.(); break;
-
-            // case OR : i = Instruction.(); break;
-            // case AND: i = Instruction.(); break;
-
-            // case GT:  i = Instruction.
+        // cannot accept right side unconditionally
+        // comment("right: %s", bo.left);
+        // Register r = bo.right.accept(this);
         
-            default:
-                break;
+        if (bo.op == Op.OR || bo.op == Op.AND) {
+            String rightLabel = uidLabel.mk("BinOp_right");
+            String endLabel = uidLabel.mk("BinOp_end");
+
+            write(Instruction.sne(result, l, 0));
+
+            switch (bo.op) {
+                // store the result
+                // if 1
+                //   goto next
+                // if 0
+                //   eval right
+                //     if 1:
+                //       goto next
+                //     if 0:
+                //       goto end
+                //   
+                // next:
+                //  "if block"
+                // end:
+                case OR : write(Instruction.beq(result, 1, endLabel)); break;
+                case AND: write(Instruction.beq(result, 0, endLabel)); break;
+                default : break;
+            }
+
+            write(rightLabel + ":");
+                Register r = bo.right.accept(this);
+                write(Instruction.sne(result, r, 0));
+            
+
+            write(endLabel + ":");
+            // nothing
+
+        } else {
+            Register r = bo.right.accept(this);
+    
+            switch (bo.op) {
+                // add and store in left register, saving one register
+                case ADD: i = Instruction.add(result, l, r); break;
+                case SUB: i = Instruction.sub(result, l, r); break;
+                case MUL: i = Instruction.mul(result, l, r); break;
+                case DIV: i = Instruction.div(result, l, r); break;
+                case MOD: i = Instruction.rem(result, l, r); break;
+    
+                case GT : i = Instruction.sgt(result, l, r); break;
+                case LT : i = Instruction.slt(result, l, r); break;
+    
+                case GE : i = Instruction.sge(result, l, r); break;
+                case LE : i = Instruction.sle(result, l, r); break;
+    
+                case NE : i = Instruction.sne(result, l, r); break;
+                case EQ : i = Instruction.seq(result, l, r); break;
+    
+                // TODO: OR and AND require branching
+                
+                // case OR : i = Instruction.(); break;
+                // case AND: i = Instruction.(); break;
+            
+                default: break;
+            }
+
+            freeRegister(r);
         }
 
         write(i);
+        comment("------------");
+
         freeRegister(l);
-        freeRegister(r);
         
-        return l;
+        return result;
     }
 
     @Override
@@ -403,10 +454,10 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitAssign(Assign a) {
         // TODO: assign goes to local or global variable?
-        Register r = a.right.accept(this);
-        // TODO: account for arrays and pointers, not just vars
-
         comment("%s = %s", a.left, a.right);
+        
+        // TODO: account for arrays and pointers, not just vars
+        Register r = a.right.accept(this);
 
         if (Expr.isVarExpr(a.left)) {
 
