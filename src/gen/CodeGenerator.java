@@ -442,6 +442,26 @@ public class CodeGenerator implements ASTVisitor<Register> {
     public Register visitWhile(While w) {
         // TODO Auto-generated method stub
         comment(w.toString());
+        String loopLabel = uidLabel.mk("while_loop");
+        String endLabel = uidLabel.mk("while_end");
+        
+        // create loop label - return here if condition still hold
+        write(loopLabel + ":");
+
+        // evaluate condition
+        Register r = w.cond.accept(this);
+        // if condition no longer holds, end the loop
+        write(Instruction.beq(r, Register.zero, endLabel));
+        
+        // otherwise, execute
+        w.stmt.accept(this);
+        
+        // loop again
+        write(Instruction.j(loopLabel));
+
+        write(endLabel + ":");
+        comment("----------");
+
         return null;
     }
 

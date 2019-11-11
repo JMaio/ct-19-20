@@ -1,3 +1,5 @@
+dec2bin.c, PASS, 1, 0000000000000001
+while.c, PASS, , 0123456789
 if.c, PASS, , yz1
 
 sizeof.c, PASS, , 1;4;16;24;24
@@ -12,8 +14,6 @@ binops.c, PASS, 1;0, 1;1;0;
 character_comparison.c, PASS, , a==a:1;a==b:0
 
 global_var.c, PASS, , 1;2
-
-if.c, PASS, ,0
 
 hello_world.c, PASS, , hello world
 hello_world_assign.c, PASS, , hello world
