@@ -187,12 +187,21 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitWhile(While w) {
+        Expr e = w.cond.accept(this);
+        if (e != null) {
+            w.cond = e;
+        }
         w.stmt.accept(this);
         return null;
     }
 
     @Override
     public Expr visitIf(If i) {
+        Expr e = i.cond.accept(this);
+        if (e != null) {
+            i.cond = e;
+        }
+
         i.stmt.accept(this);
         if (i.elseStmt != null) {
             i.elseStmt.accept(this);

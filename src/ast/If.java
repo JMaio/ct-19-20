@@ -2,7 +2,7 @@ package ast;
 
 public class If extends Stmt {
 
-    public final Expr cond;
+    public Expr cond;
     public final Stmt stmt;
     public final Stmt elseStmt;
 
@@ -20,4 +20,8 @@ public class If extends Stmt {
         return v.visitIf(this);
     }
 
+    @Override
+    public String toString() {
+        return String.format("if (%s)", cond);
+    }
 }

@@ -2,7 +2,7 @@ package ast;
 
 public class While extends Stmt {
 
-    public final Expr cond;
+    public Expr cond;
     public final Stmt stmt;
 
     public While(Expr cond, Stmt stmt) {
@@ -12,6 +12,11 @@ public class While extends Stmt {
 
     public <T> T accept(ASTVisitor<T> v) {
         return v.visitWhile(this);
+    }
+
+    @Override
+    public String toString() {
+        return String.format("while (%s)", cond);
     }
 
 }
