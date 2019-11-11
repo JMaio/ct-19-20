@@ -201,7 +201,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
         Register r = getRegister();
         if (v.vd.global) {
             // load global variable from label
-            writer.write(Instruction.la(r, v.name));
+            writer.write(Instruction.lw(r, v.name));
         } else {
             // load from stack
             writer.write(Instruction.InstrFmt("# offset '%s'\n", v.name));
@@ -322,6 +322,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
         }
 
         writer.write(i);
+        freeRegister(l);
         freeRegister(r);
         
         return l;
@@ -389,11 +390,16 @@ public class CodeGenerator implements ASTVisitor<Register> {
         // TODO: account for arrays and pointers, not just vars
 
         if (Expr.isVarExpr(a.left)) {
-            int offset = ((VarExpr) a.left).vd.offset;
-            writer.write(Instruction.InstrFmt("# store %s at (%d)", r, offset));
-            writer.write(Instruction.sw(Register.fp, r, offset));
-            // String name = ((VarExpr) a.left).name;
-            // vars.put(name, r);
+
+            VarDecl vd = ((VarExpr) a.left).vd;
+            if (vd.global) {
+                writer.write(Instruction.sw(r, vd.name));
+            } else {
+                int offset = vd.offset;
+                writer.write(Instruction.InstrFmt("# store %s at (%d)", r, offset));
+                writer.write(Instruction.sw(Register.fp, r, offset));
+            }
+
         } else if (Expr.isFieldAccessExpr(a.left)) {
 
         } else if (Expr.isArrayAccessExpr(a.left)) {

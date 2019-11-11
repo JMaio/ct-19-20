@@ -62,6 +62,10 @@ public class Instruction {
     public static String li(Register r, int val) {
         return InstrFmt("li   %s, %s", r, val);
     }
+    
+    public static String lw(Register r, String label) {
+        return InstrFmt("lw   %s, %s", r, label);
+    }
 
     public static String lw(Register r, Register address, int offset) {
         return InstrFmt("lw   %s, %d(%s)", r, offset, address);
@@ -90,6 +94,18 @@ public class Instruction {
 
     public static String sw(Register dest, Register src) {
         return sw(dest, src, 0);
+    }
+    
+    public static String sw(Register src, String label, Register offset) {
+        return InstrFmt("sw   %s, %s(%s)", src, label, offset);
+    }
+    
+    public static String sw(Register src, String label, int offset) {
+        return InstrFmt("sw   %s, %s+%d", src, label, offset);
+    }
+
+    public static String sw(Register src, String label) {
+        return sw(src, label, 0);
     }
     
     public static String syscall() {
