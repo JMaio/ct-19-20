@@ -6,7 +6,7 @@ package gen;
 public class Instruction {
 
     public static String InstrFmt(String fmt, Object ...args) {
-        return String.format("    " + fmt + "\n", args);
+        return String.format("    " + fmt, args);
     }
     
 

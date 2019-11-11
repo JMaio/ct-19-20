@@ -44,9 +44,9 @@ public abstract class LibFunc {
         return 
         "    .macro print_i (" + var + ")\n" +
         "    .text\n" +
-        Instruction.la(Register.paramRegs[0], var, true) +
-        Instruction.li(Register.v0, 1) +
-        Instruction.syscall() +
+        Instruction.la(Register.paramRegs[0], var, true) + '\n' +
+        Instruction.li(Register.v0, 1) + '\n' +
+        Instruction.syscall() + '\n' +
         "    .end_macro\n";
     }
 
@@ -55,9 +55,9 @@ public abstract class LibFunc {
         return 
         "    .macro print_c (" + var + ")\n" +
         "    .text\n" +
-        Instruction.la(Register.paramRegs[0], var, true) +
-        Instruction.li(Register.v0, 11) +
-        Instruction.syscall() +
+        Instruction.la(Register.paramRegs[0], var, true) + '\n' +
+        Instruction.li(Register.v0, 11) + '\n' +
+        Instruction.syscall() + '\n' +
         "    .end_macro\n";
     }
 
@@ -68,9 +68,9 @@ public abstract class LibFunc {
         // "    .data\n" +
         // "string_out: .asciiz " + var + "\n" +
         "    .text\n" +
-        Instruction.la(Register.paramRegs[0], var, true) +
-        Instruction.li(Register.v0, 4) +
-        Instruction.syscall() +
+        Instruction.la(Register.paramRegs[0], var, true) + '\n' +
+        Instruction.li(Register.v0, 4) + '\n' +
+        Instruction.syscall() + '\n' +
         "    .end_macro\n";
     }
 
@@ -78,8 +78,8 @@ public abstract class LibFunc {
         return 
         "    .macro read_i\n" +
         "    .text\n" +
-        Instruction.li(Register.v0, 5) +
-        Instruction.syscall() +
+        Instruction.li(Register.v0, 5) + '\n' +
+        Instruction.syscall() + '\n' +
         "    .end_macro\n";
     }
 
@@ -87,8 +87,8 @@ public abstract class LibFunc {
         return 
         "    .macro read_c\n" +
         "    .text\n" +
-        Instruction.li(Register.v0, 12) +
-        Instruction.syscall() +
+        Instruction.li(Register.v0, 12) + '\n' +
+        Instruction.syscall() + '\n' +
         "    .end_macro\n";
     }
 
@@ -97,9 +97,9 @@ public abstract class LibFunc {
         return 
         "    .macro mcmalloc (" + var + ")\n" +
         "    .text\n" +
-        Instruction.la(Register.paramRegs[0], var, true) +
-        Instruction.li(Register.v0, 9) +
-        Instruction.syscall() +
+        Instruction.la(Register.paramRegs[0], var, true) + '\n' +
+        Instruction.li(Register.v0, 9) + '\n' +
+        Instruction.syscall() + '\n' +
         "    .end_macro\n";
     }
 
