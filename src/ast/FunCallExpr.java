@@ -19,7 +19,7 @@ public class FunCallExpr extends Expr {
 
     @Override
     public String toString() {
-        return String.format("%s ()", fd);
+        return String.format("%s ()", fd.name);
     }
 
 }

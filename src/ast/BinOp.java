@@ -21,4 +21,8 @@ public class BinOp extends Expr {
         return v.visitBinOp(this);
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s %s %s", left, op, right);
+    }
 }
