@@ -264,7 +264,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
     public Register visitStrLiteral(StrLiteral s) {
         Register r = getRegister();
         
-        write(Instruction.InstrFmt("load_str_lit(%s, \"%s\")\n", r, s.value));
+        write(Instruction.InstrFmt("load_str_lit(%s, \"%s\")", r, s.value));
 
         return r;
     }
@@ -296,8 +296,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
                 }
                 // i += ")";
             }
-            write(Instruction.InstrFmt("%s (%s)\n", fce.name, String.join(", ", args)));
-            write("");
+            write(Instruction.InstrFmt("%s (%s)", fce.name, String.join(", ", args)));
         } else {
             // TODO
         }
@@ -442,12 +441,42 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitWhile(While w) {
         // TODO Auto-generated method stub
+        comment(w.toString());
         return null;
     }
 
     @Override
     public Register visitIf(If i) {
-        // TODO Auto-generated method stub
+        comment(i.toString());
+        String endLabel = uidLabel.mk("if_end");
+        String elseLabel = uidLabel.mk("if_else");
+        String next;
+        Register r = i.cond.accept(this);
+
+        // if condition is false, go to 'else' (if no else exists, acts as ending condition)
+        if (i.elseStmt == null) { 
+            next = endLabel;
+        } else { 
+            next = elseLabel;
+        }
+        write(Instruction.beq(r, Register.zero, next));
+
+        // block (if true)
+        i.stmt.accept(this);
+        // completed block, skip else
+        write(Instruction.j(endLabel));
+
+        // else condition (if false)
+        if (i.elseStmt != null) {
+            write(elseLabel + ":");
+            // comment("else");
+            i.elseStmt.accept(this);
+        }
+
+        write(endLabel + ":");
+        comment("----------");
+
+        freeRegister(r);
         return null;
     }
 
