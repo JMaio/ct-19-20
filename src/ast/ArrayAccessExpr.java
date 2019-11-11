@@ -17,4 +17,13 @@ public class ArrayAccessExpr extends Expr {
     @Override
     public boolean isArrayAccessExpr() { return true; }
 
+    @Override
+    public Expr getInnermost() {
+        return array.getInnermost();
+    }
+
+    @Override
+    public Expr getInner() {
+        return array;
+    }
 }

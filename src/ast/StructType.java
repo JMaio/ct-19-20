@@ -36,6 +36,10 @@ public class StructType implements Type {
         return s;
     }
 
+    public int getFieldOffset(String field) {
+        return structOffset.get(field);
+    }
+
     // public int getOffset(String varname) {
     //     int offset = 0;
 

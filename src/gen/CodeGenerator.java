@@ -375,11 +375,6 @@ public class CodeGenerator implements ASTVisitor<Register> {
     
                 case NE : i = Instruction.sne(result, l, r); break;
                 case EQ : i = Instruction.seq(result, l, r); break;
-    
-                // TODO: OR and AND require branching
-                
-                // case OR : i = Instruction.(); break;
-                // case AND: i = Instruction.(); break;
             
                 default: break;
             }
@@ -503,13 +498,13 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitAssign(Assign a) {
         // TODO: assign goes to local or global variable?
-        comment("%s = %s", a.left, a.right);
+        comment(a.toString());
         
         // TODO: account for arrays and pointers, not just vars
         Register r = a.right.accept(this);
 
         if (Expr.isVarExpr(a.left)) {
-
+            // get variable address to write to
             VarDecl vd = ((VarExpr) a.left).vd;
             if (vd.global) {
                 write(Instruction.sw(r, vd.name));
@@ -520,6 +515,48 @@ public class CodeGenerator implements ASTVisitor<Register> {
             }
 
         } else if (Expr.isFieldAccessExpr(a.left)) {
+
+            FieldAccessExpr fae = (FieldAccessExpr) a.left;
+            
+            StructType st = (StructType) fae.struct.type;
+            int offset = 0;
+
+            Expr inner = fae.getInnermost();
+            // should be a var expression with vardecl
+            try {
+                VarExpr innerVarExpr = ((VarExpr) inner);
+                // offset each struct
+                // a.b.c
+                //                    #      c    d    z
+                // a: struct          # 4  ---- ---- ----               
+                // b: field (struct)  #    ---- ----
+                // c: field (int)     #    ----
+                
+                // a: {b: struct, z: int}
+                // b: {c: int, d: int}
+
+                Expr outer = fae.struct;
+                offset += st.getFieldOffset(fae.field);
+
+                // add offsets from various structs
+                while (!Expr.isVarExpr(outer)) {
+                    outer = outer.getInner();
+                    offset += st.getFieldOffset(fae.field);
+                }
+
+                if (innerVarExpr.vd.global) {
+                    comment("struct '%s' (global)", innerVarExpr.name);
+                    comment("field '%s' offset=%d", fae.field, offset);
+                    write(Instruction.sw(r, innerVarExpr.vd.name));
+                } else {
+                    comment("struct '%s' (local)", innerVarExpr.name);
+
+                }
+
+            } catch (Exception e) {
+                //TODO: handle exception
+            }
+            // comment("field access offset: %d (field %s)", st.getFieldOffset(fae.field), fae.field);
 
         } else if (Expr.isArrayAccessExpr(a.left)) {
 

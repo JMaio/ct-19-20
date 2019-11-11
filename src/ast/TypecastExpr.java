@@ -19,4 +19,14 @@ public class TypecastExpr extends Expr {
         return String.format("(%s) %s", t, expr);
     }
 
+    @Override
+    public Expr getInnermost() {
+        return expr.getInnermost();
+    }
+
+    @Override
+    public Expr getInner() {
+        return expr;
+    }
+
 }

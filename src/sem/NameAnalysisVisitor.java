@@ -41,7 +41,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		FunDecl main = null;
 
 		for (StructTypeDecl std : p.structTypeDecls) {
-            std.accept(this);
+			std.accept(this);
         }
         for (VarDecl vd : p.varDecls) {
 			vd.accept(this);

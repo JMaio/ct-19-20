@@ -1,12 +1,15 @@
 #include "../minic-stdlib.h"
 int d;
 
-void dec2bin() {
+void main () {
     int factor;
     int overflow;
 
     int pow;
     int bits;
+
+
+    d = read_i();
 
     pow = 0;
     bits = 16;
@@ -20,31 +23,23 @@ void dec2bin() {
     }
     if (d > factor * 2) {
         print_s((char*) "overflow!");
-        return;
-    }
+    } else {
+        while (factor > 0) {
+            int div;
+            int rem;
+            
+            div = d / factor;
+            rem = d % factor;
+            if (div) {
+                // this is one of the powers, subtract it
+                d = d - factor;
+            }
 
-    while (factor > 0) {
-        int div;
-        int rem;
-        
-        div = d / factor;
-        rem = d % factor;
-        if (div) {
-            // this is one of the powers, subtract it
-            d = d - factor;
+            // b[factor] = div;
+            print_i(div);
+            
+            factor = factor / 2;
         }
-
-        // b[factor] = div;
-        print_i(div);
-        
-        factor = factor / 2;
     }
 
-}
-
-void main () {
-
-    d = read_i();
-
-    dec2bin();
 }

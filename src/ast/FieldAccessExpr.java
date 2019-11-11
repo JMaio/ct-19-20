@@ -21,4 +21,14 @@ public class FieldAccessExpr extends Expr {
     public String toString() {
         return String.format("%s.%s", struct, field);
     }
+
+    @Override
+    public Expr getInnermost() {
+        return struct.getInnermost();
+    }
+
+    @Override
+    public Expr getInner() {
+        return struct;
+    }
 }

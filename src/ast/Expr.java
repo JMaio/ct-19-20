@@ -43,4 +43,28 @@ public abstract class Expr implements ASTNode {
 
     public boolean isIntLiteral() { return false; }
     public boolean isChrLiteral() { return false; }
+
+    public Expr getInner() {
+        return this;
+    };
+
+    public static Expr getInner(Expr expr) {
+        try {
+            return expr.getInner();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Expr getInnermost() {
+        return this;
+    };
+
+    public static Expr getInnermost(Expr expr) {
+        try {
+            return expr.getInnermost();
+        } catch (Exception e) {
+            return null;
+        }
+    }
 }

@@ -20,4 +20,14 @@ public class ValueAtExpr extends Expr {
         return String.format("(*%s)", expr);
     }
 
+    @Override
+    public Expr getInnermost() {
+        return expr.getInnermost();
+    }
+
+    @Override
+    public Expr getInner() {
+        return expr;
+    }
+
 }

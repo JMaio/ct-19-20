@@ -1,4 +1,9 @@
 dec2bin.c, PASS, 1, 0000000000000001
+
+structs.c, PASS, ,
+
+fieldaccess.c, PASS, ,
+
 while.c, PASS, , 0123456789
 if.c, PASS, , yz1
 
