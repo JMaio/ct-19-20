@@ -15,5 +15,12 @@ public class VarDecl implements ASTNode {
     public <T> T accept(ASTVisitor<T> v) {
         return v.visitVarDecl(this);
     }
+
+    @Override
+    public String toString() {
+        String s = "%s %s";
+        if (global) s += " (global)";
+        return String.format(s, type, name);
+    }
     
 }

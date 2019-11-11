@@ -27,9 +27,12 @@ public class CodeGenerator implements ASTVisitor<Register> {
         write(String.format(s, args));
     }
 
+    public void comment(String s) {
+        write("    # " + s);
+    }
     // create a formatted comment
     public void comment(String s, Object... args) {
-        write("    # " + s, args);
+        comment(String.format(s, args));
     }
 
     public void nl() {
@@ -92,9 +95,9 @@ public class CodeGenerator implements ASTVisitor<Register> {
     }
 
     private void writeHeading(String h) {
-        write("# -------------------------------");
-        write("# " + h);
-        write("# -------------------------------");
+        comment("-------------------------------");
+        comment(h);
+        comment("-------------------------------");
         nl();
     }
 
@@ -195,7 +198,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitVarDecl(VarDecl vd) {
         if (vd.global) {
-            comment("%s", vd.name);
+            comment(vd.toString());
             write(Instruction.InstrFmt("%-11s .space %d", vd.name + ":", vd.type.size()));
             if (vd.type.size() % 4 != 0) {
                 // align non-word vars to 4 bytes
@@ -209,7 +212,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
             // save stack offset
             vd.offset = stackOffset + frameOffset;
 
-            comment("# '%s' offset = %d", vd.name, vd.offset);
+            comment("stack space for '%s' => %d bytes", vd.name, size);
             write(Instruction.incrementSp(-size));
         }
         return null;
@@ -223,7 +226,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
             write(Instruction.lw(r, v.name));
         } else {
             // load from stack
-            comment("# offset '%s'\n", v.name);
+            comment("load '%s' at $fp offset (%d)", v.name, v.vd.offset);
             write(Instruction.lw(r, Register.fp, v.vd.offset));
         }
         return r;        
@@ -257,11 +260,9 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitStrLiteral(StrLiteral s) {
-        // TODO Auto-generated method stub
         Register r = getRegister();
         
         write(Instruction.InstrFmt("load_str_lit(%s, \"%s\")\n", r, s.value));
-        // writer.write("# " + s.value + "\n");
 
         return r;
     }
@@ -405,7 +406,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
         Register r = a.right.accept(this);
         // TODO: account for arrays and pointers, not just vars
 
-        comment("# %s = %s", a.left, a.right);
+        comment("%s = %s", a.left, a.right);
 
         if (Expr.isVarExpr(a.left)) {
 
@@ -414,7 +415,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
                 write(Instruction.sw(r, vd.name));
             } else {
                 int offset = vd.offset;
-                comment("# store %s at (%d)", r, offset);
+                comment("store %s at (%d)", vd.name, offset);
                 write(Instruction.sw(Register.fp, r, offset));
             }
 

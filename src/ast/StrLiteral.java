@@ -12,4 +12,9 @@ public class StrLiteral extends Expr {
         return v.visitStrLiteral(this);
     }
 
+    @Override
+    public String toString() {
+        return String.format("\"%s\"", value);
+    }
+
 }

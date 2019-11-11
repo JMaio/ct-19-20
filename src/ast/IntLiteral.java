@@ -25,4 +25,8 @@ public class IntLiteral extends Expr {
 
     public boolean isIntLiteral() { return true; }
 
+    @Override
+    public String toString() {
+        return String.format("%s", value);
+    }
 }
