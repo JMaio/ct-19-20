@@ -138,7 +138,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
     public Register visitBlock(Block b) {
 
         stackOffsets.push(stackOffset);
-        stackOffset += frameOffset;
+        stackOffset -= frameOffset;
         frameOffset = 0;
         
         for (VarDecl vd : b.vds) {
@@ -183,11 +183,12 @@ public class CodeGenerator implements ASTVisitor<Register> {
                 writer.write(String.format("%-11s .align 2\n", ""));
             }
         } else {
-            // save stack offset
-            vd.offset = stackOffset + frameOffset;
             // align non-word vars to 4 bytes
             int size = Type.alignTo4Byte(vd.type.size());
             frameOffset -= size;
+
+            // save stack offset
+            vd.offset = stackOffset + frameOffset;
 
             writer.write(Instruction.InstrFmt("# '%s' offset = %d", vd.name, vd.offset));
             writer.write(Instruction.incrementSp(-size));
@@ -204,7 +205,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
         } else {
             // load from stack
             writer.write(Instruction.InstrFmt("# offset '%s'\n", v.name));
-            writer.write(Instruction.la(r, Register.fp, v.vd.offset));
+            writer.write(Instruction.lw(r, Register.fp, v.vd.offset));
         }
         return r;        
     }

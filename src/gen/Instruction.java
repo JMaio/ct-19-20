@@ -63,6 +63,10 @@ public class Instruction {
         return InstrFmt("li   %s, %s", r, val);
     }
 
+    public static String lw(Register r, Register address, int offset) {
+        return InstrFmt("lw   %s, %d(%s)", r, offset, address);
+    }
+
     public static String mod(Register dest, Register s, Register t) {
         return _div(s, t) +
         InstrFmt("mfhi %s", dest);
