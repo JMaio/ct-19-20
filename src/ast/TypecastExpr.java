@@ -14,4 +14,9 @@ public class TypecastExpr extends Expr {
         return v.visitTypecastExpr(this);
     }
 
+    @Override
+    public String toString() {
+        return String.format("(%s) %s", t, expr);
+    }
+
 }

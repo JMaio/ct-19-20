@@ -12,4 +12,9 @@ public class ExprStmt extends Stmt {
         return v.visitExprStmt(this);
     }
 
+    @Override
+    public String toString() {
+        return expr.toString();
+    }
+
 }

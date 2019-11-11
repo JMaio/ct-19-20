@@ -15,4 +15,9 @@ public class ValueAtExpr extends Expr {
     @Override
     public boolean isValueatExpr() { return true; }
 
+    @Override
+    public String toString() {
+        return String.format("(*%s)", expr);
+    }
+
 }

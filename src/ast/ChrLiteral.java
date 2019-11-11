@@ -27,4 +27,8 @@ public class ChrLiteral extends Expr {
     @Override
     public boolean isChrLiteral() { return true; }
 
+    @Override
+    public String toString() {
+        return String.format("'%s'", value);
+    }
 }

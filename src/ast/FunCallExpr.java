@@ -17,4 +17,9 @@ public class FunCallExpr extends Expr {
         return v.visitFunCallExpr(this);
     }
 
+    @Override
+    public String toString() {
+        return String.format("%s ()", fd);
+    }
+
 }

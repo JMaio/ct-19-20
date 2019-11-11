@@ -14,4 +14,9 @@ public class VarExpr extends Expr {
 
     @Override
     public boolean isVarExpr() { return true; }
+
+    @Override
+    public String toString() {
+        return name;
+    }
 }

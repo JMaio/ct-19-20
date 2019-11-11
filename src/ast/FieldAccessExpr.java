@@ -17,4 +17,8 @@ public class FieldAccessExpr extends Expr {
     @Override
     public boolean isFieldAccessExpr() { return true; }
 
+    @Override
+    public String toString() {
+        return String.format("%s.%s", struct, field);
+    }
 }

@@ -12,4 +12,8 @@ public class SizeOfExpr extends Expr {
         return v.visitSizeOfExpr(this);
     }
 
+    @Override
+    public String toString() {
+        return String.format("sizeof(%s)", t);
+    }
 }

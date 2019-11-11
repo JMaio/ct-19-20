@@ -31,4 +31,8 @@ public class FunDecl implements ASTNode {
         return false;
     }
 
+    @Override
+    public String toString() {
+        return String.format("def: %s %s", type, name);
+    }
 }

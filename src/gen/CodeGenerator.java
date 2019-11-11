@@ -287,8 +287,6 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitBinOp(BinOp bo) {
-        // TODO Auto-generated method stub
-
         Register result = getRegister();
         Register l = bo.left.accept(this);
         Register r = bo.right.accept(this);
@@ -388,6 +386,8 @@ public class CodeGenerator implements ASTVisitor<Register> {
         // TODO: assign goes to local or global variable?
         Register r = a.right.accept(this);
         // TODO: account for arrays and pointers, not just vars
+
+        writer.write(Instruction.InstrFmt("# %s = %s", a.left, a.right));
 
         if (Expr.isVarExpr(a.left)) {
 
