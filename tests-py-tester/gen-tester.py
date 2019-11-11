@@ -18,21 +18,28 @@ codes = {
 test_result = ["FAIL", ""]
 
 
-def run_test(mode, filename, expected, out="main.asm", logfile="test.log"):
+def run_test(mode, filename, expected, out="main.asm", logfile="test.log", inp=''):
     with open(logfile, 'a') as f:
         f.write(f"[{expected:3d}] {filename} \n"), f.flush()
-        proc = subprocess.run(['java',  '-jar', 'desc/part3/Mars4_5.jar', 'sm', 'nc', 'me', f'tests/gen/asm/{filename}'],
-            capture_output=True)
+        proc = subprocess.run(
+            ['java',  '-jar', 'desc/part3/Mars4_5.jar', 'sm', 'nc', 'me', f'tests/gen/asm/{filename}'],
+            capture_output=True,
+            # stdout=f,
+            input=inp.encode('ascii'),
+        )
+
+        f.write(6*" " + proc.stdout.decode('ascii') + '\n'), f.flush()
+
         # code = subprocess.run(['java', '-cp', 'bin', 'Main',
         #                        f'-{mode}', f'tests/{filename}', f'{filename}-dump'],
                             #    stdout=f, stderr=f).returncode
         # print(f"{filename}: ({expected}) => {code}")
-        print(proc.stdout)
+        # print(proc.stdout)
         code = proc.returncode
         f.write(f"[{code:3d}] ----------------------------")
         f.write(2 * "\n")
         
-        return code
+        return proc
 
 
 def run_tests(mode, tests, logfile):
@@ -43,9 +50,12 @@ def run_tests(mode, tests, logfile):
     with open(logfile, 'a') as f:
         f.write(f"====== {mode} [ {len(tests)} ] ====== \n")
 
-    for i, (f, c, out) in enumerate(tests):
-        code = run_test(mode, f'{f[:(f.index("."))]}.asm', c, logfile=logfile)
-        result = c == code
+    for i, (f, c, inp, real) in enumerate(tests):
+        proc = run_test(mode, f'{f[:(f.index("."))]}.asm', c, logfile=logfile, inp=inp)
+        code = proc.returncode
+
+        #                                 stdout is a bytestring
+        result = (c == code) and (real == proc.stdout.decode('ASCII'))
         failures += int(not result)
         
         logging.info(f"{i+1:2d}─[{c:3d}]─>[{code:3d}] {test_result[int(result)]:4} {f}")
@@ -57,7 +67,7 @@ def run_tests(mode, tests, logfile):
 
 def compile_all(tests):
     errors = 0
-    for (f, c, out) in tests:
+    for (f, c, inp, real) in tests:
         proc = subprocess.run(['java', '-cp', 'bin', 'Main', '-gen', f'tests/gen/{f}', f'tests/gen/asm/{f[:(f.index("."))]}.asm'])
         # all files should compile!
         if(proc.returncode != 0):
@@ -86,8 +96,8 @@ if __name__ == "__main__":
             for line in f.readlines():
                 l = line.strip()
                 if l:
-                    f, c, out = l.split(',')
-                    tests.append([f, codes[c.strip()], out])
+                    f, c, inp, real = l.split(',')
+                    tests.append([f, codes[c.strip()], inp.strip(), real.strip()])
 
         if compile_all(tests) > 0:
             exit()

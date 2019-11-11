@@ -1,1 +1,4 @@
-print_i.c, PASS, 1
+hello_world.c, PASS, , hello world
+hello_world_assign.c, PASS, , hello world
+print_i.c, PASS, , 21
+read_i.c, PASS, 42, 42
