@@ -162,25 +162,21 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	}
 
 	public Type visitFieldAccessExpr(FieldAccessExpr fae) {
-		FieldAccessExpr left = null;
-		if(Expr.isFieldAccessExpr(fae.struct)) {
-			left = (FieldAccessExpr) fae.struct;
-		};
 
 		fae.struct.type = fae.struct.accept(this);
 		if (Type.isStructType(fae.struct.type)) {
 			StructType s = ((StructType) fae.struct.type);
-			// left was fae, set offset
-			if (left != null) {
+			// point to start of field in this struct
+			fae.totalOffset = s.getFieldOffset(fae.field); // offset of field in this struct (end marker + offset), minus
+			
+			if (Expr.isFieldAccessExpr(fae.struct)) {
+				FieldAccessExpr prev = (FieldAccessExpr) fae.struct;
 				// "complete" offset in this particular struct is:
-				fae.totalOffset = left.totalOffset + 			// relative offset of parent struct in its parent (end marker) plus
-								  s.getFieldOffset(fae.field) - // offset of field in this struct (end marker + offset), minus
-								  ((StructType) left.struct.type).getFieldSize(left.field); // total struct size (field add = (end marker + offset) - struct size)
-				// fae.relativeOffset = s.getFieldOffset(fae.field) - s.getFieldSize(fae.field);
-			} else {
-				// point to start of field in this struct
-				fae.totalOffset = s.getFieldOffset(fae.field);
+				// relative offset of parent struct in its parent (end marker)
+				// total struct size (field add = (end marker + offset) - struct size)
+				fae.totalOffset += prev.totalOffset - s.size;				  
 			}
+
 			// get the type of this vardecl in structdecl
 			return s.std.getFieldType(fae.field);
 		} else {
