@@ -5,3 +5,5 @@ struct v {
 struct a f (struct v b) {
     int c;
 }
+
+void main () {}

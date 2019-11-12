@@ -1,4 +1,4 @@
-void f () {
+void main () {
     int a;
     a = "hi";
 }

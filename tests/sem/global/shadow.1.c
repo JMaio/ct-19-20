@@ -1,6 +1,6 @@
 int a;
 
-void f () {
+void main () {
     char a;
 
     if ((int) a == 1) {

@@ -8,7 +8,7 @@ struct point {
     int y;
     int mag;
     struct pair p;
-    char name[4];
+    int z;
 };
 
 struct point p1;
@@ -23,9 +23,14 @@ void main () {
 
     p1.p.a = 16;
     p1.p.b = 20;
+    // offset p = 20
+    // off(a)[point] = off(p)[point] - size[pair] + off(a)[pair]
+
+    p1.z = 24;
+    
 
     // p1.name;
-    p2.x = 1;
+    p2.x = 4;
 
     // ((((a.b).c).d).e).f;
 }

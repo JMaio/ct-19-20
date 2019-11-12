@@ -36,3 +36,5 @@ void f () {
     i <= i;
     i >= i;
 }
+
+void main () {}

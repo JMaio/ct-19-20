@@ -8,6 +8,8 @@ int f () {
     s.b;
 }
 
+void main () {}
+
 // int f (int a) {
     
 //     // if (a == 0) {

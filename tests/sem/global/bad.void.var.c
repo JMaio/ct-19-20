@@ -1,1 +1,3 @@
 void a;
+
+void main () {}

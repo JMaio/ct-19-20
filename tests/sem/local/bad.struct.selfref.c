@@ -1,6 +1,6 @@
 struct next {
     int val;
-    struct next* n; 
+    struct next n; 
 };
 
 struct next another;

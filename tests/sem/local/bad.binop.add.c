@@ -1,3 +1,3 @@
-void f () {
+void main () {
     1 + "hello";
 }

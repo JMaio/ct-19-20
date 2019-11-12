@@ -1,5 +1,5 @@
 int a;
 
-void f () {
+void main () {
     a();
 }

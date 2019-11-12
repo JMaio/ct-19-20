@@ -33,6 +33,7 @@ public class StructTypeDecl implements ASTNode {
     }
 
     public void populateOffsets() {
+        // should only be called after types are validated
         int s = 0;        
         for (VarDecl vd : vds) {
             int inner = vd.type.size();

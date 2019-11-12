@@ -7,7 +7,7 @@ struct node {
     struct val value;
 };
 
-void f () {
+void main () {
     struct node n1;
     n1.value.next = 2;
 }

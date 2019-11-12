@@ -1,4 +1,4 @@
-void f () {
+void main () {
     int i;
 
     if (i == 0) {

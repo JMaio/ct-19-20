@@ -4,3 +4,5 @@ int f () {
     }
     return a;
 }
+
+void main () {}

@@ -8,3 +8,5 @@ void f (int a, struct v vv) {
     int a;
     int a;
 }
+
+void main () {}

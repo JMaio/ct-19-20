@@ -9,3 +9,5 @@ int y;
 struct p f (int x, int y, struct p point) {
 
 }
+
+void main () {}

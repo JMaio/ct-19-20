@@ -9,3 +9,5 @@ void f (int i) {
     v.x = i;
     v.x = c;
 }
+
+void main () {}

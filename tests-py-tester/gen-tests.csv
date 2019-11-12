@@ -1,5 +1,18 @@
 dec2bin.c, PASS, 1, 0000000000000001
 
+# fibonacci.c, PASS, 1, 0;
+# fibonacci.c, PASS, 2, 0;1;
+# fibonacci.c, PASS, 3, 0;1;1;
+# fibonacci.c, PASS, 4, 0;1;1;2;
+# fibonacci.c, PASS, 5, 0;1;1;2;3;
+# fibonacci.c, PASS, 6, 0;1;1;2;3;5;
+# fibonacci.c, PASS, 7, 0;1;1;2;3;5;8;
+# fibonacci.c, PASS, 8, 0;1;1;2;3;5;8;13;
+# fibonacci.c, PASS, 9, 0;1;1;2;3;5;8;13;21;
+# fibonacci.c, PASS, 10, 0;1;1;2;3;5;8;13;21;34;
+# fibonacci.c, PASS, 11, 0;1;1;2;3;5;8;13;21;34;55;
+fibonacci.c, PASS, 12, 0;1;1;2;3;5;8;13;21;34;55;89;
+
 structs.c, PASS, ,
 
 fieldaccess.c, PASS, ,

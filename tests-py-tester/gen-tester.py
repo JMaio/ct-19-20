@@ -95,7 +95,7 @@ if __name__ == "__main__":
         with open(file) as f:
             for line in f.readlines():
                 l = line.strip()
-                if l:
+                if l and l[0] != '#':
                     f, c, inp, real = l.split(',')
                     tests.append([f, codes[c.strip()], inp.strip().split(';'), real.strip()])
 

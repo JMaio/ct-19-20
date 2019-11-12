@@ -4,3 +4,5 @@ struct v {
 struct v {
     int a;
 };
+
+void main () {}

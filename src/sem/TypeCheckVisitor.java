@@ -166,19 +166,21 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		fae.struct.type = fae.struct.accept(this);
 		if (Type.isStructType(fae.struct.type)) {
 			StructType s = ((StructType) fae.struct.type);
-			// point to start of field in this struct
-			fae.totalOffset = s.getFieldOffset(fae.field); // offset of field in this struct (end marker + offset), minus
-			
-			if (Expr.isFieldAccessExpr(fae.struct)) {
-				FieldAccessExpr prev = (FieldAccessExpr) fae.struct;
-				// "complete" offset in this particular struct is:
-				// relative offset of parent struct in its parent (end marker)
-				// total struct size (field add = (end marker + offset) - struct size)
-				fae.totalOffset += prev.totalOffset - s.size;				  
+			try {
+				// point to start of field in this struct
+				fae.totalOffset = s.getFieldOffset(fae.field); // offset of field in this struct (end marker + offset), minus
+				if (Expr.isFieldAccessExpr(fae.struct)) {
+					FieldAccessExpr prev = (FieldAccessExpr) fae.struct;
+					// "complete" offset in this particular struct is:
+					// relative offset of parent struct in its parent (end marker)
+					// total struct size (field add = (end marker + offset) - struct size)
+					fae.totalOffset += prev.totalOffset - s.size;				  
+				}
+				// get the type of this vardecl in structdecl
+				return s.std.getFieldType(fae.field);
+			} catch (Exception e) {
+				// field does not exist... something's wrong
 			}
-
-			// get the type of this vardecl in structdecl
-			return s.std.getFieldType(fae.field);
 		} else {
 			error("bad field access type!");
 		}
