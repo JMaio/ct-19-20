@@ -3,7 +3,7 @@ int d;
 
 void main () {
     int factor;
-    int overflow;
+    // int overflow;
 
     int pow;
     int bits;
@@ -12,7 +12,7 @@ void main () {
     d = read_i();
 
     pow = 0;
-    bits = 16;
+    bits = 8;
     factor = 1;
 
 
@@ -22,7 +22,7 @@ void main () {
         pow = pow + 1;
     }
     if (d > factor * 2) {
-        print_s((char*) "overflow!");
+        print_s((char*) "overflow!\n");
     } else {
         while (factor > 0) {
             int div;

@@ -16,6 +16,8 @@ public class Register {
     public static final Register zero = new Register(0,"zero");
 
     public static final Register v0 = new Register(2,"v0");
+    public static final Register v1 = new Register(3,"v1");
+    
     public static final Register[] paramRegs = {
             new Register(4,"a0"),
             new Register(5,"a1"),

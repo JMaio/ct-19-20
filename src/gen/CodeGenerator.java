@@ -160,8 +160,8 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitBlock(Block b) {
 
-        stackOffsets.push(stackOffset);
-        stackOffset -= frameOffset;
+        // stackOffsets.push(stackOffset);
+        stackOffset += frameOffset;
         frameOffset = 0;
         
         for (VarDecl vd : b.vds) {
@@ -172,8 +172,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
             s.accept(this);
         }
         
-        stackOffset = stackOffsets.pop();
-        frameOffset = 0;
+        // stackOffset = stackOffsets.pop();
 
         return null;
     }
@@ -314,7 +313,8 @@ public class CodeGenerator implements ASTVisitor<Register> {
         
         // TODO free temporary registers?
         freeAllRegisters();
-
+        
+        nl();
         // result should have been returned in $v0
         return Register.v0;
     }
@@ -427,7 +427,10 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitFieldAccessExpr(FieldAccessExpr fae) {
         // TODO Auto-generated method stub
-        return null;
+        Register r = getRegister();
+        VarDecl inner = ((VarExpr) fae.getInnermost()).vd;
+        write(Instruction.la(r, Register.fp, inner.offset - fae.totalOffset));
+        return r;
     }
 
     @Override
@@ -544,6 +547,8 @@ public class CodeGenerator implements ASTVisitor<Register> {
         }
 
         write(Instruction.sw(l, r));
+
+        nl();
 
         // if (Expr.isVarExpr(a.left)) {
         //     // get variable address to write to

@@ -76,8 +76,8 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitFunCallExpr(FunCallExpr fce) {
-        // funcall should be immediate if size is low enough to pass through register
-        fce.isImmediate = fce.type.size() <= 4;
+        // funcall should be immediate if function type is a base type
+        fce.isImmediate = Type.isBaseType(fce.type);
         ArrayList<Expr> simplifiedArgs = new ArrayList<Expr>();
         for (Expr arg : fce.args) {
             Expr simplified = arg.accept(this);

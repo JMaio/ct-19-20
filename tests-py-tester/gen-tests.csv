@@ -1,4 +1,7 @@
-dec2bin.c, PASS, 1, 0000000000000001
+dec2bin.c, PASS, 1, 00000001
+dec2bin.c, PASS, 2, 00000010
+dec2bin.c, PASS, 5, 00000101
+dec2bin.c, PASS, 10, 00001010
 
 # fibonacci.c, PASS, 1, 0;
 # fibonacci.c, PASS, 2, 0;1;
@@ -13,7 +16,7 @@ dec2bin.c, PASS, 1, 0000000000000001
 # fibonacci.c, PASS, 11, 0;1;1;2;3;5;8;13;21;34;55;
 fibonacci.c, PASS, 12, 0;1;1;2;3;5;8;13;21;34;55;89;
 
-structs.c, PASS, ,
+structs.c, PASS, , 1; 1; 1; 1; 1; 1; 1
 
 fieldaccess.c, PASS, ,
 
