@@ -1,3 +1,5 @@
+#include "../minic-stdlib.h"
+
 struct pair {
     int a;
     int b;
@@ -45,8 +47,16 @@ void main () {
     print_s(delimiter);
 
     // p1.name;
-    p2.x = 4 - 4;
-    print_i(p2.x == 0);    
+    p2.x = 1;
+    p2.y = 2;
+    p2.z = 3;
+    print_i(p2.x);   
+    print_s(delimiter);
+    print_i(p2.y);   
+    print_s(delimiter);
+    print_i(p2.z);   
+    print_s(delimiter);
+    print_i(p1.x);    
 
     // ((((a.b).c).d).e).f;
 }

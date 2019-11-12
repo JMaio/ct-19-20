@@ -420,16 +420,27 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitArrayAccessExpr(ArrayAccessExpr aae) {
-        // TODO Auto-generated method stub
+        Register r = aae.array.accept(this);
+
+
         return null;
     }
 
     @Override
     public Register visitFieldAccessExpr(FieldAccessExpr fae) {
         // TODO Auto-generated method stub
-        Register r = getRegister();
-        VarDecl inner = ((VarExpr) fae.getInnermost()).vd;
-        write(Instruction.la(r, Register.fp, inner.offset - fae.totalOffset));
+        Register r = fae.struct.accept(this);
+
+        // a.b.c
+        StructType st = (StructType) fae.struct.type;
+        write(Instruction.addi(r, r, st.getFieldOffset(fae.field)));
+        // VarExpr inner = ((VarExpr) fae.getInnermost()).vd;
+
+        // r = fae.getInnermost().accept(this);
+        // // if (inner.global) {
+
+        // // }
+        // write(Instruction.la(r, Register.fp, inner.offset - fae.totalOffset));
         return r;
     }
 

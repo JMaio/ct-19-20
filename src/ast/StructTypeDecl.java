@@ -36,11 +36,11 @@ public class StructTypeDecl implements ASTNode {
         // should only be called after types are validated
         int s = 0;        
         for (VarDecl vd : vds) {
+            structOffset.put(vd.name, s);
             int inner = vd.type.size();
             // inner = 5, 5%4 = 1 ==> add [4 - (n%4)] % 4
             // pad to align to 4 byte boundary
             s += Type.alignTo4Byte(inner);
-            structOffset.put(vd.name, s);
         }
         structSize = s;
     }
