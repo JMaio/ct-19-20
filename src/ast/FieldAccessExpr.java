@@ -4,6 +4,7 @@ public class FieldAccessExpr extends Expr {
 
     public final Expr struct;
     public final String field;
+    public int totalOffset = 0;
 
     public FieldAccessExpr(Expr struct, String field) {
         this.struct = struct;

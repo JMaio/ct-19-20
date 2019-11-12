@@ -42,6 +42,7 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 
 		for (StructTypeDecl std : p.structTypeDecls) {
 			std.accept(this);
+			std.populateOffsets();
         }
         for (VarDecl vd : p.varDecls) {
 			vd.accept(this);
