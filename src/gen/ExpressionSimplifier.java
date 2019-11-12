@@ -53,16 +53,19 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitIntLiteral(IntLiteral i) {
+        i.isImmediate = true;
         return i;
     }
 
     @Override
     public Expr visitStrLiteral(StrLiteral s) {
+        s.isImmediate = true;
         return s;
     }
 
     @Override
     public Expr visitChrLiteral(ChrLiteral c) {
+        c.isImmediate = true;
         return c;
     }
 
@@ -73,6 +76,8 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitFunCallExpr(FunCallExpr fce) {
+        // funcall should be immediate if size is low enough to pass through register
+        fce.isImmediate = fce.type.size() <= 4;
         ArrayList<Expr> simplifiedArgs = new ArrayList<Expr>();
         for (Expr arg : fce.args) {
             Expr simplified = arg.accept(this);
@@ -90,6 +95,8 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitBinOp(BinOp bo) {
+        bo.isImmediate = true;
+
         Expr left = bo.left.accept(this);
         Expr right = bo.right.accept(this);
 
@@ -134,7 +141,9 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
         }
 
         if (val != null) {
-            return new IntLiteral(val);
+            IntLiteral i = new IntLiteral(val);
+            i.isImmediate = true;
+            return i;
         } else {
             return null;
         }
@@ -166,16 +175,20 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitSizeOfExpr(SizeOfExpr soe) {
-        return new IntLiteral(soe.t.size());
+        IntLiteral i = new IntLiteral(soe.t.size());
+        i.isImmediate = true;
+        return i;
     }
 
     @Override
     public Expr visitTypecastExpr(TypecastExpr te) {
         // TODO Auto-generated method stub
         // to simplify!
+        te.expr.accept(this);
         if (te.t == BaseType.INT && Expr.isChrLiteral(te.expr)) {
             return new IntLiteral(((ChrLiteral) te.expr).value);
         }
+        te.isImmediate = te.expr.isImmediate;
         return null;
     }
 

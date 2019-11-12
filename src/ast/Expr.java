@@ -3,6 +3,7 @@ package ast;
 public abstract class Expr implements ASTNode {
 
     public Type type; // to be filled in by the type analyser
+    public boolean isImmediate = false; // not an immediate by default
     public abstract <T> T accept(ASTVisitor<T> v);
 
     public static boolean isVarExpr(Expr expr) {
