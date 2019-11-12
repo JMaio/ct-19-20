@@ -80,6 +80,11 @@ public class Instruction {
     public static String lw(Register r, Register address, int offset) {
         return InstrFmt("lw   %s, %d(%s)", r, offset, address);
     }
+    
+    public static String lw(Register r, Register address) {
+        return lw(r, address, 0);
+    }
+
 
     public static String move(Register dest, Register src) {
         return InstrFmt("move %s, %s", dest, src);

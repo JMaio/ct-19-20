@@ -225,11 +225,11 @@ public class CodeGenerator implements ASTVisitor<Register> {
         Register r = getRegister();
         if (v.vd.global) {
             // load global variable from label
-            write(Instruction.lw(r, v.name));
+            write(Instruction.la(r, v.name));
         } else {
             // load from stack
             comment("load '%s' at $fp offset (%d)", v.name, v.vd.offset);
-            write(Instruction.lw(r, Register.fp, v.vd.offset));
+            write(Instruction.la(r, Register.fp, v.vd.offset));
         }
         return r;        
     }
@@ -283,6 +283,12 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
         comment("%s ()", fce.name);
 
+        int returnSize = fce.type.size();
+
+        if (returnSize > 0) {
+            write(Instruction.incrementSp(fce.type.size()));
+        }
+
         if (LibFunc.isLibFunc(fce.name)) {
             // String i = "    " + fce.name;
             // String delimiter = "";
@@ -292,10 +298,15 @@ public class CodeGenerator implements ASTVisitor<Register> {
             if (fce.args.size() > 0) {
                 // i += "(";
                 for (Expr arg : fce.args) {
-                    args.add(arg.accept(this).toString());
+                    Register r = arg.accept(this);
+                    if (!arg.isImmediate) {
+                        write(Instruction.lw(r, r));
+                    }
+                    args.add(r.toString());
                 }
                 // i += ")";
             }
+            
             write(Instruction.InstrFmt("%s (%s)", fce.name, String.join(", ", args)));
         } else {
             // TODO
@@ -316,16 +327,18 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
         comment("left: %s", bo.left);
         Register l = bo.left.accept(this);
+        Register r;
         
-        String i = "";
+        if (!bo.left.isImmediate) {
+            comment("load value of left side from memory");
+            write(Instruction.lw(l, l));
+        }
 
-        // cannot accept right side unconditionally
-        // comment("right: %s", bo.left);
-        // Register r = bo.right.accept(this);
+        String rightLabel = uidLabel.mk("BinOp_right");
+        String endLabel = uidLabel.mk("BinOp_end");
         
         if (bo.op == Op.OR || bo.op == Op.AND) {
-            String rightLabel = uidLabel.mk("BinOp_right");
-            String endLabel = uidLabel.mk("BinOp_end");
+            // cannot accept right side unconditionally
 
             write(Instruction.sne(result, l, 0));
 
@@ -349,16 +362,24 @@ public class CodeGenerator implements ASTVisitor<Register> {
             }
 
             write(rightLabel + ":");
-                Register r = bo.right.accept(this);
-                write(Instruction.sne(result, r, 0));
-            
 
-            write(endLabel + ":");
-            // nothing
+            r = bo.right.accept(this);
+            if (!bo.right.isImmediate) {
+                comment("load value of right side from memory");
+                write(Instruction.lw(r, r));
+            }
+
+            write(Instruction.sne(result, r, 0));
 
         } else {
-            Register r = bo.right.accept(this);
-    
+            String i = "";
+
+            r = bo.right.accept(this);
+            if (!bo.right.isImmediate) {
+                comment("load value of right side from memory");
+                write(Instruction.lw(r, r));
+            }
+
             switch (bo.op) {
                 // add and store in left register, saving one register
                 case ADD: i = Instruction.add(result, l, r); break;
@@ -379,13 +400,15 @@ public class CodeGenerator implements ASTVisitor<Register> {
                 default: break;
             }
 
-            freeRegister(r);
+            write(i);
         }
 
-        write(i);
+        write(endLabel + ":");
+
         comment("------------");
 
         freeRegister(l);
+        freeRegister(r);
         
         return result;
     }
@@ -445,6 +468,12 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
         // evaluate condition
         Register r = w.cond.accept(this);
+        
+        if (!w.cond.isImmediate) {
+            comment("load value of if condition from memory");
+            write(Instruction.lw(r, r));
+        }
+
         // if condition no longer holds, end the loop
         write(Instruction.beq(r, Register.zero, endLabel));
         
@@ -474,6 +503,12 @@ public class CodeGenerator implements ASTVisitor<Register> {
         } else { 
             next = elseLabel;
         }
+        
+        if (!i.cond.isImmediate) {
+            comment("load value of if condition from memory");
+            write(Instruction.lw(r, r));
+        }
+
         write(Instruction.beq(r, Register.zero, next));
 
         // block (if true)
@@ -502,67 +537,92 @@ public class CodeGenerator implements ASTVisitor<Register> {
         
         // TODO: account for arrays and pointers, not just vars
         Register r = a.right.accept(this);
+        Register l = a.left.accept(this);
 
-        if (Expr.isVarExpr(a.left)) {
-            // get variable address to write to
-            VarDecl vd = ((VarExpr) a.left).vd;
-            if (vd.global) {
-                write(Instruction.sw(r, vd.name));
-            } else {
-                int offset = vd.offset;
-                comment("store %s at (%d)", vd.name, offset);
-                write(Instruction.sw(Register.fp, r, offset));
-            }
-
-        } else if (Expr.isFieldAccessExpr(a.left)) {
-
-            FieldAccessExpr fae = (FieldAccessExpr) a.left;
-            
-            StructType st = (StructType) fae.struct.type;
-            int offset = 0;
-
-            Expr inner = fae.getInnermost();
-            // should be a var expression with vardecl
-            try {
-                VarExpr innerVarExpr = ((VarExpr) inner);
-                // offset each struct
-                // a.b.c
-                //                    #      c    d    z
-                // a: struct          # 4  ---- ---- ----               
-                // b: field (struct)  #    ---- ----
-                // c: field (int)     #    ----
-                
-                // a: {b: struct, z: int}
-                // b: {c: int, d: int}
-
-                Expr outer = fae.struct;
-                offset += st.getFieldOffset(fae.field);
-
-                // add offsets from various structs
-                while (!Expr.isVarExpr(outer)) {
-                    outer = outer.getInner();
-                    offset += st.getFieldOffset(fae.field);
-                }
-
-                if (innerVarExpr.vd.global) {
-                    comment("struct '%s' (global)", innerVarExpr.name);
-                    comment("field '%s' offset=%d", fae.field, offset);
-                    write(Instruction.sw(r, innerVarExpr.vd.name));
-                } else {
-                    comment("struct '%s' (local)", innerVarExpr.name);
-
-                }
-
-            } catch (Exception e) {
-                //TODO: handle exception
-            }
-            // comment("field access offset: %d (field %s)", st.getFieldOffset(fae.field), fae.field);
-
-        } else if (Expr.isArrayAccessExpr(a.left)) {
-
-        } else {
-            
+        if (!a.right.isImmediate) {
+            write(Instruction.lw(r, r));
         }
+
+        write(Instruction.sw(l, r));
+
+        // if (Expr.isVarExpr(a.left)) {
+        //     // get variable address to write to
+        //     VarDecl vd = ((VarExpr) a.left).vd;
+        //     if (vd.global) {
+        //         write(Instruction.sw(r, vd.name));
+        //     } else {
+        //         int offset = vd.offset;
+        //         comment("store %s at (%d)", vd.name, offset);
+        //         write(Instruction.sw(Register.fp, r, offset));
+        //     }
+
+        // } else if (Expr.isFieldAccessExpr(a.left)) {
+            
+        //     FieldAccessExpr fae = (FieldAccessExpr) a.left;
+        //     comment("%s offset = %d", fae.struct.type, fae.totalOffset);
+
+        //     VarDecl vd = ((VarExpr) a.left.getInnermost()).vd;
+        //     if (vd.global) {
+        //         write(Instruction.sw(r, vd.name, fae.totalOffset));
+        //     } else {
+        //         int offset = vd.offset;
+        //         comment("store %s at (%d)", vd.name, offset);
+        //         write(Instruction.sw(Register.fp, r, offset + fae.totalOffset));
+        //     }
+
+
+        //     // StructType st = (StructType) fae.struct.type;
+        //     // int offset = 0;
+
+        //     // Expr inner = fae.getInnermost();
+        //     // // should be a var expression with vardecl
+        //     // try {
+        //     //     VarExpr innerVarExpr = ((VarExpr) inner);
+        //     //     // offset each struct
+        //     //     // a.b.c
+        //     //     //                    #      c    d    z
+        //     //     // a: struct          # 4  ---- ---- ----               
+        //     //     // b: field (struct)  #    ---- ----
+        //     //     //  c: field (int)    #    ----
+                
+        //     //     // a: {b: struct, z: int}
+        //     //     // b: {c: int, d: int}
+
+        //     //     Expr outer = fae.struct;
+        //     //     offset += st.getFieldOffset(fae.field);
+
+        //     //     // add offsets from various structs
+        //     //     while (!Expr.isVarExpr(outer)) {
+                    
+        //     //         // off(a)[point] = off(p)[point] - size[pair] + off(a)[pair]
+        //     //         // offset += st.getFieldOffset(outer.field) - ().size() + ;
+                    
+        //     //         // a.x.y.z
+                    
+        //     //         // (StructType) fae.struct.type
+        //     //         outer = outer.getInner();
+        //     //     }
+
+        //     //     if (innerVarExpr.vd.global) {
+        //     //         comment("struct '%s' (global)", innerVarExpr.name);
+        //     //         comment("field '%s' offset=%d", fae.field, offset);
+        //     //         comment("fae total offset=%d", fae.totalOffset);
+        //     //         write(Instruction.sw(r, innerVarExpr.vd.name));
+        //     //     } else {
+        //     //         comment("struct '%s' (local)", innerVarExpr.name);
+
+        //     //     }
+
+        //     // } catch (Exception e) {
+        //     //     //TODO: handle exception
+        //     // }
+        //     // comment("field access offset: %d (field %s)", st.getFieldOffset(fae.field), fae.field);
+
+        // } else if (Expr.isArrayAccessExpr(a.left)) {
+
+        // } else {
+            
+        // }
 
         return null;
     }

@@ -104,14 +104,14 @@ public abstract class LibFunc {
     }
 
     public static String load_str_lit() {
-        String r = "%r";
+        String reg = "%r";
         String var = "%s";
         return
-        "    .macro load_str_lit (" + r + "," + var + ")\n" +
+        "    .macro load_str_lit (" + reg + "," + var + ")\n" +
         "    .data\n" +
         "string: .asciiz " + var + "\n" +
         "    .text\n" +
-        "    la " + r + ", string\n" +
+        "    la " + reg + ", string\n" +
         // Instruction.la(r, "string") +
         "    .end_macro\n";
     }
