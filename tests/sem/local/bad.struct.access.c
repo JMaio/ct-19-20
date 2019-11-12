@@ -3,7 +3,7 @@ struct val {
 };
 struct node {
     int val;
-    struct node next;
+    struct node* next;
     struct val value;
 };
 
