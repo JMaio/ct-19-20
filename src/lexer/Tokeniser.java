@@ -140,7 +140,7 @@ public class Tokeniser {
                         c = scanner.next();
                         if (escapedChars.containsKey(c)) {
                             // valid escape character
-                            sb.append(escapedChars.get(c));
+                            sb.append("\\" + c);
                         } else {
                             error("\\" + c, line, column);
                             sb.append('\\' + c);
