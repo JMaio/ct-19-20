@@ -285,6 +285,8 @@ public class NameAnalysisVisitor extends BaseSemanticVisitor<Void> {
 		}
 		if (r.expr != null) {
 			r.expr.accept(this);
+			// should determine if expr is global
+			r.fd.returnExpr = r.expr;
 		}
 		return null;
 	}

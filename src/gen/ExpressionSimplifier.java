@@ -9,6 +9,9 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitProgram(Program p) {
+        // for (VarDecl vd : p.varDecls) {
+        //     vd.accept(this);
+        // }
         for (FunDecl fd : p.funDecls) {
             fd.accept(this);
         }
@@ -80,6 +83,7 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitVarExpr(VarExpr v) {
+        v.isGlobal = v.vd.global;
         return v;
     }
 
@@ -119,6 +123,10 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
         }
 
         fce.isImmediate = LibFunc.isImmediate(fce.name);
+        if (fce.fd.returnExpr != null) {
+            // whether inside of return is global
+            fce.isGlobal = fce.fd.returnExpr.isGlobal;
+        }
 
         return null;
     }
@@ -187,18 +195,21 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
     public Expr visitArrayAccessExpr(ArrayAccessExpr aae) {
         aae.array.accept(this);
         aae.index.accept(this);
+        aae.isGlobal = aae.array.isGlobal;
         return null;
     }
 
     @Override
     public Expr visitFieldAccessExpr(FieldAccessExpr fae) {
         fae.struct.accept(this);
+        fae.isGlobal = fae.struct.isGlobal;
         return null;
     }
 
     @Override
     public Expr visitValueAtExpr(ValueAtExpr vae) {
         vae.expr.accept(this);
+        vae.isGlobal = vae.expr.isGlobal;
         return null;
     }
 
@@ -221,6 +232,7 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
             i.isImmediate = true;
             return i;
         }
+        te.isGlobal = te.expr.isGlobal;
         return null;
     }
 
@@ -257,7 +269,10 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
     @Override
     public Expr visitAssign(Assign a) {
         a.left.accept(this);
+        a.left.isGlobal = Expr.getInnermost(a.left).isGlobal;
+        
         a.right.accept(this);
+        a.right.isGlobal = Expr.getInnermost(a.right).isGlobal;
         return null;
     }
 

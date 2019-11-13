@@ -14,6 +14,10 @@ public class Instruction {
         return InstrFmt("add  %s, %s, %s", dest, s, t);
     }
     
+    public static String addi(Register r, int i) {
+        return addi(r, r, i);
+    }
+    
     public static String addi(Register dest, Register src, int i) {
         return InstrFmt("addi %s, %s, %d", dest, src, i);
     }

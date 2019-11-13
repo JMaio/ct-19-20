@@ -75,8 +75,9 @@ public class CodeGenerator implements ASTVisitor<Register> {
         }
     }
 
-    private void freeUnused() {
-
+    private void restoreUsedRegisters(ArrayList<Register> regs) {
+        freeAllRegisters();
+        freeRegs.addAll(regs);
     }
 
     private void freeAllRegisters() {
@@ -188,19 +189,71 @@ public class CodeGenerator implements ASTVisitor<Register> {
     @Override
     public Register visitFunDecl(FunDecl fd) {
         // reset the stack
-        stackOffsets.push(stackOffset);
-        stackOffset = 0;
+        // stackOffsets.push(stackOffset);
+        int frameOffset = 0;
+        
         // create the function label
         write("%s:", fd.name);
 
-        // ArrayList<Register> paramRegs = new ArrayList<>();
+        int returnSize = fd.type.size();
+        write(Instruction.incrementSp(returnSize));
+        frameOffset -= returnSize;
+
         comment("allocate stack space for vars");
         for (VarDecl param : fd.params) {
             param.accept(this);
+            frameOffset -= param.type.size();
+        }
+        
+        for (Register r : new Register[] {Register.fp, Register.ra}) {
+            comment("save %s", r);
+            write(Instruction.incrementSp(4));
+            frameOffset -= 4;
+            write(Instruction.sw(Register.fp, r, frameOffset));
         }
 
-        fd.block.accept(this);
+        // ArrayList<Register> savedRegs = new ArrayList<>();
+        comment("save temporary registers");    
+        for (Register r : Register.tmpRegs) {
+            write(Instruction.incrementSp(4));
+            frameOffset -= 4;
+            write(Instruction.sw(Register.fp, r, frameOffset));
+            // if (!freeRegs.contains(r)) {
+            //     savedRegs.add(r);
+            // }
+        }
+
+        // store used registers
+        ArrayList<Register> inUse = regsInUse;
+        freeAllRegisters();
+
+        fd.block.accept(this);        
+
+        comment("load old $fp");
+        write(Instruction.lw(Register.fp, Register.fp, 4 * 20));
         
+        int callStackOffset = 0;
+        for (Register r : new Register[] {Register.ra}) {
+            comment("load old %s", r);
+            callStackOffset -= 4;
+            write(Instruction.lw(r, Register.fp, callStackOffset));
+        }
+        comment("load temporary registers");    
+        for (Register r : Register.tmpRegs) {
+            callStackOffset -= 4;
+            write(Instruction.lw(r, Register.fp, callStackOffset));
+        }
+        
+        comment("set new stack pointer location");
+        write(Instruction.decrementSp(callStackOffset));
+
+        write(Instruction.addi(Register.v0, Register.fp, -returnSize));
+        // stackOffset = stackOffsets.pop();
+        // write(Instruction.move(Register.fp, Register.sp));
+
+        // restore registers which were in use
+        restoreUsedRegisters(inUse);
+
         // return
         comment("default return even if one exists");
         write(Instruction.jr(Register.ra));
@@ -208,10 +261,13 @@ public class CodeGenerator implements ASTVisitor<Register> {
         nl();
 
         // all registers here are only local
-        freeAllRegisters();
-        stackOffset = stackOffsets.pop();
+        // freeAllRegisters();
+        // stackOffset = stackOffsets.pop();
         
         nl();
+        // reset global stack offset
+        stackOffset = 0;
+
         return null;
     }
 
@@ -322,7 +378,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
             // TODO store contents of temp registers
 
             int returnSize = fce.type.size();            
-            int frameOffset = stackOffset;
+            
 
             // // TODO
             // if (returnSize > 4) {
@@ -339,29 +395,9 @@ public class CodeGenerator implements ASTVisitor<Register> {
             // |  return type size  |   1   |   1   |        18         |   args
             // |    return value    |  $fp  |  $ra  |  $t0-$t... others |   args
 
-            write(Instruction.incrementSp(returnSize));
-            frameOffset -= returnSize;
-
-            for (Register r : new Register[] {Register.fp, Register.ra}) {
-                comment("save %s", r);
-                write(Instruction.incrementSp(4));
-                frameOffset -= 4;
-                write(Instruction.sw(Register.fp, r, frameOffset));
-            }
-
-            // ArrayList<Register> savedRegs = new ArrayList<>();
-            comment("save temporary registers");    
-            for (Register r : Register.tmpRegs) {
-                write(Instruction.incrementSp(4));
-                frameOffset -= 4;
-                write(Instruction.sw(Register.fp, r, frameOffset));
-                // if (!freeRegs.contains(r)) {
-                //     savedRegs.add(r);
-                // }
-            }
 
             // save registers in use
-            freeAllRegisters();
+            // freeAllRegisters();
 
             // TODO Works
             // comment("set new frame pointer location");
@@ -389,13 +425,13 @@ public class CodeGenerator implements ASTVisitor<Register> {
                 if (!arg.isImmediate) {
                     write(Instruction.lw(r, r));
                 }
-                write(Instruction.sw(Register.fp, r, argsOffset + frameOffset));
+                write(Instruction.sw(Register.fp, r, argsOffset));
                 // write(Instruction.move(Register.paramRegs[a], r));
                 freeRegister(r);
             }
             
-            comment("set new frame pointer location");
-            write(Instruction.addi(Register.fp, Register.fp, frameOffset));
+            // comment("set new frame pointer location");
+            // write(Instruction.addi(Register.fp, Register.fp, frameOffset));
 
             nl();
 
@@ -413,32 +449,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
                 
                 // write(Instruction.decrementSp(callStackOffset));
                 
-            comment("load old $fp");
-            write(Instruction.lw(Register.fp, Register.fp, 4 * 20));
             
-            int callStackOffset = 0;
-            for (Register r : new Register[] {Register.ra}) {
-                comment("load old %s", r);
-                callStackOffset -= 4;
-                write(Instruction.lw(r, Register.fp, callStackOffset));
-            }
-            comment("load temporary registers");    
-            for (Register r : Register.tmpRegs) {
-                callStackOffset -= 4;
-                write(Instruction.lw(r, Register.fp, callStackOffset));
-            }
-            
-            comment("set new stack pointer location");
-            write(Instruction.decrementSp(callStackOffset));
-
-            write(Instruction.addi(Register.v0, Register.fp, -returnSize));
-            // stackOffset = stackOffsets.pop();
-            // write(Instruction.move(Register.fp, Register.sp));
-
-            // restore registers which were in use
-            // for (Register reg : inUse) {
-            //     get
-            // }
             
         }
         comment("------------- %s () : end call", fce.name);
@@ -689,7 +700,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
             switch (size) {
                 case 1: write(Instruction.lb(r, r)); break;
                 case 4: write(Instruction.lw(r, r)); break;
-            
+                // no structs as it's never immediate
                 default: break;
             }
             // write(Instruction.lw(r, r));
@@ -699,89 +710,32 @@ public class CodeGenerator implements ASTVisitor<Register> {
             case 1: write(Instruction.sb(l, r)); break;
             case 4: write(Instruction.sw(l, r)); break;
         
-            default: break;
+            default: {
+                // struct / array - needs to be copied over
+                comment("copying struct over");
+                // int leftIncrement = a.left.isGlobal ? 4 : -4;
+                // comment("left: %s isglobal %s", a.left, a.left.isGlobal);
+                // int rightIncrement = a.right.isGlobal ? 4 : -4;
+                // comment("right: %s isglobal %s", a.right, a.right.isGlobal);
+                // if (a.left.isGlobal) {
+                //     write(Instruction.addi(dest, src, i));
+                // }
+                Register s = getRegister();
+                for (int i = 0; i < a.left.type.size(); i += 4) {
+                    write(Instruction.lw(s, r));
+                    write(Instruction.sw(l, s));
+                    
+                    write(Instruction.addi(l, 4));
+                    write(Instruction.addi(r, 4));
+                }
+                freeRegister(s);
+            }; break;
         }
 
         nl();
-
-        // if (Expr.isVarExpr(a.left)) {
-        //     // get variable address to write to
-        //     VarDecl vd = ((VarExpr) a.left).vd;
-        //     if (vd.global) {
-        //         write(Instruction.sw(r, vd.name));
-        //     } else {
-        //         int offset = vd.offset;
-        //         comment("store %s at (%d)", vd.name, offset);
-        //         write(Instruction.sw(Register.fp, r, offset));
-        //     }
-
-        // } else if (Expr.isFieldAccessExpr(a.left)) {
-            
-        //     FieldAccessExpr fae = (FieldAccessExpr) a.left;
-        //     comment("%s offset = %d", fae.struct.type, fae.totalOffset);
-
-        //     VarDecl vd = ((VarExpr) a.left.getInnermost()).vd;
-        //     if (vd.global) {
-        //         write(Instruction.sw(r, vd.name, fae.totalOffset));
-        //     } else {
-        //         int offset = vd.offset;
-        //         comment("store %s at (%d)", vd.name, offset);
-        //         write(Instruction.sw(Register.fp, r, offset + fae.totalOffset));
-        //     }
-
-
-        //     // StructType st = (StructType) fae.struct.type;
-        //     // int offset = 0;
-
-        //     // Expr inner = fae.getInnermost();
-        //     // // should be a var expression with vardecl
-        //     // try {
-        //     //     VarExpr innerVarExpr = ((VarExpr) inner);
-        //     //     // offset each struct
-        //     //     // a.b.c
-        //     //     //                    #      c    d    z
-        //     //     // a: struct          # 4  ---- ---- ----               
-        //     //     // b: field (struct)  #    ---- ----
-        //     //     //  c: field (int)    #    ----
-                
-        //     //     // a: {b: struct, z: int}
-        //     //     // b: {c: int, d: int}
-
-        //     //     Expr outer = fae.struct;
-        //     //     offset += st.getFieldOffset(fae.field);
-
-        //     //     // add offsets from various structs
-        //     //     while (!Expr.isVarExpr(outer)) {
-                    
-        //     //         // off(a)[point] = off(p)[point] - size[pair] + off(a)[pair]
-        //     //         // offset += st.getFieldOffset(outer.field) - ().size() + ;
-                    
-        //     //         // a.x.y.z
-                    
-        //     //         // (StructType) fae.struct.type
-        //     //         outer = outer.getInner();
-        //     //     }
-
-        //     //     if (innerVarExpr.vd.global) {
-        //     //         comment("struct '%s' (global)", innerVarExpr.name);
-        //     //         comment("field '%s' offset=%d", fae.field, offset);
-        //     //         comment("fae total offset=%d", fae.totalOffset);
-        //     //         write(Instruction.sw(r, innerVarExpr.vd.name));
-        //     //     } else {
-        //     //         comment("struct '%s' (local)", innerVarExpr.name);
-
-        //     //     }
-
-        //     // } catch (Exception e) {
-        //     //     //TODO: handle exception
-        //     // }
-        //     // comment("field access offset: %d (field %s)", st.getFieldOffset(fae.field), fae.field);
-
-        // } else if (Expr.isArrayAccessExpr(a.left)) {
-
-        // } else {
-            
-        // }
+        
+        freeRegister(l);
+        freeRegister(r);
 
         return null;
     }

@@ -19,4 +19,7 @@ public class VarExpr extends Expr {
     public String toString() {
         return name;
     }
+
+    @Override
+    public Expr getInnermost() { return this; }
 }

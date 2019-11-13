@@ -9,6 +9,7 @@ public class FunDecl implements ASTNode {
     public final String name;
     public final List<VarDecl> params;
     public final Block block;
+    public Expr returnExpr;
 
     public List<VarDecl> regArgs = new ArrayList<VarDecl>();
     public List<VarDecl> stackArgs = new ArrayList<VarDecl>();
