@@ -60,16 +60,19 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 
 	public Type visitIntLiteral(IntLiteral i) {
 		i.type = BaseType.INT;
+        i.isImmediate = true;
 		return i.type;
 	}
 
 	public Type visitStrLiteral(StrLiteral s) {
 		s.type = new ArrayType(BaseType.CHAR, s.value.length() + 1); // account for null terminator!
+        s.isImmediate = true;
 		return s.type;
 	}
 
 	public Type visitChrLiteral(ChrLiteral c) {
 		c.type = BaseType.CHAR;
+        c.isImmediate = true;
 		return c.type;
 	}
 
@@ -77,6 +80,10 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 		// v.vd can be null if not picked up by name visitor
 		if (v != null && v.isVarExpr() && v.vd != null) { 
 			v.type = v.vd.type;
+			// accept this type
+			Type t = v.type.accept(this);
+			// if basic type, set as "immediate"
+			// v.isImmediate = Type.isBaseType(t);
 			return v.type;
 		} else {
 			error("varexpr");
@@ -107,6 +114,8 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 				}
 			}
 			fce.type = fce.fd.type;
+			// funcall should be immediate if function type is a base type (*value* in a register [not address])
+			fce.isImmediate = Type.isBaseType(fce.type);
 
 		} catch (Exception e) {
 			/* ran out of args? */
@@ -117,6 +126,8 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	}
 
 	public Type visitBinOp(BinOp bo) {
+        bo.isImmediate = true;
+
 		Type l = bo.left.accept(this);
 		Op o = bo.op;
 		Type r = bo.right.accept(this);
@@ -157,6 +168,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 			error(String.format("bad array access %s[%s]", a, i));
 		} else {
 			aae.type = Type.getElemType(a);
+			// aae.isImmediate = aae.array.isImmediate;
 		}
 		return aae.type;
 	}
@@ -200,11 +212,13 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 	}
 
 	public Type visitSizeOfExpr(SizeOfExpr soe) {
+        soe.isImmediate = true;		
 		return BaseType.INT;
 	}
 
 	public Type visitTypecastExpr(TypecastExpr te) {
 		Type et = te.expr.accept(this);
+
 		try {
 			if (et == BaseType.CHAR && te.t == BaseType.INT) {
 				// char -> int
@@ -225,6 +239,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 			return null;
 		}
 		te.type = te.t;
+        te.isImmediate = te.expr.isImmediate || Type.isPointerType(te.t);
 
 		return te.t;
 	}

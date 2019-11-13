@@ -85,13 +85,31 @@ public class Instruction {
         return lw(r, address, 0);
     }
 
+    
+    public static String lb(Register r, String label) {
+        return InstrFmt("lb   %s, %s", r, label);
+    }
+
+    public static String lb(Register r, Register address, int offset) {
+        return InstrFmt("lb   %s, %d(%s)", r, offset, address);
+    }
+    
+    public static String lb(Register r, Register address) {
+        return lb(r, address, 0);
+    }
+
 
     public static String move(Register dest, Register src) {
         return InstrFmt("move %s, %s", dest, src);
     }
         
+    
     public static String mul(Register dest, Register s, Register t) {
         return InstrFmt("mul  %s, %s, %s", dest, s, t);
+    }
+
+    public static String mulo(Register dest, Register src, int i) {
+        return InstrFmt("mulo %s, %s, %s", dest, src, i);
     }
 
 
@@ -141,6 +159,28 @@ public class Instruction {
     public static String sub(Register dest, Register s, Register t) {
         return InstrFmt("sub  %s, %s, %s", dest, s, t);
     }
+
+    
+    public static String sb(Register dest, Register src, int offset) {
+        return InstrFmt("sb   %s, %d(%s)", src, offset, dest);
+    }
+
+    public static String sb(Register dest, Register src) {
+        return sb(dest, src, 0);
+    }
+
+    public static String sb(Register src, String label, Register offset) {
+        return InstrFmt("sb   %s, %s(%s)", src, label, offset);
+    }
+    
+    public static String sb(Register src, String label, int offset) {
+        return InstrFmt("sb   %s, %s+%d", src, label, offset);
+    }
+
+    public static String sb(Register src, String label) {
+        return sb(src, label, 0);
+    }
+
 
     public static String sw(Register dest, Register src, int offset) {
         return InstrFmt("sw   %s, %d(%s)", src, offset, dest);

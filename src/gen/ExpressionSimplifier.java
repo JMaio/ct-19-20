@@ -53,19 +53,16 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitIntLiteral(IntLiteral i) {
-        i.isImmediate = true;
         return i;
     }
 
     @Override
     public Expr visitStrLiteral(StrLiteral s) {
-        s.isImmediate = true;
         return s;
     }
 
     @Override
     public Expr visitChrLiteral(ChrLiteral c) {
-        c.isImmediate = true;
         return c;
     }
 
@@ -76,8 +73,6 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitFunCallExpr(FunCallExpr fce) {
-        // funcall should be immediate if function type is a base type
-        fce.isImmediate = Type.isBaseType(fce.type);
         ArrayList<Expr> simplifiedArgs = new ArrayList<Expr>();
         for (Expr arg : fce.args) {
             Expr simplified = arg.accept(this);
@@ -95,8 +90,6 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitBinOp(BinOp bo) {
-        bo.isImmediate = true;
-
         Expr left = bo.left.accept(this);
         Expr right = bo.right.accept(this);
 
@@ -186,9 +179,10 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
         // to simplify!
         te.expr.accept(this);
         if (te.t == BaseType.INT && Expr.isChrLiteral(te.expr)) {
-            return new IntLiteral(((ChrLiteral) te.expr).value);
+            IntLiteral i = new IntLiteral(((ChrLiteral) te.expr).value);
+            i.isImmediate = true;
+            return i;
         }
-        te.isImmediate = te.expr.isImmediate;
         return null;
     }
 

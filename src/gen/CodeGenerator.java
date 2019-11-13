@@ -420,27 +420,32 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitArrayAccessExpr(ArrayAccessExpr aae) {
+        comment("array access:");
         Register r = aae.array.accept(this);
+        Register i = aae.index.accept(this);
 
+        if (!aae.index.isImmediate) {
+            comment("load value from " + i);    
+            write(Instruction.lw(i, i));
+        }
+        // TODO finish
+        int size = aae.type.size();
 
-        return null;
+        write(Instruction.mulo(i, i, size));
+        write(Instruction.add(r, r, i));
+
+        freeRegister(i);
+        comment("array accessed!...");
+        return r;
     }
 
     @Override
     public Register visitFieldAccessExpr(FieldAccessExpr fae) {
-        // TODO Auto-generated method stub
         Register r = fae.struct.accept(this);
 
-        // a.b.c
         StructType st = (StructType) fae.struct.type;
         write(Instruction.addi(r, r, st.getFieldOffset(fae.field)));
-        // VarExpr inner = ((VarExpr) fae.getInnermost()).vd;
 
-        // r = fae.getInnermost().accept(this);
-        // // if (inner.global) {
-
-        // // }
-        // write(Instruction.la(r, Register.fp, inner.offset - fae.totalOffset));
         return r;
     }
 
@@ -452,7 +457,6 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitSizeOfExpr(SizeOfExpr soe) {
-        // TODO will always be exaluated beforehand?
         return null;
     }
 
@@ -550,14 +554,30 @@ public class CodeGenerator implements ASTVisitor<Register> {
         comment(a.toString());
         
         // TODO: account for arrays and pointers, not just vars
-        Register r = a.right.accept(this);
         Register l = a.left.accept(this);
+        Register r = a.right.accept(this);
+
+        int size = a.left.type.size();
+        // comment("size of %s = %d", a.left.type, size);
 
         if (!a.right.isImmediate) {
-            write(Instruction.lw(r, r));
+            comment("loaded value of right in assign %s", a.right);
+            switch (size) {
+                case 1: write(Instruction.lb(r, r)); break;
+                case 4: write(Instruction.lw(r, r)); break;
+            
+                default: break;
+            }
+            // write(Instruction.lw(r, r));
         }
 
-        write(Instruction.sw(l, r));
+        switch (size) {
+            case 1: write(Instruction.sb(l, r)); break;
+            case 4: write(Instruction.sw(l, r)); break;
+        
+            default: break;
+        }
+        // write(Instruction.sw(l, r));
 
         nl();
 
