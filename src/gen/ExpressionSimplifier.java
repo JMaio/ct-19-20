@@ -47,6 +47,18 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
     @Override
     public Expr visitFunDecl(FunDecl fd) {
+        
+        for (VarDecl p : fd.params) {
+            int size = p.type.size();
+            // can load char / int onto a register
+            if (fd.regArgs.size() < 4 && size <= 4 && !Type.isPointerType(p.type)) {
+                fd.regArgs.add(p);
+            } else {
+                // only addresses of vars should stored on the stack and accessed later
+                fd.stackArgs.add(p);
+            }
+        }
+
         fd.block.accept(this);
         return null;
     }
@@ -97,12 +109,16 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
         for (Expr arg : simplifiedArgs) {
             int size = arg.type.size();
-            if (size <= 4 && fce.regArgs.size() < 4) {
+            // can load char / int onto a register
+            if (fce.regArgs.size() < 4 && size <= 4 && !Type.isPointerType(arg.type)) {
                 fce.regArgs.add(arg);
             } else {
+                // only addresses of vars should stored on the stack and accessed later
                 fce.stackArgs.add(arg);
             }
         }
+
+        fce.isImmediate = LibFunc.isImmediate(fce.name);
 
         return null;
     }

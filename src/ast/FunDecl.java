@@ -1,5 +1,6 @@
 package ast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class FunDecl implements ASTNode {
@@ -8,6 +9,9 @@ public class FunDecl implements ASTNode {
     public final String name;
     public final List<VarDecl> params;
     public final Block block;
+
+    public List<VarDecl> regArgs = new ArrayList<VarDecl>();
+    public List<VarDecl> stackArgs = new ArrayList<VarDecl>();
 
     public FunDecl(Type type, String name, List<VarDecl> params, Block block) {
         this.type = type;

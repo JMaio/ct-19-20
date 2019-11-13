@@ -208,7 +208,20 @@ public class Instruction {
 
 
     public static String incrementSp(int size) {
-        return addi(Register.sp, Register.sp, size);
+        return addi(Register.sp, Register.sp, -size);
+    }
+
+    public static String decrementSp(int size) {
+        return incrementSp(-size);
+    }
+    
+    
+    public static String incrementFp(int size) {
+        return addi(Register.fp, Register.fp, -size);
+    }
+
+    public static String decrementFp(int size) {
+        return incrementSp(-size);
     }
 
 }

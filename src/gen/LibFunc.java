@@ -28,6 +28,17 @@ public abstract class LibFunc {
         add("mcmalloc");
     }};
 
+    public static boolean isImmediate(String f) {
+        return new ArrayList<String>() {{
+            // add("print_i");
+            // add("print_c");
+            // add("print_s");
+            add("read_i");
+            add("read_c");
+            // add("mcmalloc"); // pointer type
+        }}.contains(f);
+    }
+
     public static boolean isLibFunc(String f) {
         return libFuncs.contains(f);
     }

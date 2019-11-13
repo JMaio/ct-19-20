@@ -1,3 +1,9 @@
+funcall_1.c, PASS, 1, 222
+
+funcall_5.c, PASS, 1;1;1;1;1 , 15; 5; 5
+
+fun_return_struct.c, PASS, , 123456789
+
 arrayaccess.c, PASS, , hello world
 
 dec2bin.c, PASS, 1, 00000001
