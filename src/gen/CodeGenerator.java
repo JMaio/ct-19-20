@@ -289,13 +289,9 @@ public class CodeGenerator implements ASTVisitor<Register> {
         }
 
         if (LibFunc.isLibFunc(fce.name)) {
-            // String i = "    " + fce.name;
-            // String delimiter = "";
-            // System.out.println("function: " +fce.name);
             ArrayList<String> args = new ArrayList<>();
 
             if (fce.args.size() > 0) {
-                // i += "(";
                 for (Expr arg : fce.args) {
                     Register r = arg.accept(this);
                     if (!arg.isImmediate) {
@@ -303,12 +299,34 @@ public class CodeGenerator implements ASTVisitor<Register> {
                     }
                     args.add(r.toString());
                 }
-                // i += ")";
             }
             
             write(Instruction.InstrFmt("%s (%s)", fce.name, String.join(", ", args)));
         } else {
-            // TODO
+            int a = 0;
+            Register prevFp = getRegister();
+            write(Instruction.move(prevFp, Register.fp));
+
+            comment("function call arguments (registers):");
+            for (Expr arg : fce.regArgs) {
+                Register r = arg.accept(this);
+                write(Instruction.move(Register.paramRegs[a], r));
+                freeRegister(r);
+            }
+
+            comment("function call arguments (stack):");
+            int spIncrement = 0;
+            for (Expr arg : fce.stackArgs) {
+                spIncrement += arg.type.size();
+            }
+            write(Instruction.incrementSp(spIncrement));
+
+            int fpIncrement = 0;
+            for (Expr arg : fce.stackArgs) {
+                Register r = arg.accept(this);
+                write(Instruction.move(Register.paramRegs[a], r));
+                freeRegister(r);
+            }
         }
         
         // TODO free temporary registers?
@@ -428,7 +446,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
             comment("load value from " + i);    
             write(Instruction.lw(i, i));
         }
-        // TODO finish
+
         int size = aae.type.size();
 
         write(Instruction.mulo(i, i, size));
@@ -451,7 +469,6 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitValueAtExpr(ValueAtExpr vae) {
-        // TODO Auto-generated method stub
         return null;
     }
 
@@ -462,9 +479,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitTypecastExpr(TypecastExpr te) {
-        // writer.write(s);
         Register r = te.expr.accept(this);
-        // writer.write(te.);
         return r;
     }
 
@@ -476,7 +491,6 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitWhile(While w) {
-        // TODO Auto-generated method stub
         comment(w.toString());
         String loopLabel = uidLabel.mk("while_loop");
         String endLabel = uidLabel.mk("while_end");
@@ -550,10 +564,8 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
     @Override
     public Register visitAssign(Assign a) {
-        // TODO: assign goes to local or global variable?
         comment(a.toString());
         
-        // TODO: account for arrays and pointers, not just vars
         Register l = a.left.accept(this);
         Register r = a.right.accept(this);
 
@@ -577,7 +589,6 @@ public class CodeGenerator implements ASTVisitor<Register> {
         
             default: break;
         }
-        // write(Instruction.sw(l, r));
 
         nl();
 

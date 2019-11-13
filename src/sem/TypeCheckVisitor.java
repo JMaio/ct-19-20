@@ -102,6 +102,7 @@ public class TypeCheckVisitor extends BaseSemanticVisitor<Type> {
 
 				Type paramType = param.type;
 				Type argType = arg.accept(this);
+				arg.type = argType;
 
 				// System.out.println(String.format("expected %s - got %s", paramType, argType));
 

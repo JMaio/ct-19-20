@@ -85,6 +85,25 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
         fce.args = simplifiedArgs;
 
+        // for (int i = 0; i < fce.args.size(); i++) {
+        //     int size = fce.args.get(i).type.size();
+        //     Expr arg = simplifiedArgs.get(i);
+        //     if (size <= 4 && fce.regArgs.size() < 4) {
+        //         fce.regArgs.add(arg);
+        //     } else {
+        //         fce.stackArgs.add(arg);
+        //     }
+        // }
+
+        for (Expr arg : simplifiedArgs) {
+            int size = arg.type.size();
+            if (size <= 4 && fce.regArgs.size() < 4) {
+                fce.regArgs.add(arg);
+            } else {
+                fce.stackArgs.add(arg);
+            }
+        }
+
         return null;
     }
 
@@ -135,6 +154,7 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
 
         if (val != null) {
             IntLiteral i = new IntLiteral(val);
+            i.type = BaseType.INT;
             i.isImmediate = true;
             return i;
         } else {
@@ -169,6 +189,7 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
     @Override
     public Expr visitSizeOfExpr(SizeOfExpr soe) {
         IntLiteral i = new IntLiteral(soe.t.size());
+        i.type = BaseType.INT;
         i.isImmediate = true;
         return i;
     }
@@ -180,6 +201,7 @@ public class ExpressionSimplifier implements ASTVisitor<Expr> {
         te.expr.accept(this);
         if (te.t == BaseType.INT && Expr.isChrLiteral(te.expr)) {
             IntLiteral i = new IntLiteral(((ChrLiteral) te.expr).value);
+            i.type = BaseType.INT;
             i.isImmediate = true;
             return i;
         }
