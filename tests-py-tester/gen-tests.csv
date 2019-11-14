@@ -1,5 +1,7 @@
 funcall_1.c, PASS, 1, 222
 
+tictactoe.c, PASS, ,
+
 funcall_5.c, PASS, 1;1;1;1;1 , 15; 5; 5
 
 fun_return_struct.c, PASS, , 123456789

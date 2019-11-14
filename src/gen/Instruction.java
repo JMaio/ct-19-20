@@ -218,14 +218,27 @@ public class Instruction {
     public static String decrementSp(int size) {
         return incrementSp(-size);
     }
-    
-    
-    public static String incrementFp(int size) {
-        return addi(Register.fp, Register.fp, -size);
-    }
 
-    public static String decrementFp(int size) {
-        return incrementSp(-size);
+    public static String copy(Register srcAddress, Register targetAddress, Register tmp, int size) {
+        String ins = "";
+        for (int i = 0; i < size; i += 4) {
+            ins += 
+            Instruction.lw(tmp, srcAddress) + '\n' +
+            Instruction.sw(targetAddress, tmp) + '\n' +
+            Instruction.addi(srcAddress, 4) + '\n' +
+            Instruction.addi(targetAddress, 4) + '\n'
+            ;
+        }
+        return ins;
     }
+    
+    
+    // public static String incrementFp(int size) {
+    //     return addi(Register.fp, Register.fp, -size);
+    // }
+
+    // public static String decrementFp(int size) {
+    //     return incrementSp(-size);
+    // }
 
 }

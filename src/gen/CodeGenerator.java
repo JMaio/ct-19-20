@@ -68,21 +68,29 @@ public class CodeGenerator implements ASTVisitor<Register> {
         }
     }
 
+    // private Register getRegister(Register r) {
+    //     freeRegs.contains(o);
+    // }
+
     private void freeRegister(Register reg) {
-        if (Register.tmpRegs.contains(reg) && !freeRegs.contains(reg)) {
+        if (Register.tmpRegs.contains(reg)) {
             freeRegs.push(reg);
             regsInUse.remove(reg);
         }
     }
 
     private void restoreUsedRegisters(ArrayList<Register> regs) {
-        freeAllRegisters();
-        freeRegs.addAll(regs);
+        for (Register r : regs) {
+            freeRegs.remove(r);
+        }
+        regsInUse = regs;
+        // freeRegs.removeAll(regs);
     }
 
     private void freeAllRegisters() {
-        freeRegs.removeAllElements();
-        freeRegs.addAll(Register.tmpRegs);
+        for (Register r : Register.tmpRegs) {
+            freeRegister(r);
+        }
     }
 
 
@@ -145,6 +153,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
         // main
         write("main:");
+        write(Instruction.move(Register.fp, Register.sp));
         p.main.block.accept(this);
 
         // write(Instruction.j("exit"));
@@ -195,64 +204,95 @@ public class CodeGenerator implements ASTVisitor<Register> {
         // create the function label
         write("%s:", fd.name);
 
-        int returnSize = fd.type.size();
-        write(Instruction.incrementSp(returnSize));
-        frameOffset -= returnSize;
+        // vars are the first thing to come through
 
-        comment("allocate stack space for vars");
-        for (VarDecl param : fd.params) {
-            param.accept(this);
-            frameOffset -= param.type.size();
+        int returnSize = Type.alignTo4Byte(fd.type.size());
+        write(Instruction.incrementSp(returnSize));
+        frameOffset += returnSize;
+
+        // write(Instruction.incrementSp(4));
+        // write(Instruction.sw(Register.sp, Register.fp));
+        // frameOffset -= 4;
+        ArrayList<Register> regsToSave = new ArrayList<Register>() {{
+            addAll(Register.tmpRegs);
+            add(Register.fp);
+            add(Register.ra);
+        }};
+        
+        write(Instruction.incrementSp(4 * regsToSave.size()));
+        frameOffset += 4 * regsToSave.size();
+
+        int regOff = 0;
+        for (Register r : regsToSave) {
+            write(Instruction.sw(Register.sp, r, regOff));
+            regOff += 4;
         }
         
-        for (Register r : new Register[] {Register.fp, Register.ra}) {
-            comment("save %s", r);
-            write(Instruction.incrementSp(4));
-            frameOffset -= 4;
-            write(Instruction.sw(Register.fp, r, frameOffset));
+        int argOffset = 0;
+        // set the offsets of the args with respect to $fp
+        for (VarDecl param : fd.params) {
+            param.offset = frameOffset + argOffset;
+            argOffset += param.type.size();
         }
 
-        // ArrayList<Register> savedRegs = new ArrayList<>();
-        comment("save temporary registers");    
-        for (Register r : Register.tmpRegs) {
-            write(Instruction.incrementSp(4));
-            frameOffset -= 4;
-            write(Instruction.sw(Register.fp, r, frameOffset));
-            // if (!freeRegs.contains(r)) {
-            //     savedRegs.add(r);
-            // }
-        }
+        // frameOffset += ar
+
+        // set fp at new stack beginning
+        write(Instruction.move(Register.fp, Register.sp));
 
         // store used registers
-        ArrayList<Register> inUse = regsInUse;
+        ArrayList<Register> inUse = new ArrayList<>();
+        inUse.addAll(regsInUse);
         freeAllRegisters();
 
-        fd.block.accept(this);        
+        stackOffset = 0;
 
-        comment("load old $fp");
-        write(Instruction.lw(Register.fp, Register.fp, 4 * 20));
-        
-        int callStackOffset = 0;
-        for (Register r : new Register[] {Register.ra}) {
-            comment("load old %s", r);
-            callStackOffset -= 4;
-            write(Instruction.lw(r, Register.fp, callStackOffset));
-        }
-        comment("load temporary registers");    
-        for (Register r : Register.tmpRegs) {
-            callStackOffset -= 4;
-            write(Instruction.lw(r, Register.fp, callStackOffset));
-        }
-        
-        comment("set new stack pointer location");
-        write(Instruction.decrementSp(callStackOffset));
+        fd.block.accept(this);
 
-        write(Instruction.addi(Register.v0, Register.fp, -returnSize));
+        restoreUsedRegisters(inUse);
+        // regsInUse.clear();
+
+        if (fd.returnExpr != null && !fd.returnExpr.isImmediate) {
+            Register src = getRegister();
+            Register target = getRegister();
+            Register tmp = getRegister();
+            comment("copy return to specified stack space src=%s, dst=%s, tmp=%s", src, target, tmp);
+            write(Instruction.addi(target, Register.fp, frameOffset - returnSize));
+            write(Instruction.move(src, Register.v0));
+            write(Instruction.copy(src, target, tmp, fd.type.size()));
+    
+            freeRegister(src);
+            freeRegister(target);
+            freeRegister(tmp);
+        }
+
+        comment("restore registers");
+
+        // move stack back by variables in func, and params
+        // comment("decrement $sp by %s + %s", argsSize, stackOffset);
+        // write(Instruction.decrementSp(argsSize + stackOffset));        
+        // write(Instruction.decrementSp(argsSize));        
+
+        // decrement
+        write(Instruction.move(Register.sp, Register.fp));
+        // write(Instruction.addi(Register.sp, Register.fp, argsSize));
+
+        regOff = 0;
+        for (Register r : regsToSave) {
+            write(Instruction.lw(r, Register.sp, regOff));
+            regOff += 4;
+        }
+        
+        write(Instruction.decrementSp(regOff));
+
+        if (fd.returnExpr != null && fd.returnExpr.isImmediate) {
+            write(Instruction.sw(Register.sp, Register.v0));
+        }
+        write(Instruction.move(Register.v0, Register.sp));
         // stackOffset = stackOffsets.pop();
         // write(Instruction.move(Register.fp, Register.sp));
 
         // restore registers which were in use
-        restoreUsedRegisters(inUse);
 
         // return
         comment("default return even if one exists");
@@ -370,35 +410,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
             
             write(Instruction.InstrFmt("%s (%s)", fce.name, String.join(", ", args)));
         } else {
-            // which a register to get from the list
-            // int a = 0;
-            // Register prevFp = getRegister();
-            // write(Instruction.move(prevFp, Register.fp));
             
-            // TODO store contents of temp registers
-
-            int returnSize = fce.type.size();            
-            
-
-            // // TODO
-            // if (returnSize > 4) {
-            //     // return type must be passed via stack
-            //     // return value stored at $sp address
-            //     write(Instruction.incrementSp(returnSize));
-            //     write(Instruction.incrementFp(returnSize));
-            //     // only write past the return space 
-            //     // stackOffset += returnSize;
-            //     // framePtr = returnSize;
-            // }    
-            //                                                         $fp
-            //    ------------  return type size + 20 ----------------- |  sum(size(args))
-            // |  return type size  |   1   |   1   |        18         |   args
-            // |    return value    |  $fp  |  $ra  |  $t0-$t... others |   args
-
-
-            // save registers in use
-            // freeAllRegisters();
-
             // TODO Works
             // comment("set new frame pointer location");
             // write(Instruction.move(Register.fp, Register.sp));
@@ -415,7 +427,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
 
                 // get a register with the address
                 Register r = arg.accept(this);
-                int size = arg.type.size();
+                int size = Type.alignTo4Byte(arg.type.size());
 
                 argsOffset -= size;
                 write(Instruction.incrementSp(size));
@@ -425,10 +437,11 @@ public class CodeGenerator implements ASTVisitor<Register> {
                 if (!arg.isImmediate) {
                     write(Instruction.lw(r, r));
                 }
-                write(Instruction.sw(Register.fp, r, argsOffset));
+                write(Instruction.sw(Register.sp, r));
                 // write(Instruction.move(Register.paramRegs[a], r));
                 freeRegister(r);
             }
+            // stackOffset += argsOffset;
             
             // comment("set new frame pointer location");
             // write(Instruction.addi(Register.fp, Register.fp, frameOffset));
@@ -453,7 +466,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
             
         }
         comment("------------- %s () : end call", fce.name);
-        freeAllRegisters();
+        // freeAllRegisters();
         
         // result should have been returned in $v0
         return Register.v0;
@@ -712,15 +725,22 @@ public class CodeGenerator implements ASTVisitor<Register> {
         
             default: {
                 // struct / array - needs to be copied over
-                comment("copying struct over");
                 // int leftIncrement = a.left.isGlobal ? 4 : -4;
                 // comment("left: %s isglobal %s", a.left, a.left.isGlobal);
                 // int rightIncrement = a.right.isGlobal ? 4 : -4;
                 // comment("right: %s isglobal %s", a.right, a.right.isGlobal);
                 // if (a.left.isGlobal) {
-                //     write(Instruction.addi(dest, src, i));
-                // }
+                    //     write(Instruction.addi(dest, src, i));
+                    // }
                 Register s = getRegister();
+                // String st = "";
+                // for (Register reg : freeRegs) {
+                //     st += reg + ", ";
+                // }
+                // System.out.println(st);
+                // System.out.println(String.join(", ", freeRegs));
+                comment("copy return to specified stack space src=%s, dst=%s, tmp=%s", r, l, s);
+                
                 for (int i = 0; i < a.left.type.size(); i += 4) {
                     write(Instruction.lw(s, r));
                     write(Instruction.sw(l, s));
@@ -748,7 +768,9 @@ public class CodeGenerator implements ASTVisitor<Register> {
             // expression evaluated and placed in a register
             Register rReg = r.expr.accept(this);
             // this is the address of the return of the function, so set $v0 to it
+            // if (r.expr.isImmediate) {
             write(Instruction.move(Register.v0, rReg));
+            // }
             // if (r.expr.type.size() <= 4) {
             // } else {
             //     // pass on the stack
@@ -759,9 +781,9 @@ public class CodeGenerator implements ASTVisitor<Register> {
         }
         
         // return in main?
-        if (!r.fd.name.equals("main")) {
-            write(Instruction.jr(Register.ra));
-        }
+        // if (!r.fd.name.equals("main")) {
+        //     write(Instruction.jr(Register.ra));
+        // }
         return null;
     }
 }
