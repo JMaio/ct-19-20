@@ -208,6 +208,7 @@ public class CodeGenerator implements ASTVisitor<Register> {
         // vars are the first thing to come through
 
         int returnSize = Type.alignTo4Byte(fd.type.size());
+        // System.out.println("function return type " + fd.type + " has size : " + returnSize);
         write(Instruction.incrementSp(returnSize));
         frameOffset += returnSize;
 
@@ -235,7 +236,8 @@ public class CodeGenerator implements ASTVisitor<Register> {
         int argOffset = 0;
         // set the offsets of the args with respect to $fp
         for (VarDecl param : fd.params) {
-            param.offset = frameOffset + argOffset + argSize - returnSize;
+            // subtract 4 to get to params
+            param.offset = frameOffset + argOffset + argSize - 4;
             argOffset -= Type.alignTo4Byte(param.type.size());
         }
 
