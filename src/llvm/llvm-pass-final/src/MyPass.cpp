@@ -10,63 +10,59 @@
 
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
+#include "llvm/Transforms/Utils/Local.h"
 
 using namespace llvm;
 using namespace std;
 
 namespace {
-struct CountOp : public FunctionPass {
+struct MyPass : public FunctionPass {
   map<string, int> opCounter;
   static char ID;
-  CountOp() : FunctionPass(ID) {}
+  MyPass() : FunctionPass(ID) {}
 
-  virtual bool runOnFunction(Function &F) {
-    errs() << "Function " << F.getName() << '\n';
+  bool hasDeadInstructions(Function &F) {
+    SmallVector<Instruction*, 64> Worklist;
+
     for (Function::iterator bb = F.begin(), e = F.end(); bb != e; ++bb) {
       for (BasicBlock::iterator i = bb->begin(), e = bb->end(); i != e; ++i) {
-        if (opCounter.find(i->getOpcodeName()) == opCounter.end()) {
-          opCounter[i->getOpcodeName()] = 1;
-        } else {
-          opCounter[i->getOpcodeName()] += 1;
+        Instruction* I = &*i;
+        if (isInstructionTriviallyDead(I)) {
+          Worklist.push_back(I);
         }
       }
     }
 
-    map<string, int>::iterator i = opCounter.begin();
-    map<string, int>::iterator e = opCounter.end();
+    bool cutInstruction = !Worklist.empty();
 
-    while (i != e) {
-      errs() << i->first << ": " << i->second << "\n";
-      i++;
+    while (!Worklist.empty()) {
+        Instruction* i = Worklist.pop_back_val();
+        errs() << "removed instruction " << i->getOpcodeName() << "\n";
+        i->eraseFromParent();
     }
     
-    errs() << "\n";
-    opCounter.clear();
+    return cutInstruction;
+  }
+  
+  virtual bool runOnFunction(Function &F) {
 
-    return false;
+    bool hadDeadCode = false;
+
+    while (hasDeadInstructions(F)) {
+      hadDeadCode = true;
+    }
+    
+    return hadDeadCode;
   }
 };
-
-
-// struct MyPass : public FunctionPass {
-//   static char ID;
-//   MyPass() : FunctionPass(ID) {}
-
-//   int counter = 0;
-
-//   bool runOnFunction(Function &F) override {
-//     errs() << "I saw a function called " << F.getName() << "!\n";
-//     return false;
-//   }
-// };
 }
 
-char CountOp::ID = 0;
-static RegisterPass<CountOp> X("opCounter", "Counts opcodes per functions");
-// static RegisterPass<MyPass> X("mypass", "My liveness analysis and dead code elimination pass");
+char MyPass::ID = 0;
+// static RegisterPass<MyPass> X("opCounter", "Counts opcodes per functions");
+static RegisterPass<MyPass> X("mypass", "My liveness analysis and dead code elimination pass");
 
 static RegisterStandardPasses Y(
     PassManagerBuilder::EP_EarlyAsPossible,
     [](const PassManagerBuilder &Builder,
-       legacy::PassManagerBase &PM) { PM.add(new CountOp()); });
+       legacy::PassManagerBase &PM) { PM.add(new MyPass()); });
 
