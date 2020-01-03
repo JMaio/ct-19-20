@@ -3,6 +3,7 @@
 
 #include "llvm/Pass.h"
 #include "llvm/IR/Function.h"
+#include "llvm/IR/InstIterator.h"
 #include "llvm/Support/raw_ostream.h"
 
 #include "llvm/IR/LegacyPassManager.h"
@@ -37,7 +38,7 @@ struct MyPass : public FunctionPass {
   
   virtual bool runOnFunction(Function &F) {
 
-    bool hadDeadCode = false;
+    bool hadDeadCode, changed = false;
 
     // declare each set
     map<Value*, set<Value*>> def;
@@ -54,6 +55,8 @@ struct MyPass : public FunctionPass {
         for (User::op_iterator u = inst->op_begin(), oe = inst->op_end(); u != oe; ++u) {
           Value* v = u->get();
 
+          
+
           if (isa<Argument>(v) || isa<Instruction>(v)) { 
             // is not a label:
             // %a => Argument
@@ -69,21 +72,21 @@ struct MyPass : public FunctionPass {
     }
 
 
-    for (Function::iterator bb = F.begin(), e = F.end(); bb != e; ++bb) {
-      for (BasicBlock::iterator inst = bb->begin(), e = bb->end(); inst != e; ++inst) {
-        // iterate through operands of instruction (for use set)
-        Instruction* I = &*inst;
-        errs() << *inst << "\n";
+    // for (Function::iterator bb = F.begin(), e = F.end(); bb != e; ++bb) {
+    //   for (BasicBlock::iterator inst = bb->begin(), e = bb->end(); inst != e; ++inst) {
+    //     // iterate through operands of instruction (for use set)
+    //     Instruction* I = &*inst;
+    //     errs() << *inst << "\n";
 
-        errs() << "Def: ";
-        printSet(def[I]);
+    //     errs() << "Def: ";
+    //     printSet(def[I]);
 
-        errs() << "Use: ";
-        printSet(use[I]);
+    //     errs() << "Use: ";
+    //     printSet(use[I]);
         
-        errs() << "\n";
-      }
-    }
+    //     errs() << "\n";
+    //   }
+    // }
 
 
     map<Value*, set<Value*>> in;
@@ -92,21 +95,67 @@ struct MyPass : public FunctionPass {
     map<Value*, set<Value*>> in_prev;
     map<Value*, set<Value*>> out_prev;
 
-    set<Value*> tmp;
+    // Instruction* prev_inst;
 
     do {
-      // store previous "in" to use as "out" set
+      // assume no changes
+      changed = false;
+      
+      // previous "in" set
+      set<Value*> tmp;
+      
+      // iterate through instructions in reverse
+      for (inst_iterator B = inst_begin(F), inst = inst_end(F); inst != B;) {
+        inst--;
+        Instruction* I = &*inst;
+        
+        // save previous sets
+        in_prev[I] = in[I];
+        out_prev[I] = out[I];
+        
+        // calculate in / out sets
+        out[I] = tmp;
 
-      for (Function::iterator bb = F.begin(), e = F.end(); bb != e; ++bb) {
-        for (BasicBlock::iterator i = bb->end(), top = bb->begin(); i != top; --i) {
-          Instruction* I = &*i;
+        set<Value*> delta, res;
+        // delta = out[n] - def[n]
+        set_difference(out[I].begin(), out[I].end(),
+                       def[I].begin(), def[I].end(),
+                       inserter(delta, delta.begin()));
+        // in[n] = res = use[n] U delta
+        set_union(
+          // first set
+          use[I].begin(), use[I].end(),
+          // second set
+          delta.begin(), delta.end(),
+          // insert into destination
+          inserter(res, res.begin())
+        );
 
-
-        }
+        in[I] = res;
+        tmp = in[I];
       }
 
-      hadDeadCode = false;
-    } while (hadDeadCode /* sets are not equal*/);
+
+      // final output
+      for (inst_iterator inst = inst_begin(F), E = inst_end(F); inst != E; ++inst) {
+        Instruction* I = &*inst;
+        if (isa<PHINode>(I)) {
+          continue;
+        }
+        // errs() << "printing set: \n";
+        errs() << "\n";
+        printSet(in[I]);
+        errs() << *I << "\n";
+        printSet(out[I]);
+
+
+        changed |= (in[I] != in_prev[I]) || (out[I] != out_prev[I]);
+      }
+
+      errs() << "\n";
+
+      
+    } while (changed /* sets are not equal*/);
 
     // // while (hasDeadInstructions(F)) {
     // //   hadDeadCode = true;
