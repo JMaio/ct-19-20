@@ -39,7 +39,6 @@ struct MyPass : public FunctionPass {
   // phi-node parent block, incoming block
   map<BasicBlock*, map<BasicBlock*, set<Value*>>> blockPhiUse;
   map<BasicBlock*, set<Value*>> blockPhiDef;
-  map<BasicBlock*, set<Value*>> blockOuts;
 
 
   void printSet(set<Value*> s) {
@@ -56,22 +55,63 @@ struct MyPass : public FunctionPass {
 
   bool runOnFunction(Function &F) override {
     // compute the sets
-    computeLiveness(F);
-    
-    if (debug) {
-      for (inst_iterator inst = inst_begin(F), e = inst_end(F); inst != e; inst++) {
-        printSet(def[&*inst]);
-      }
-      errs() << "\n";
+    do {
+      computeLiveness(F);
 
-      for (inst_iterator inst = inst_begin(F), e = inst_end(F); inst != e; inst++) {
-        printSet(use[&*inst]);
+      if (debug) {
+        errs() << "computed liveness\n";
+
+        for (inst_iterator inst = inst_begin(F), e = inst_end(F); inst != e; inst++) {
+          printSet(def[&*inst]);
+        }
+        errs() << "\n";
+
+        for (inst_iterator inst = inst_begin(F), e = inst_end(F); inst != e; inst++) {
+          printSet(use[&*inst]);
+        }
+        errs() << "\n";
       }
-      errs() << "\n";
-    }
+    } while (removeDeadCode(F));
     
     printLiveness(F);
+
     return true;
+  }
+
+  bool isInstructionDeadAndRemovable(Instruction* I) {
+    return 
+      out[I].find(I) == out[I].end()
+      &&
+      !I->isTerminator()
+      &&
+      !I->mayHaveSideEffects()
+    ;
+  }
+
+  bool removeDeadCode(Function &F) {
+    SmallVector<Instruction*, 16> Worklist;
+
+    for (Function::iterator bb = F.begin(), e = F.end(); bb != e; ++bb) {
+      for (BasicBlock::iterator i = bb->begin(), e = bb->end(); i != e; ++i) {
+        Instruction* I = &*i;
+
+        if (isInstructionDeadAndRemovable(I)) {
+          Worklist.push_back(I);
+        }
+      }
+    }
+
+    bool cutInstruction = !Worklist.empty();
+
+    while (!Worklist.empty()) {
+        Instruction* i = Worklist.pop_back_val();
+        if (debug) {
+          errs() << "removed instruction " << i->getOpcodeName() << "\n";
+        }
+        i->eraseFromParent();
+    }
+    
+    return cutInstruction;
   }
   
   void printLiveness(Function &F) {
@@ -83,7 +123,6 @@ struct MyPass : public FunctionPass {
         
         errs() << "{";
         
-        // /* UNCOMMENT AND ADAPT FOR YOUR "IN" SET
         auto operatorSet = in[&*i];
         for (auto oper = operatorSet.begin(); oper != operatorSet.end(); oper++) {
           auto op = *oper;
@@ -91,7 +130,6 @@ struct MyPass : public FunctionPass {
             errs() << ", ";
           (*oper)->printAsOperand(errs(), false);
         }
-        // */
         
         errs() << "}\n";
       }
@@ -100,6 +138,15 @@ struct MyPass : public FunctionPass {
   }
 
   bool computeLiveness(Function &F) {
+    // -- reset sets --
+            def.clear();
+            use.clear();
+             in.clear();
+            out.clear();
+        in_prev.clear();
+       out_prev.clear();
+    blockPhiUse.clear();
+    blockPhiDef.clear();
 
     bool hadDeadCode, changed = false;
 
@@ -107,8 +154,6 @@ struct MyPass : public FunctionPass {
     for (Function::iterator bb = F.begin(), e = F.end(); bb != e; ++bb) {
       for (BasicBlock::iterator inst = bb->begin(), e = bb->end(); inst != e; ++inst) {
         Instruction* I = &*inst;
-        // errs() << "--------------------------------------------------------------------\n";
-        // errs() << "inst: " << *I << "\n";
 
         if (isa<PHINode>(I)) {
           // phi node has predecessors - result depends on which one 
@@ -118,18 +163,13 @@ struct MyPass : public FunctionPass {
           
           // technically a use but actually a value?
           for (Use &u : pnode->incoming_values()) {
-            // errs() << " phi --> " << *u << "\n";
-            // BasicBlock* parentBlock = dyn_cast<BasicBlock>(&*u);
-            // errs() << "def instruction: " << u << "\n";
-            // errs() << "def instruction: " << *u << "\n";
-            
 
             if (isa<Argument>(u) || isa<Instruction>(u)) {
               BasicBlock* b = pnode->getIncomingBlock(u);
               
               blockPhiUse[I->getParent()][b].insert(u);
               
-              if (isa<Instruction>(*u)) {
+              if (isa<Instruction>(u)) {
                 def[u].insert(u);
                 // store the value in the origin (predecessor) block
               }
@@ -142,7 +182,6 @@ struct MyPass : public FunctionPass {
               // only considered use if not defined in the same block
               if (b != pnode->getParent()) {
                 use[I].insert(u);
-                // blockOuts[b].insert(u);
               }
             }
           }
@@ -158,22 +197,19 @@ struct MyPass : public FunctionPass {
               use[I].insert(v);
               // if instruction, must have definition point at that instruction:
               if (isa<Instruction>(*v)) {
-                // errs() << "--- " << v << " into " << &*v << "\n";
                 def[&*v].insert(v);
-                // blockDefs[I->getParent()].insert(v);
               }
             }
           }
         }
       }
     }
-
+    // calculate in and out sets
     do {
       // assume no changes
       changed = false;
       
-      // previous "in" set
-      // set<Value*> succ_in;
+      // store previous instruction
       Instruction* prevInst;
 
       // iterate through instructions in reverse
@@ -196,34 +232,7 @@ struct MyPass : public FunctionPass {
         // if not terminator -> use previous in set
 
         // out set ------------------------
-        // set<Instruction*> succ;
-        // set<PHINode*> PHIsucc;
-
-        // if (I->isTerminator()) {
-        //   // this node has one or more outward edges to other blocks
-        //   for (int i = 0; i < I->getNumSuccessors(); ++i) {
-        //     BasicBlock* bb = I->getSuccessor(i);
-        //     BasicBlock::iterator blockIter = bb->begin();
-
-        //     // Instruction* succInst = ;
-        //     // store successor instruction(s)
-        //     succ.insert(&*blockIter);
-
-        //     // if this is a phi node, find the next non-phi node instruction and store the phi nodes in between
-        //     while (isa<PHINode>(&*blockIter) && blockIter != bb->end()) {
-        //       blockIter++;
-        //       PHIsucc.insert(dyn_cast<PHINode>(&*blockIter));
-        //     }  
-        //   }
-        // } else {
-        //   succ.insert(prevInst);
-        // }
-        // // } else {
-        //   out[I] = tmp;
-        // }
-
         set<Value*> out_i;
-        // set<Instruction*> succ;
 
         if (debug) {
           errs() << "--------------------------------------------------------------------\n";
@@ -235,7 +244,6 @@ struct MyPass : public FunctionPass {
           errs() << "\n";
         }
 
-        // set<Value*> phiExclude;
         if (I->isTerminator()) {
           // remember values used in successor blocks' phi node
           // multiple successors possible
@@ -246,20 +254,17 @@ struct MyPass : public FunctionPass {
               errs() << "----------------------------------------------\n";
               errs() << *bb << "\n";
             }
-            // for each successor block, find the "in" set
-            // skip phis
+
             BasicBlock::iterator blockIter = bb->begin();
             while (isa<PHINode>(&*blockIter) && blockIter != bb->end()) {
               // blockPhiDefs[bb].insert(&*blockIter);
               // skip phi nodes
               ++blockIter;
             }
+
             Value* startInstruction = &*blockIter;
             set<Value*> succIn = in[startInstruction];
             set<Value*> succOut = out[startInstruction];
-
-            // first non-phi node
-            // succ.insert(&*blockIter);
 
             if (debug) {
               // errs() << "block starting instruction:\n";
@@ -273,21 +278,10 @@ struct MyPass : public FunctionPass {
               printSet(blockPhiUse[bb][I->getParent()]);
               errs() << "block phi def: ";
               printSet(blockPhiDef[bb]);
-              errs() << "block phi out set: ";
-              printSet(blockOuts[bb]);
             }
-            
-            // // remove block phi out
-            // set_difference(
-            //   out_i.begin(), out_i.end(),
-            //   // succIn.begin(), succIn.end(),
-            //   blockOuts[I->getParent()].begin(), blockOuts[I->getParent()].end(),
-            //   inserter(out_i, out_i.begin())
-            // );
 
             // remove phi definitions
             set<Value*> delta;
-            //   blockPhiDef[bb].begin(), blockPhiDef[bb].end(),
             set_difference(
               succIn.begin(), succIn.end(),
               blockPhiDef[bb].begin(), blockPhiDef[bb].end(),
@@ -301,16 +295,13 @@ struct MyPass : public FunctionPass {
               // succIn.begin(), succIn.end(),
               inserter(out_i, out_i.begin())
             );
-
-
-            // out_i.insert(succIn.begin(), succIn.end());
           }
+
           out[I] = out_i;
         } else {
           // only one successor: the previous instruction
           out[I] = in[prevInst];
         }
-        
 
         // in set -------------------------
         set<Value*> delta, res;
@@ -339,8 +330,6 @@ struct MyPass : public FunctionPass {
         }
 
         in[I] = res;
-        // save this "in" set for the next "out" set
-        // pre = in[I];
   
         // remember this as the "previous" instruction
         prevInst = I;
@@ -348,22 +337,6 @@ struct MyPass : public FunctionPass {
         changed |= (in[I] != in_prev[I]) || (out[I] != out_prev[I]);
       }
 
-      // // // final output
-      // for (inst_iterator inst = inst_begin(F), E = inst_end(F); inst != E; ++inst) {
-      // //   Instruction* I = &*inst;
-      // //   if (isa<PHINode>(I)) {
-      // //     continue;
-      // //   }
-      // //   // errs() << "printing set: \n";
-      // //   // errs() << "\n";
-      // //   // printSet(in[I]);
-      // //   // errs() << *I << "\n";
-      // //   // printSet(out[I]);
-
-
-      // }
-
-      // // // errs() << "\n";
       if (debug) {
         errs() << "loop - changed = " << changed << "\n";
         errs() << "====================================================\n";
