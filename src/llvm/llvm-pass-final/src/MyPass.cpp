@@ -24,7 +24,7 @@ struct MyPass : public FunctionPass {
   static char ID;
   MyPass() : FunctionPass(ID) {}
 
-  bool debug = true;
+  bool debug = false;
 
   // declare each set
   map<Value*, set<Value*>> def;
@@ -36,7 +36,11 @@ struct MyPass : public FunctionPass {
   map<Value*, set<Value*>> in_prev;
   map<Value*, set<Value*>> out_prev;
 
-  map<PHINode*, map<BasicBlock*, set<Value*>>> phiNodes;
+  // phi-node parent block, incoming block
+  map<BasicBlock*, map<BasicBlock*, set<Value*>>> blockPhiUse;
+  map<BasicBlock*, set<Value*>> blockPhiDef;
+  map<BasicBlock*, set<Value*>> blockOuts;
+
 
   void printSet(set<Value*> s) {
     string de = "";
@@ -54,15 +58,17 @@ struct MyPass : public FunctionPass {
     // compute the sets
     computeLiveness(F);
     
-    for (inst_iterator inst = inst_begin(F), e = inst_end(F); inst != e; inst++) {
-      printSet(def[&*inst]);
-    }
-    errs() << "\n";
+    if (debug) {
+      for (inst_iterator inst = inst_begin(F), e = inst_end(F); inst != e; inst++) {
+        printSet(def[&*inst]);
+      }
+      errs() << "\n";
 
-    for (inst_iterator inst = inst_begin(F), e = inst_end(F); inst != e; inst++) {
-      printSet(use[&*inst]);
+      for (inst_iterator inst = inst_begin(F), e = inst_end(F); inst != e; inst++) {
+        printSet(use[&*inst]);
+      }
+      errs() << "\n";
     }
-    errs() << "\n";
     
     printLiveness(F);
     return true;
@@ -108,18 +114,36 @@ struct MyPass : public FunctionPass {
           // phi node has predecessors - result depends on which one 
           PHINode* pnode = dyn_cast<PHINode>(I);
           
+          blockPhiDef[I->getParent()].insert(pnode);
+          
           // technically a use but actually a value?
           for (Use &u : pnode->incoming_values()) {
             // errs() << " phi --> " << *u << "\n";
+            // BasicBlock* parentBlock = dyn_cast<BasicBlock>(&*u);
+            // errs() << "def instruction: " << u << "\n";
+            // errs() << "def instruction: " << *u << "\n";
+            
+
             if (isa<Argument>(u) || isa<Instruction>(u)) {
-              use[I].insert(u);
+              BasicBlock* b = pnode->getIncomingBlock(u);
+              
+              blockPhiUse[I->getParent()][b].insert(u);
+              
               if (isa<Instruction>(*u)) {
-                // errs() << " phi: " << u << " into " << &*u << "\n";
-                def[&*u].insert(u);
+                def[u].insert(u);
+                // store the value in the origin (predecessor) block
               }
-              // BasicBlock* b = pnode->getIncomingBlock(u);
-              // // store the origin (predecessor) value in the set of possible origins (predecessors) from this block
-              // phiNodes[pnode][b].insert(u);
+              if (debug) {
+                errs() << "current block: " << b << "\n";
+                errs() << " parent block: " << dyn_cast<Instruction>(u)->getParent() << "\n";
+                errs() << "phi par block: " << pnode->getParent() << "\n";
+              }
+
+              // only considered use if not defined in the same block
+              if (b != pnode->getParent()) {
+                use[I].insert(u);
+                // blockOuts[b].insert(u);
+              }
             }
           }
         } else {
@@ -136,6 +160,7 @@ struct MyPass : public FunctionPass {
               if (isa<Instruction>(*v)) {
                 // errs() << "--- " << v << " into " << &*v << "\n";
                 def[&*v].insert(v);
+                // blockDefs[I->getParent()].insert(v);
               }
             }
           }
@@ -203,14 +228,19 @@ struct MyPass : public FunctionPass {
         if (debug) {
           errs() << "--------------------------------------------------------------------\n";
           errs() << "inst: " << *I << "\n";
+          errs() << "use: ";
+          printSet(use[I]);
+          errs() << "def: ";
+          printSet(def[I]);
+          errs() << "\n";
         }
 
-        set<Value*> phiExclude;
+        // set<Value*> phiExclude;
         if (I->isTerminator()) {
+          // remember values used in successor blocks' phi node
           // multiple successors possible
           for (BasicBlock* bb : successors(I)) {
             // store which values are defined in this block via phi node
-            set<Value*> blockPhiDefs;
 
             if (debug) {
               errs() << "----------------------------------------------\n";
@@ -220,31 +250,59 @@ struct MyPass : public FunctionPass {
             // skip phis
             BasicBlock::iterator blockIter = bb->begin();
             while (isa<PHINode>(&*blockIter) && blockIter != bb->end()) {
-              blockPhiDefs.insert(&*blockIter);
+              // blockPhiDefs[bb].insert(&*blockIter);
               // skip phi nodes
-              blockIter++;
+              ++blockIter;
             }
+            Value* startInstruction = &*blockIter;
+            set<Value*> succIn = in[startInstruction];
+            set<Value*> succOut = out[startInstruction];
+
             // first non-phi node
             // succ.insert(&*blockIter);
-            set<Value*> succIn = in[&*blockIter];
-            set<Value*> succOut = out[&*blockIter];
 
             if (debug) {
               // errs() << "block starting instruction:\n";
               errs() << "block starting instruction:\n";
-              errs() << *blockIter << "\n";
-              errs() << "block in set: ";
+              errs() << *startInstruction << "\n";
+              errs() << "start instruction in set: ";
               printSet(succIn);
-              errs() << "block out set: ";
+              errs() << "                 out set: ";
               printSet(succOut);
-              errs() << "block phi set: ";
-              printSet(blockPhiDefs);
+              errs() << "block phi use: ";
+              printSet(blockPhiUse[bb][I->getParent()]);
+              errs() << "block phi def: ";
+              printSet(blockPhiDef[bb]);
+              errs() << "block phi out set: ";
+              printSet(blockOuts[bb]);
             }
+            
+            // // remove block phi out
+            // set_difference(
+            //   out_i.begin(), out_i.end(),
+            //   // succIn.begin(), succIn.end(),
+            //   blockOuts[I->getParent()].begin(), blockOuts[I->getParent()].end(),
+            //   inserter(out_i, out_i.begin())
+            // );
+
+            // remove phi definitions
+            set<Value*> delta;
+            //   blockPhiDef[bb].begin(), blockPhiDef[bb].end(),
             set_difference(
               succIn.begin(), succIn.end(),
-              blockPhiDefs.begin(), blockPhiDefs.end(),
+              blockPhiDef[bb].begin(), blockPhiDef[bb].end(),
+              inserter(delta, delta.begin())
+            );
+            
+            // add to this set the vars needed for successor phis
+            set_union(
+              delta.begin(), delta.end(),
+              blockPhiUse[bb][I->getParent()].begin(), blockPhiUse[bb][I->getParent()].end(),
+              // succIn.begin(), succIn.end(),
               inserter(out_i, out_i.begin())
             );
+
+
             // out_i.insert(succIn.begin(), succIn.end());
           }
           out[I] = out_i;
@@ -306,14 +364,12 @@ struct MyPass : public FunctionPass {
       // }
 
       // // // errs() << "\n";
-
-      errs() << "loop - changed = " << changed << "\n";
+      if (debug) {
+        errs() << "loop - changed = " << changed << "\n";
+        errs() << "====================================================\n";
+      }
       
     } while (changed /* sets are not equal*/);
-
-    // // while (hasDeadInstructions(F)) {
-    // //   hadDeadCode = true;
-    // // }
     
     return hadDeadCode;
   }
