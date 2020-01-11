@@ -55,7 +55,11 @@ struct MyPass : public FunctionPass {
 
   bool runOnFunction(Function &F) override {
     // compute the sets
-    do {
+    computeLiveness(F);
+    // print first-run liveness set (before any code elimination)
+    printLiveness(F);
+
+    while (removeDeadCode(F)) {
       computeLiveness(F);
 
       if (debug) {
@@ -71,9 +75,7 @@ struct MyPass : public FunctionPass {
         }
         errs() << "\n";
       }
-    } while (removeDeadCode(F));
-    
-    printLiveness(F);
+    }
 
     return true;
   }
