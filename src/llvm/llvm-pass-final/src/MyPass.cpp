@@ -129,7 +129,7 @@ struct MyPass : public FunctionPass {
         for (auto oper = operatorSet.begin(); oper != operatorSet.end(); oper++) {
           auto op = *oper;
           if (oper != operatorSet.begin())
-            errs() << ", ";
+            errs() << ",";
           (*oper)->printAsOperand(errs(), false);
         }
         
