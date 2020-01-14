@@ -51,32 +51,6 @@ struct MyPass : public FunctionPass {
     while (hasDeadInstructions(F)) {
       hadDeadCode = true;
     }
-
-    // errs() << "Function " << F.getName() << '\n';
-    // for (Function::iterator bb = F.begin(), e = F.end(); bb != e; ++bb) {
-    //   for (BasicBlock::iterator i = bb->begin(), e = bb->end(); i != e; ++i) {
-    //     // if (opCounter.find(i->getOpcodeName()) == opCounter.end()) {
-    //     //   opCounter[i->getOpcodeName()] = 1;
-    //     // } else {
-    //     //   opCounter[i->getOpcodeName()] += 1;
-    //     // }
-
-    //     Instruction* I = &*i;
-    //     if (isInstructionTriviallyDead(I)) {
-    //       Worklist.push_back(I);
-    //     }
-    //   }
-    // }
-
-    // // has it been modified?
-    // bool cutInstruction = !Worklist.empty();
-
-    // while (!Worklist.empty()) {
-    //     Instruction* i = Worklist.pop_back_val();
-    //     /* std::cout << *it; ... */
-    //     errs() << "removed instruction " << i->getOpcodeName() ;
-    //     i->eraseFromParent();
-    // }
     
     return hadDeadCode;
   }
@@ -87,8 +61,8 @@ char MyPass::ID = 0;
 // static RegisterPass<MyPass> X("opCounter", "Counts opcodes per functions");
 static RegisterPass<MyPass> X("mypass", "My liveness analysis and dead code elimination pass");
 
-static RegisterStandardPasses Y(
-    PassManagerBuilder::EP_EarlyAsPossible,
-    [](const PassManagerBuilder &Builder,
-       legacy::PassManagerBase &PM) { PM.add(new MyPass()); });
+// static RegisterStandardPasses Y(
+//     PassManagerBuilder::EP_EarlyAsPossible,
+//     [](const PassManagerBuilder &Builder,
+//        legacy::PassManagerBase &PM) { PM.add(new MyPass()); });
 
